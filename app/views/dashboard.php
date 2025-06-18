@@ -27,7 +27,7 @@ $show_message_form = isset($_GET['offer_id'], $_GET['receiver_id']);
 // Handle AJAX request to mark messages as read
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'mark_read') {
     header('Content-Type: application/json');
-    if (!verifyCsrfToken($_POST['csrf_token'])) {
+    if (!validateCsrfToken($_POST['csrf_token'])) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'CSRF token verification failed']);
         exit;
