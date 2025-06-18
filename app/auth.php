@@ -37,8 +37,19 @@ function sendVerificationEmail($email, $token) {
     $headers[] = "MIME-Version: 1.0";
     $headers[] = "Content-Type: text/plain; charset=UTF-8";
 
-    // Use mail() without suppressing errors to surface any potential issues
-    mail($email, $subject, $message, implode("\r\n", $headers));
+    // Attempt to send the email. If this fails, store the email contents so the
+    // verification link can still be accessed manually.
+    $sent = mail($email, $subject, $message, implode("\r\n", $headers));
+    if (!$sent) {
+        $dir = __DIR__ . '/sent_emails';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        $safeEmail = preg_replace('/[^a-zA-Z0-9_]+/', '_', $email);
+        $filename = $dir . '/verification_' . $safeEmail . '_' . time() . '.txt';
+        $content  = "To: $email\nSubject: $subject\n\n$message";
+        file_put_contents($filename, $content);
+    }
 }
 
 function emailDomainExists($email) {
