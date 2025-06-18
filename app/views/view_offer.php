@@ -19,6 +19,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/lightgallery.min.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -76,7 +77,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-roboto">
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-roboto">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php

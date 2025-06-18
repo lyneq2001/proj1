@@ -15,6 +15,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     <link rel="stylesheet" href="styles.css">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -30,7 +31,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         }
     </script>
 </head>
-<body class="bg-gray-50 font-roboto">
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-white font-roboto">
     <?php include 'header.php'; ?>
     
     <main class="relative">

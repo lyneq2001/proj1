@@ -37,7 +37,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
     <?php include 'header.php'; ?>
     
     <div class="container mx-auto px-4 py-8">
