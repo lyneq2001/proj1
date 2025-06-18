@@ -33,6 +33,17 @@ function sendVerificationEmail($email, $token) {
     @mail($email, $subject, $message);
 }
 
+function emailDomainExists($email) {
+    $domain = substr(strrchr($email, '@'), 1);
+    return checkdnsrr($domain, 'MX') || checkdnsrr($domain, 'A');
+}
+
+function isValidPassword($password) {
+    return strlen($password) >= 6 &&
+           preg_match('/[A-Za-z]/', $password) &&
+           preg_match('/[0-9]/', $password);
+}
+
 function register($username, $email, $password) {
     global $pdo;
     // Validate inputs
@@ -40,12 +51,23 @@ function register($username, $email, $password) {
         setFlashMessage('error', 'Invalid email format.');
         return;
     }
-    if (strlen($password) < 8) {
-        setFlashMessage('error', 'Password must be at least 8 characters.');
+    if (!emailDomainExists($email)) {
+        setFlashMessage('error', 'Email domain does not exist.');
+        return;
+    }
+    if (!isValidPassword($password)) {
+        setFlashMessage('error', 'Password must be at least 6 characters and include a letter and a number.');
         return;
     }
     if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
         setFlashMessage('error', 'Username can only contain letters, numbers, and underscores.');
+        return;
+    }
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    if ($stmt->fetchColumn() > 0) {
+        setFlashMessage('error', 'Adres email jest już zajęty.');
         return;
     }
 
