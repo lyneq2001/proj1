@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Offer - Apartment Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            600: '#1D4ED8',
+                            700: '#1E40AF',
+                        },
+                        secondary: {
+                            500: '#6B7280',
+                            600: '#4B5563',
+                        },
+                        accent: {
+                            500: '#10B981',
+                            600: '#059669',
+                        },
+                        dark: '#111827',
+                        light: '#F9FAFB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .form-section {
+            transition: all 0.3s ease;
+        }
+        .form-section:hover {
+            transform: translateY(-2px);
+        }
+        .checkbox-label {
+            transition: all 0.2s ease;
+        }
+        .checkbox-label:hover {
+            background-color: #F3F4F6;
+        }
+        .image-preview-container {
+            transition: all 0.2s ease;
+        }
+        .image-preview-container:hover {
+            transform: scale(1.02);
+        }
+        .image-preview-container.primary {
+            box-shadow: 0 0 0 3px #1D4ED8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <?php include 'header.php'; ?>
+    <main class="container mx-auto px-4 py-8">
+        <?php
+        $flash = getFlashMessage();
+        if ($flash):
+        ?>
+            <div class="mb-6 p-4 rounded-lg shadow <?php echo $flash['type'] === 'error' ? 'bg-red-100 text-red-700 border-l-4 border-red-500' : 'bg-green-100 text-green-700 border-l-4 border-green-500'; ?> flex items-start">
+                <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
+                </svg>
+                <div><?php echo htmlspecialchars($flash['message']); ?></div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!isLoggedIn()): ?>
+            <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-card text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-dark mb-2">You must be logged in</h2>
+                <p class="text-secondary-500 mb-6">Please log in to add new property offers.</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="index.php?action=login" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
+                        Login
+                    </a>
+                    <a href="index.php?action=register" class="px-6 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
+                        Register
+                    </a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-8 text-center">
+                    <h1 class="text-3xl font-bold text-dark mb-2">Add New Property</h1>
+                    <p class="text-secondary-500">Fill in the details about your property to create a listing</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                    <input type="hidden" name="primary_image" id="primary_image" value="0">
+
+                    <!-- Basic Information Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            Basic Information
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Title*</label>
+                                <input type="text" name="title" placeholder="e.g. Modern apartment in city center" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Property Type*</label>
+                                <select name="building_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <option value="" disabled selected>Select type</option>
+                                    <option value="apartment">Apartment</option>
+                                    <option value="block">Residential Block</option>
+                                    <option value="house">Detached House</option>
+                                    <option value="studio">Studio</option>
+                                    <option value="loft">Loft</option>
+                                </select>
+                            </div>
+                            <div class="mb-4 md:col-span-2">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Description*</label>
+                                <textarea name="description" placeholder="Describe your property in detail..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="4" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Location Details
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">City*</label>
+                                <input type="text" name="city" id="city" placeholder="e.g. Warsaw" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Street*</label>
+                                <input type="text" name="street" id="street" placeholder="e.g. Main Street 14" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Size Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Pricing & Size
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Price (PLN)*</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-secondary-500">PLN</span>
+                                    <input type="number" step="1" name="price" placeholder="e.g. 2500" class="w-full pl-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Size (m²)*</label>
+                                <div class="relative">
+                                    <span class="absolute right-3 top-3 text-secondary-500">m²</span>
+                                    <input type="number" name="size" placeholder="e.g. 65" class="w-full pr-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Floor</label>
+                                <input type="number" name="floor" placeholder="e.g. 3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Features Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Property Features
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Rooms*</label>
+                                <select name="rooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5+">5+</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Bathrooms*</label>
+                                <select name="bathrooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4+">4+</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Heating Type*</label>
+                                <select name="heating_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="gas">Gas</option>
+                                    <option value="electric">Electric</option>
+                                    <option value="district">District</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Condition*</label>
+                                <select name="condition_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="new">New</option>
+                                    <option value="renovated">Renovated</option>
+                                    <option value="used">Used</option>
+                                    <option value="to_renovate">To Renovate</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Year Built</label>
+                                <input type="number" name="year_built" placeholder="e.g. 2010" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Available From</label>
+                                <input type="date" name="available_from" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amenities Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Amenities
+                        </h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="has_balcony" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Balcony</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="has_elevator" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Elevator</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="parking" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Parking</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="garage" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Garage</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="garden" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Garden</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="furnished" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Furnished</span>
+                            </label>
+                            <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="pets_allowed" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Pets Allowed</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Images Section -->
+                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                        <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Property Images
+                        </h2>
+                        <div class="mb-4">
+                            <label class="block text-secondary-600 text-sm font-medium mb-1">Upload Images (JPEG/PNG, max 5)*</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="images" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        <p class="text-sm text-secondary-500">
+                                            <span class="font-semibold">Click to upload</span> or drag and drop
+                                        </p>
+                                        <p class="text-xs text-secondary-400">JPEG or PNG (MAX. 5MB each)</p>
+                                    </div>
+                                    <input id="images" name="images[]" type="file" accept="image/jpeg,image/png" multiple onchange="updatePrimaryImageOptions()" class="hidden" required>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <p class="text-secondary-500 text-sm">Click an image to set it as primary (displayed first)</p>
+                        </div>
+                        <div id="image-preview" class="flex flex-wrap gap-4 mt-2"></div>
+                    </div>
+
+                    <!-- Submit Section -->
+                    <div class="flex justify-end space-x-4">
+                        <a href="index.php?action=dashboard" class="px-6 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
+                            Cancel
+                        </a>
+                        <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add Property Offer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        <?php endif; ?>
+    </main>
+</body>
+</html>
+
+<script>
+    function updatePrimaryImageOptions() {
+        const imageInput = document.getElementById('images');
+        const previewContainer = document.getElementById('image-preview');
+        const primaryImageInput = document.getElementById('primary_image');
+        previewContainer.innerHTML = '';
+        
+        if (imageInput.files.length > 5) {
+            alert('You can upload maximum 5 images');
+            imageInput.value = '';
+            return;
+        }
+
+        for (let i = 0; i < imageInput.files.length; i++) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = `relative cursor-pointer image-preview-container ${i === 0 ? 'primary' : ''}`;
+                imgContainer.style.width = '150px';
+                imgContainer.style.height = '150px';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-full object-cover rounded-lg';
+                img.alt = 'Property image ' + (i + 1);
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-black/20 rounded-lg opacity-0 hover:opacity-100 transition flex items-center justify-center';
+                
+                const checkIcon = document.createElement('div');
+                checkIcon.className = 'bg-white rounded-full p-1';
+                checkIcon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                `;
+                
+                overlay.appendChild(checkIcon);
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(overlay);
+                
+                imgContainer.addEventListener('click', () => {
+                    // Remove primary class from all images
+                    previewContainer.querySelectorAll('.image-preview-container').forEach(container => {
+                        container.classList.remove('primary');
+                    });
+                    // Add primary class to clicked image
+                    imgContainer.classList.add('primary');
+                    // Update hidden input
+                    primaryImageInput.value = i;
+                });
+                
+                previewContainer.appendChild(imgContainer);
+            };
+            reader.readAsDataURL(imageInput.files[i]);
+        }
+        
+        // Set first image as primary by default
+        if (imageInput.files.length > 0) {
+            primaryImageInput.value = 0;
+        }
+    }
+
+    // Drag and drop functionality
+    const dropArea = document.querySelector('label[for="images"]');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropArea.classList.add('border-primary-600', 'bg-gray-100');
+    }
+
+    function unhighlight() {
+        dropArea.classList.remove('border-primary-600', 'bg-gray-100');
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        document.getElementById('images').files = files;
+        updatePrimaryImageOptions();
+    }
+</script>
