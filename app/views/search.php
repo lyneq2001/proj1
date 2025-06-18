@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -63,7 +64,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
+<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php

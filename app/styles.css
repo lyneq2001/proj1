@@ -1,6 +1,20 @@
 body {
     font-family: 'Inter', sans-serif;
 }
+
+html.dark body {
+    background-color: #111827;
+    color: #F9FAFB;
+}
+
+html.dark header {
+    background-color: #1F2937;
+    color: #F9FAFB;
+}
+
+html.dark .mobile-menu {
+    background-color: #1F2937;
+}
 .nav-link {
     position: relative;
 }
