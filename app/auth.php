@@ -25,6 +25,14 @@ function getFlashMessage() {
     return null;
 }
 
+function sendVerificationEmail($email, $token) {
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $link = "http://$host/index.php?action=verify&token=$token";
+    $subject = 'Potwierdzenie konta';
+    $message = "Kliknij link, aby aktywować konto: $link";
+    @mail($email, $subject, $message);
+}
+
 function register($username, $email, $password) {
     global $pdo;
     // Validate inputs
@@ -42,10 +50,12 @@ function register($username, $email, $password) {
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')");
+    $token = bin2hex(random_bytes(16));
+    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role, is_verified, verification_token) VALUES (?, ?, ?, 'user', 0, ?)");
     try {
-        $stmt->execute([$username, $email, $hashedPassword]);
-        setFlashMessage('success', 'Registration successful. Please log in.');
+        $stmt->execute([$username, $email, $hashedPassword, $token]);
+        sendVerificationEmail($email, $token);
+        setFlashMessage('success', 'Rejestracja udana. Sprawdź email, aby aktywować konto.');
         header("Location: index.php?action=login");
     } catch (PDOException $e) {
         setFlashMessage('error', 'Registration failed: ' . $e->getMessage());
@@ -64,6 +74,10 @@ function login($email, $password) {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     if ($user && password_verify($password, $user['password'])) {
+        if (!$user['is_verified']) {
+            setFlashMessage('error', 'Najpierw potwierdź swój adres email.');
+            return;
+        }
         $_SESSION['user_id'] = $user['id'];
         setFlashMessage('success', 'Logged in successfully.');
         header("Location: index.php");
@@ -95,5 +109,20 @@ function getUserRole() {
 
 function isAdmin() {
     return isLoggedIn() && getUserRole() === 'admin';
+}
+
+function verifyAccount($token) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE verification_token = ?");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+        $stmt = $pdo->prepare("UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?");
+        $stmt->execute([$user['id']]);
+        setFlashMessage('success', 'Konto zostało aktywowane. Możesz się zalogować.');
+    } else {
+        setFlashMessage('error', 'Nieprawidłowy link aktywacyjny.');
+    }
+    header("Location: index.php?action=login");
 }
 ?>

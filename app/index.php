@@ -21,6 +21,14 @@ switch ($action) {
         }
         include 'views/register.php';
         break;
+    case 'verify':
+        if (isset($_GET['token'])) {
+            verifyAccount($_GET['token']);
+        } else {
+            setFlashMessage('error', 'Brak tokenu weryfikacyjnego.');
+            header("Location: index.php?action=login");
+        }
+        break;
     case 'login':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             login($_POST['email'], $_POST['password']);
