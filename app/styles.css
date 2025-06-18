@@ -1,0 +1,38 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+.nav-link {
+    position: relative;
+}
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #D4AF37;
+    transition: width 0.3s ease;
+}
+.nav-link:hover:after {
+    width: 100%;
+}
+.mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: #1E3A8A;
+}
+.mobile-menu.open {
+    max-height: 300px;
+    transition: max-height 0.3s ease-in;
+}
+.admin-badge {
+    background-color: #EF4444;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    margin-left: 0.5rem;
+    vertical-align: super;
+}
