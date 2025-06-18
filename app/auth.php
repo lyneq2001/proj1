@@ -30,7 +30,15 @@ function sendVerificationEmail($email, $token) {
     $link = "http://$host/index.php?action=verify&token=$token";
     $subject = 'Potwierdzenie konta';
     $message = "Kliknij link, aby aktywować konto: $link";
-    @mail($email, $subject, $message);
+
+    $headers   = [];
+    $headers[] = "From: Apartment Rental <no-reply@$host>";
+    $headers[] = "Reply-To: no-reply@$host";
+    $headers[] = "MIME-Version: 1.0";
+    $headers[] = "Content-Type: text/plain; charset=UTF-8";
+
+    // Use mail() without suppressing errors to surface any potential issues
+    mail($email, $subject, $message, implode("\r\n", $headers));
 }
 
 function emailDomainExists($email) {
