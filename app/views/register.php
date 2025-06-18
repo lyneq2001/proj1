@@ -80,24 +80,27 @@
                 
                 <div>
                     <label for="username" class="block text-sm font-medium text-secondary-600 mb-1">Nazwa użytkownika</label>
-                    <input type="text" id="username" name="username" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" 
-                           placeholder="Wprowadź nazwę użytkownika">
+                    <input type="text" id="username" name="username" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                           placeholder="Wprowadź nazwę użytkownika"
+                           value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
                 </div>
                 
                 <div>
                     <label for="email" class="block text-sm font-medium text-secondary-600 mb-1">Adres email</label>
-                    <input type="email" id="email" name="email" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" 
-                           placeholder="wpisz@email.com">
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                           placeholder="wpisz@email.com"
+                           value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                 </div>
                 
                 <div>
                     <label for="password" class="block text-sm font-medium text-secondary-600 mb-1">Hasło</label>
-                    <input type="password" id="password" name="password" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" 
-                           placeholder="••••••••">
-                    <p class="mt-1 text-xs text-secondary-500">Hasło powinno mieć co najmniej 8 znaków</p>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                           placeholder="••••••••"
+                           value="<?php echo htmlspecialchars($_POST['password'] ?? ''); ?>">
+                    <p class="mt-1 text-xs text-secondary-500">Hasło powinno mieć co najmniej 6 znaków oraz zawierać literę i cyfrę</p>
                 </div>
                 
                 <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition font-medium">
