@@ -28,46 +28,5 @@ foreach ($offers as $offer) {
     } else {
         echo "Failed to geocode offer ID {$offer['id']}\n";
     }
-    sleep(1);
-    function searchOffers($userLat, $userLng, $maxDistance, $filters = []) {
-    global $pdo;
-    
-    // Podstawowe zapytanie
-    $sql = "SELECT *, 
-            (6371 * ACOS(
-                COS(RADIANS(:user_lat)) * COS(RADIANS(lat)) * 
-                COS(RADIANS(lng) - RADIANS(:user_lng)) + 
-                SIN(RADIANS(:user_lat)) * SIN(RADIANS(lat))
-            ) AS distance
-            FROM offers
-            WHERE lat IS NOT NULL AND lng IS NOT NULL";
-    
-    // Filtry
-    $params = [
-        ':user_lat' => $userLat,
-        ':user_lng' => $userLng
-    ];
-    
-    if (!empty($filters['price_min'])) {
-        $sql .= " AND price >= :price_min";
-        $params[':price_min'] = $filters['price_min'];
-    }
-    
-    if (!empty($filters['price_max'])) {
-        $sql .= " AND price <= :price_max";
-        $params[':price_max'] = $filters['price_max'];
-    }
-    
-    // Dodaj inne filtry według potrzeb...
-    
-    // Filtrowanie po odległości
-    $sql .= " HAVING distance <= :max_distance ORDER BY distance";
-    $params[':max_distance'] = $maxDistance;
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 }
 ?>
