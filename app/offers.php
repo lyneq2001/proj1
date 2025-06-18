@@ -84,7 +84,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
 
         // Handle image uploads
         if (!empty($images['name'][0])) {
-            $upload_dir = 'Uploads/';
+            $upload_dir = 'uploads/';
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
@@ -498,7 +498,7 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
 
         // Handle image uploads
         if (!empty($images['name'][0])) {
-            $upload_dir = 'Uploads/';
+            $upload_dir = 'uploads/';
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
