@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rejestracja | Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <script>
         tailwind.config = {
             theme: {
@@ -46,8 +47,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
+<body class="bg-gray-50 min-h-screen font-sans">
+    <?php include 'header.php'; ?>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
         <div class="register-card bg-white rounded-xl shadow-card p-8">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
