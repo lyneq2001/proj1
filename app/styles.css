@@ -15,6 +15,26 @@ html.dark header {
 html.dark .mobile-menu {
     background-color: #1F2937;
 }
+.dark .form-section,
+.dark .login-card,
+.dark .register-card,
+.dark .filter-section {
+    background-color: #1F2937;
+    color: #F9FAFB;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+    background-color: #374151;
+    color: #F9FAFB;
+    border-color: #4B5563;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #9CA3AF;
+}
 .nav-link {
     position: relative;
 }

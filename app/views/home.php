@@ -81,42 +81,42 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         </div>
 
         <!-- Features Section -->
-        <section class="py-12 sm:py-20 bg-white">
+        <section class="py-12 sm:py-20 bg-white dark:bg-gray-800">
             <div class="container mx-auto px-4 sm:px-6">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl sm:text-4xl font-playfair font-bold text-dark-blue mb-4">Dlaczego warto wybrać nasze apartamenty?</h2>
+                    <h2 class="text-3xl sm:text-4xl font-playfair font-bold text-dark-blue dark:text-white mb-4">Dlaczego warto wybrać nasze apartamenty?</h2>
                     <div class="w-24 h-1 bg-gold mx-auto"></div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
                     <div class="text-center px-4">
-                        <div class="bg-gray-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <div class="bg-gray-100 dark:bg-gray-700 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
                             <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue mb-3">Premium lokalizacje</h3>
-                        <p class="text-gray-600 text-sm sm:text-base">Najlepsze adresy w mieście, blisko atrakcji i centrum biznesowego.</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue dark:text-white mb-3">Premium lokalizacje</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Najlepsze adresy w mieście, blisko atrakcji i centrum biznesowego.</p>
                     </div>
-                    
+
                     <div class="text-center px-4">
-                        <div class="bg-gray-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <div class="bg-gray-100 dark:bg-gray-700 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
                             <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue mb-3">Pełne bezpieczeństwo</h3>
-                        <p class="text-gray-600 text-sm sm:text-base">Monitoring, ochrona i systemy bezpieczeństwa dla Twojego spokoju.</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue dark:text-white mb-3">Pełne bezpieczeństwo</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Monitoring, ochrona i systemy bezpieczeństwa dla Twojego spokoju.</p>
                     </div>
-                    
+
                     <div class="text-center px-4">
-                        <div class="bg-gray-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
+                        <div class="bg-gray-100 dark:bg-gray-700 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6">
                             <svg class="w-10 h-10 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue mb-3">Luksusowe wyposażenie</h3>
-                        <p class="text-gray-600 text-sm sm:text-base">Designerskie meble, wysokiej klasy sprzęty i dbałość o każdy detal.</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-dark-blue dark:text-white mb-3">Luksusowe wyposażenie</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Designerskie meble, wysokiej klasy sprzęty i dbałość o każdy detal.</p>
                     </div>
                 </div>
             </div>
