@@ -551,7 +551,7 @@ function deleteOffer($offerId) {
 
     $stmt = $pdo->prepare("DELETE FROM offers WHERE id = ? AND user_id = ?");
     try {
-        $stmt->beginTransaction();
+        $pdo->beginTransaction();
         
         // Delete associated images from filesystem
         // $stmt_images = $pdo->prepare("SELECT file_path FROM images WHERE id = ?");
@@ -578,11 +578,11 @@ function deleteOffer($offerId) {
         // Delete the offer
         $stmt->execute([$offerId, $_SESSION['user_id']]);
         
-        $stmt->commit();
+        $pdo->commit();
         setFlashMessage('success', 'Offer deleted successfully.');
         header("Location: index.php?action=dashboard");
     } catch (PDOException $e) {
-        $stmt->rollBack();
+        $pdo->rollBack();
         setFlashMessage('error', 'Failed to delete offer: ' . $e->getMessage());
     }
 }
