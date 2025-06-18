@@ -32,7 +32,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     </script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 dark:text-white font-roboto">
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
     
     <main class="relative">
         <!-- Hero Section -->
