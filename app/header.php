@@ -147,3 +147,22 @@ require_once __DIR__ . '/auth.php';
         applyTheme(storedTheme);
     }));
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll("input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]), textarea").forEach(function(elem) {
+        if (!elem.title) {
+            if (elem.placeholder) {
+                elem.title = elem.placeholder;
+            } else {
+                var label = elem.id ? document.querySelector('label[for="' + elem.id + '"]') : null;
+                if (label) {
+                    elem.title = label.textContent.trim();
+                } else if (elem.name) {
+                    elem.title = elem.name;
+                }
+            }
+        }
+    });
+});
+</script>
