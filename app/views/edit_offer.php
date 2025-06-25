@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Offer - Apartment Rental</title>
+    <title>Edytuj ogłoszenie - Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -50,8 +50,8 @@
         
         <div class="max-w-4xl mx-auto">
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Edit Offer</h1>
-                <p class="text-gray-600 mt-1">Update your property listing details</p>
+                <h1 class="text-3xl font-bold text-gray-900">Edytuj ogłoszenie</h1>
+                <p class="text-gray-600 mt-1">Zaktualizuj szczegóły ogłoszenia</p>
             </div>
             
             <?php
@@ -61,7 +61,7 @@
                             <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                             </svg>
-                            <p class="text-red-700 font-medium">You must be logged in to edit offers.</p>
+                                <p class="text-red-700 font-medium">Musisz być zalogowany, aby edytować ogłoszenia.</p>
                         </div>
                     </div>';
             } else {
@@ -72,7 +72,7 @@
                                 <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                 </svg>
-                                <p class="text-red-700 font-medium">Offer not found or you do not have permission to edit it.</p>
+                                <p class="text-red-700 font-medium">Ogłoszenie nie istnieje lub nie masz uprawnień do jego edycji.</p>
                             </div>
                         </div>';
                 } else {
@@ -84,7 +84,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Basic Information Section -->
                     <div class="md:col-span-2">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Basic Information</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informacje podstawowe</h2>
                     </div>
                     
                     <div class="mb-4">
@@ -126,7 +126,7 @@
                     
                     <!-- Property Details Section -->
                     <div class="md:col-span-2 mt-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Property Details</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Szczegóły nieruchomości</h2>
                     </div>
                     
                     <div class="mb-4">
@@ -189,7 +189,7 @@
                     
                     <!-- Amenities Section -->
                     <div class="md:col-span-2 mt-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Amenities</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Udogodnienia</h2>
                     </div>
                     
                     <div class="mb-4 md:col-span-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -248,11 +248,11 @@
                     
                     <!-- Images Section -->
                     <div class="md:col-span-2 mt-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Images</h2>
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Zdjęcia</h2>
                     </div>
                     
                     <div class="mb-4 md:col-span-2">
-                        <label class="block text-gray-700 text-sm font-medium mb-2">Upload New Images</label>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Dodaj nowe zdjęcia</label>
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                             <input type="file" id="images" name="images[]" accept="image/jpeg,image/png" multiple onchange="updatePrimaryImageOptions()" 
                                    class="hidden">
@@ -260,18 +260,18 @@
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </svg>
-                                <p class="mt-1 text-sm text-gray-600">Click to upload images (JPEG/PNG, max 5)</p>
-                                <p class="mt-1 text-xs text-gray-500">Leave empty to keep existing images</p>
+                                <p class="mt-1 text-sm text-gray-600">Kliknij, aby przesłać zdjęcia (JPEG/PNG, maks. 5)</p>
+                                <p class="mt-1 text-xs text-gray-500">Pozostaw puste, aby zachować obecne zdjęcia</p>
                             </label>
                         </div>
                         <div id="image-preview" class="flex flex-wrap gap-4 mt-4"></div>
-                        <p class="mt-2 text-sm text-gray-500">Click an image to set it as primary (shown first)</p>
+                        <p class="mt-2 text-sm text-gray-500">Kliknij zdjęcie, aby ustawić je jako główne (wyświetlane jako pierwsze)</p>
                     </div>
                 </div>
                 
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <button type="submit" class="w-full bg-primary hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-md">
-                        Update Offer
+                        Zaktualizuj ogłoszenie
                     </button>
                 </div>
             </form>
@@ -293,7 +293,7 @@
         const files = imageInput.files;
 
         if (files.length === 0) {
-            previewContainer.innerHTML = '<p class="text-gray-500 text-sm">No images selected</p>';
+            previewContainer.innerHTML = '<p class="text-gray-500 text-sm">Nie wybrano zdjęć</p>';
             return;
         }
 
