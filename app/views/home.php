@@ -35,7 +35,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 
     <main>
         <!-- Hero Section -->
-        <section class="h-screen flex items-center bg-gradient-to-r from-dark-blue via-gray-700 to-black text-white">
+        <section class="h-screen flex items-center bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
             <div class="container mx-auto px-4 sm:px-6">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-playfair font-bold mb-6">
                     Luksusowe apartamenty<br><span class="text-gold">w zasięgu ręki</span>
@@ -44,10 +44,10 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     Znajdź idealne miejsce do zamieszkania w kilka chwil.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="index.php?action=search" class="bg-gold hover:bg-yellow-600 text-dark-blue font-medium py-3 px-8 rounded-md transition text-center">
+                    <a href="index.php?action=search" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-md transition text-center">
                         Przeglądaj oferty
                     </a>
-                    <a href="<?php echo isLoggedIn() ? 'index.php?action=add_offer' : 'index.php?action=login'; ?>" class="border-2 border-white hover:bg-white/20 font-medium py-3 px-8 rounded-md transition text-center">
+                    <a href="<?php echo isLoggedIn() ? 'index.php?action=add_offer' : 'index.php?action=login'; ?>" class="border border-gray-300 hover:bg-gray-200 font-medium py-3 px-8 rounded-md transition text-center">
                         Dodaj ofertę
                     </a>
                 </div>

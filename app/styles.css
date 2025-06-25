@@ -1,5 +1,13 @@
 body {
     font-family: 'Inter', sans-serif;
+    color: #1F2937;
+    background-color: #ffffff;
+}
+
+header {
+    background-color: #ffffff;
+    color: #1F2937;
+    border-bottom: 1px solid #E5E7EB;
 }
 
 html.dark body {
@@ -10,6 +18,7 @@ html.dark body {
 html.dark header {
     background-color: #1F2937;
     color: #F9FAFB;
+    border-bottom: 1px solid #374151;
 }
 
 html.dark .mobile-menu {
@@ -45,7 +54,7 @@ html.dark .mobile-menu {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #D4AF37;
+    background-color: #2563EB;
     transition: width 0.3s ease;
 }
 .nav-link:hover:after {
@@ -55,14 +64,15 @@ html.dark .mobile-menu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    background-color: #1E3A8A;
+    background-color: #ffffff;
+    border-bottom: 1px solid #E5E7EB;
 }
 .mobile-menu.open {
     max-height: 300px;
     transition: max-height 0.3s ease-in;
 }
 .admin-badge {
-    background-color: #EF4444;
+    background-color: #2563EB;
     color: white;
     font-size: 0.75rem;
     padding: 0.15rem 0.5rem;
