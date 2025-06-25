@@ -82,22 +82,22 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <h2 class="text-2xl font-bold text-dark mb-2">You must be logged in</h2>
-                <p class="text-secondary-500 mb-6">Please log in to add new property offers.</p>
+                <h2 class="text-2xl font-bold text-dark mb-2">Musisz być zalogowany</h2>
+                <p class="text-secondary-500 mb-6">Zaloguj się, aby dodać nowe ogłoszenie.</p>
                 <div class="flex justify-center space-x-4">
                     <a href="index.php?action=login" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
-                        Login
+                        Zaloguj się
                     </a>
                     <a href="index.php?action=register" class="px-6 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
-                        Register
+                        Zarejestruj
                     </a>
                 </div>
             </div>
         <?php else: ?>
             <div class="max-w-4xl mx-auto">
                 <div class="mb-8 text-center">
-                    <h1 class="text-3xl font-bold text-dark mb-2">Add New Property</h1>
-                    <p class="text-secondary-500">Fill in the details about your property to create a listing</p>
+                    <h1 class="text-3xl font-bold text-dark mb-2">Dodaj nowe ogłoszenie</h1>
+                    <p class="text-secondary-500">Uzupełnij dane nieruchomości, aby dodać ogłoszenie</p>
                 </div>
 
                 <form method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -110,27 +110,27 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
-                            Basic Information
+                            Informacje podstawowe
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Title*</label>
-                                <input type="text" name="title" placeholder="e.g. Modern apartment in city center" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Tytuł*</label>
+                                <input type="text" name="title" placeholder="np. Nowoczesne mieszkanie w centrum" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Property Type*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Typ nieruchomości*</label>
                                 <select name="building_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Select type</option>
-                                    <option value="apartment">Apartment</option>
-                                    <option value="block">Residential Block</option>
-                                    <option value="house">Detached House</option>
-                                    <option value="studio">Studio</option>
+                                    <option value="" disabled selected>Wybierz typ</option>
+                                    <option value="apartment">Mieszkanie</option>
+                                    <option value="block">Blok mieszkalny</option>
+                                    <option value="house">Dom wolnostojący</option>
+                                    <option value="studio">Kawalerka</option>
                                     <option value="loft">Loft</option>
                                 </select>
                             </div>
                             <div class="mb-4 md:col-span-2">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Description*</label>
-                                <textarea name="description" placeholder="Describe your property in detail..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="4" required></textarea>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Opis*</label>
+                                <textarea name="description" placeholder="Opisz nieruchomość..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="4" required></textarea>
                             </div>
                         </div>
                     </div>
@@ -142,16 +142,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            Location Details
+                            Szczegóły lokalizacji
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">City*</label>
-                                <input type="text" name="city" id="city" placeholder="e.g. Warsaw" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Miasto*</label>
+                                <input type="text" name="city" id="city" placeholder="np. Warszawa" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Street*</label>
-                                <input type="text" name="street" id="street" placeholder="e.g. Main Street 14" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Ulica*</label>
+                                <input type="text" name="street" id="street" placeholder="np. Główna 14" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                             </div>
                         </div>
                     </div>
@@ -162,26 +162,26 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Pricing & Size
+                            Cena i metraż
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Price (PLN)*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Cena (PLN)*</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-3 text-secondary-500">PLN</span>
-                                    <input type="number" step="1" name="price" placeholder="e.g. 2500" class="w-full pl-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <input type="number" step="1" name="price" placeholder="np. 2500" class="w-full pl-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Size (m²)*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Powierzchnia (m²)*</label>
                                 <div class="relative">
                                     <span class="absolute right-3 top-3 text-secondary-500">m²</span>
-                                    <input type="number" name="size" placeholder="e.g. 65" class="w-full pr-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <input type="number" name="size" placeholder="np. 65" class="w-full pr-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Floor</label>
-                                <input type="number" name="floor" placeholder="e.g. 3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Piętro</label>
+                                <input type="number" name="floor" placeholder="np. 3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
                             </div>
                         </div>
                     </div>
@@ -192,13 +192,13 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                            Property Features
+                            Cechy nieruchomości
                         </h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Rooms*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Pokoje*</label>
                                 <select name="rooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Select</option>
+                                    <option value="" disabled selected>Wybierz</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -207,7 +207,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Bathrooms*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Łazienki*</label>
                                 <select name="bathrooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
                                     <option value="" disabled selected>Select</option>
                                     <option value="1">1</option>
@@ -217,31 +217,31 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Heating Type*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Rodzaj ogrzewania*</label>
                                 <select name="heating_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="gas">Gas</option>
-                                    <option value="electric">Electric</option>
-                                    <option value="district">District</option>
-                                    <option value="other">Other</option>
+                                    <option value="" disabled selected>Wybierz</option>
+                                    <option value="gas">Gazowe</option>
+                                    <option value="electric">Elektryczne</option>
+                                    <option value="district">Miejskie</option>
+                                    <option value="other">Inne</option>
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Condition*</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Stan*</label>
                                 <select name="condition_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="new">New</option>
-                                    <option value="renovated">Renovated</option>
-                                    <option value="used">Used</option>
-                                    <option value="to_renovate">To Renovate</option>
+                                    <option value="" disabled selected>Wybierz</option>
+                                    <option value="new">Nowe</option>
+                                    <option value="renovated">Po remoncie</option>
+                                    <option value="used">Używane</option>
+                                    <option value="to_renovate">Do remontu</option>
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Year Built</label>
-                                <input type="number" name="year_built" placeholder="e.g. 2010" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Rok budowy</label>
+                                <input type="number" name="year_built" placeholder="np. 2010" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
                             </div>
                             <div class="mb-4">
-                                <label class="block text-secondary-600 text-sm font-medium mb-1">Available From</label>
+                                <label class="block text-secondary-600 text-sm font-medium mb-1">Dostępne od</label>
                                 <input type="date" name="available_from" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
                             </div>
                         </div>
@@ -253,16 +253,16 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                             </svg>
-                            Amenities
+                            Udogodnienia
                         </h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="has_balcony" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Balcony</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Balkon</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="has_elevator" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Elevator</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Winda</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="parking" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
@@ -270,19 +270,19 @@
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="garage" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Garage</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Garaż</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="garden" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Garden</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Ogród</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="furnished" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Furnished</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Umeblowane</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="pets_allowed" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
-                                <span class="ml-3 text-secondary-600 text-sm font-medium">Pets Allowed</span>
+                                <span class="ml-3 text-secondary-600 text-sm font-medium">Zwierzęta dozwolone</span>
                             </label>
                         </div>
                     </div>
@@ -293,10 +293,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            Property Images
+                            Zdjęcia nieruchomości
                         </h2>
                         <div class="mb-4">
-                            <label class="block text-secondary-600 text-sm font-medium mb-1">Upload Images (JPEG/PNG, max 5)*</label>
+                            <label class="block text-secondary-600 text-sm font-medium mb-1">Prześlij zdjęcia (JPEG/PNG, maks. 5)*</label>
                             <div class="flex items-center justify-center w-full">
                                 <label for="images" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
                                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -304,16 +304,16 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                         </svg>
                                         <p class="text-sm text-secondary-500">
-                                            <span class="font-semibold">Click to upload</span> or drag and drop
+                                            <span class="font-semibold">Kliknij, aby przesłać</span> lub upuść pliki
                                         </p>
-                                        <p class="text-xs text-secondary-400">JPEG or PNG (MAX. 5MB each)</p>
+                                        <p class="text-xs text-secondary-400">JPEG lub PNG (max 5MB)</p>
                                     </div>
                                     <input id="images" name="images[]" type="file" accept="image/jpeg,image/png" multiple onchange="updatePrimaryImageOptions()" class="hidden" required>
                                 </label>
                             </div>
                         </div>
                         <div class="mb-2">
-                            <p class="text-secondary-500 text-sm">Click an image to set it as primary (displayed first)</p>
+                            <p class="text-secondary-500 text-sm">Kliknij zdjęcie, aby ustawić je jako główne (wyświetlane jako pierwsze)</p>
                         </div>
                         <div id="image-preview" class="flex flex-wrap gap-4 mt-2"></div>
                     </div>
@@ -321,13 +321,13 @@
                     <!-- Submit Section -->
                     <div class="flex justify-end space-x-4">
                         <a href="index.php?action=dashboard" class="px-6 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
-                            Cancel
+                            Anuluj
                         </a>
                         <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            Add Property Offer
+                            Dodaj ogłoszenie
                         </button>
                     </div>
                 </form>
@@ -345,7 +345,7 @@
         previewContainer.innerHTML = '';
         
         if (imageInput.files.length > 5) {
-            alert('You can upload maximum 5 images');
+            alert('Możesz przesłać maksymalnie 5 zdjęć');
             imageInput.value = '';
             return;
         }
