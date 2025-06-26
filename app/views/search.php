@@ -14,8 +14,8 @@
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -91,10 +91,10 @@
                             </svg>
                         </button>
                     </div>
-                    
+
                     <form method="GET" action="index.php" id="filters-form" class="space-y-6">
                         <input type="hidden" name="action" value="search">
-                        
+
                         <!-- Location Filters -->
                         <div class="filter-section">
                             <h3 class="font-medium text-dark mb-3 flex items-center">
@@ -119,7 +119,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Price & Size -->
                         <div class="filter-section">
                             <h3 class="font-medium text-dark mb-3 flex items-center">
@@ -143,7 +143,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Property Type -->
                         <div class="filter-section">
                             <h3 class="font-medium text-dark mb-3 flex items-center">
@@ -162,7 +162,7 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <!-- Rooms & Floors -->
                         <div class="filter-section">
                             <h3 class="font-medium text-dark mb-3 flex items-center">
@@ -190,7 +190,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Amenities -->
                         <div class="filter-section">
                             <h3 class="font-medium text-dark mb-3 flex items-center">
@@ -218,7 +218,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <!-- Sort & Submit -->
                         <div class="filter-section">
                             <div class="mb-3">
@@ -242,7 +242,7 @@
                     </form>
                 </div>
             </aside>
-            
+
             <!-- Main Content -->
             <div class="flex-1">
                 <div class="flex justify-between items-center mb-6">
@@ -251,7 +251,7 @@
                         Znaleziono <?php echo count($offers); ?> ofert
                     </p>
                 </div>
-                
+
                 <?php if (empty($offers)): ?>
                     <div class="bg-white rounded-xl shadow-card p-8 text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -359,14 +359,14 @@
         const toggleFilters = document.getElementById('toggle-filters');
         const showFilters = document.getElementById('show-filters');
         const filtersForm = document.getElementById('filters-form');
-        
+
         if (toggleFilters && filtersForm) {
             toggleFilters.addEventListener('click', () => {
                 filtersForm.classList.toggle('hidden');
                 toggleFilters.classList.toggle('rotate-180');
             });
         }
-        
+
         if (showFilters && filtersForm) {
             showFilters.addEventListener('click', () => {
                 filtersForm.classList.toggle('hidden');
@@ -374,7 +374,7 @@
                 document.querySelector('aside').scrollIntoView({ behavior: 'smooth' });
             });
         }
-        
+
         // Hide filters on mobile by default
         if (window.innerWidth < 1024) {
             if (filtersForm) filtersForm.classList.add('hidden');

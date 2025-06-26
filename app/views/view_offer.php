@@ -24,8 +24,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -38,7 +38,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         dark: '#111827',
                         light: '#F9FAFB',
                         gold: '#A0D9A0',
-                        'dark-blue': '#1E3656',
+                        'dark-blue': '#8CCF83',
                     },
                     fontFamily: {
                         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
@@ -110,7 +110,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 </a>
             </div>
         <?php } ?>
-        
+
         <?php if ($offer): ?>
             <!-- Breadcrumbs -->
             <nav class="flex mb-6" aria-label="Breadcrumb">
@@ -158,7 +158,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                                         <span class="text-sm font-medium px-2"><?php echo htmlspecialchars($offer['visits']); ?> views</span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Thumbnails -->
                                 <div class="grid grid-cols-3 gap-2 px-4 pb-4">
                                     <?php foreach ($offer['images'] as $image): ?>
@@ -392,7 +392,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            
+
             // Add marker
             var marker = L.marker([<?php echo $offer['lat']; ?>, <?php echo $offer['lng']; ?>]).addTo(map)
                 .bindPopup('<?php echo htmlspecialchars($offer['title']); ?>')

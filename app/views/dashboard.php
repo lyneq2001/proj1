@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -104,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             display: block;
         }
         .tab-button.active {
-            border-bottom: 2px solid #1D4ED8;
-            color: #1D4ED8;
+            border-bottom: 2px solid #A0D9A0;
+            color: #A0D9A0;
         }
     </style>
 </head>
@@ -564,7 +564,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 const content = this.querySelector('.conversation-content');
                 const icon = this.querySelector('svg');
                 const wasHidden = content.classList.contains('hidden');
-                
+
                 content.classList.toggle('hidden');
                 icon.classList.toggle('rotate-180');
 

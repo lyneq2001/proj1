@@ -69,8 +69,8 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     },
                     colors: {
                         'gold': '#A0D9A0',
-                        'dark-blue': '#1E3656',
-                        'primary': '#1D4ED8',
+                        'dark-blue': '#8CCF83',
+                        'primary': '#A0D9A0',
                         'secondary': '#6B7280',
                         'accent': '#A0D9A0',
                         'danger': '#EF4444',
@@ -112,7 +112,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    
+
     <main class="container mx-auto px-4 py-8">
         <?php
         $flash = getFlashMessage();
@@ -125,7 +125,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 </div>
             </div>
         <?php endif; ?>
-        
+
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-playfair font-bold text-dark-blue">
                 <i class="fas fa-tachometer-alt mr-2"></i>Admin Control Panel
@@ -149,7 +149,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                         <h3 class="text-lg font-semibold text-secondary">Total Users</h3>
                         <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format($total_users); ?></p>
                     </div>
-                    <div class="p-3 rounded-full bg-blue-50 text-primary">
+                    <div class="p-3 rounded-full bg-green-50 text-primary">
                         <i class="fas fa-users text-xl"></i>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     </a>
                 </div>
             </div>
-            
+
             <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-accent">
                 <div class="flex justify-between items-start">
                     <div>
@@ -178,7 +178,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     </a>
                 </div>
             </div>
-            
+
             <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-primary">
                 <div class="flex justify-between items-start">
                     <div>
@@ -209,7 +209,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
             </div>
-            
+
             <?php if (empty($users)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-user-slash text-4xl text-gray-300 mb-3"></i>
@@ -286,7 +286,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
             </div>
-            
+
             <?php if (empty($offers)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-home text-4xl text-gray-300 mb-3"></i>
@@ -359,7 +359,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
             </div>
-            
+
             <?php if (empty($messages)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-envelope-open-text text-4xl text-gray-300 mb-3"></i>

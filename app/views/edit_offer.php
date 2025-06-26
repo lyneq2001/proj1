@@ -13,7 +13,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563eb', // More modern blue
+                        primary: '#A0D9A0', // More modern blue
                         secondary: '#64748b', // Updated gray
                         accent: '#10b981', // Green
                         dark: '#1e293b', // Dark slate
@@ -47,13 +47,13 @@
                 </div>
             </div>
         <?php endif; ?>
-        
+
         <div class="max-w-4xl mx-auto">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">Edytuj ogłoszenie</h1>
                 <p class="text-gray-600 mt-1">Zaktualizuj szczegóły ogłoszenia</p>
             </div>
-            
+
             <?php
             if (!isLoggedIn()) {
                 echo '<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
@@ -80,70 +80,70 @@
             <form method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                 <input type="hidden" name="primary_image" id="primary_image" value="0">
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Basic Information Section -->
                     <div class="md:col-span-2">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Informacje podstawowe</h2>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Title*</label>
-                        <input type="text" name="title" value="<?php echo htmlspecialchars($offer['title']); ?>" 
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400" 
+                        <input type="text" name="title" value="<?php echo htmlspecialchars($offer['title']); ?>"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400"
                                placeholder="Modern apartment in city center" required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">City*</label>
-                        <input type="text" name="city" value="<?php echo htmlspecialchars($offer['city']); ?>" 
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400" 
+                        <input type="text" name="city" value="<?php echo htmlspecialchars($offer['city']); ?>"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400"
                                placeholder="Warsaw" required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Street*</label>
-                        <input type="text" name="street" value="<?php echo htmlspecialchars($offer['street']); ?>" 
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400" 
+                        <input type="text" name="street" value="<?php echo htmlspecialchars($offer['street']); ?>"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400"
                                placeholder="Main Street 123" required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Price (PLN)*</label>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">PLN</span>
-                            <input type="number" step="1" name="price" value="<?php echo htmlspecialchars($offer['price']); ?>" 
+                            <input type="number" step="1" name="price" value="<?php echo htmlspecialchars($offer['price']); ?>"
                                    class="w-full pl-12 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition" required>
                         </div>
                     </div>
-                    
+
                     <div class="mb-4 md:col-span-2">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Description*</label>
-                        <textarea name="description" rows="4" 
-                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400" 
+                        <textarea name="description" rows="4"
+                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition placeholder-gray-400"
                                   required><?php echo htmlspecialchars($offer['description']); ?></textarea>
                     </div>
-                    
+
                     <!-- Property Details Section -->
                     <div class="md:col-span-2 mt-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Szczegóły nieruchomości</h2>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Size (m²)*</label>
                         <div class="relative">
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">m²</span>
-                            <input type="number" name="size" value="<?php echo htmlspecialchars($offer['size']); ?>" 
+                            <input type="number" name="size" value="<?php echo htmlspecialchars($offer['size']); ?>"
                                    class="w-full pr-10 pl-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition" required>
                         </div>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Floor</label>
-                        <input type="number" name="floor" value="<?php echo htmlspecialchars($offer['floor'] ?? ''); ?>" 
+                        <input type="number" name="floor" value="<?php echo htmlspecialchars($offer['floor'] ?? ''); ?>"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition">
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Building Type*</label>
                         <select name="building_type" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition appearance-none bg-white" required>
@@ -152,25 +152,25 @@
                             <option value="house" <?php echo $offer['building_type'] == 'house' ? 'selected' : ''; ?>>Detached House</option>
                         </select>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Rooms*</label>
-                        <input type="number" name="rooms" value="<?php echo htmlspecialchars($offer['rooms']); ?>" 
+                        <input type="number" name="rooms" value="<?php echo htmlspecialchars($offer['rooms']); ?>"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition" required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Bathrooms*</label>
-                        <input type="number" name="bathrooms" value="<?php echo htmlspecialchars($offer['bathrooms']); ?>" 
+                        <input type="number" name="bathrooms" value="<?php echo htmlspecialchars($offer['bathrooms']); ?>"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition" required>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Year Built</label>
-                        <input type="number" name="year_built" value="<?php echo htmlspecialchars($offer['year_built'] ?? ''); ?>" 
+                        <input type="number" name="year_built" value="<?php echo htmlspecialchars($offer['year_built'] ?? ''); ?>"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition">
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Condition*</label>
                         <select name="condition_type" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition appearance-none bg-white" required>
@@ -180,62 +180,62 @@
                             <option value="to_renovate" <?php echo $offer['condition_type'] == 'to_renovate' ? 'selected' : ''; ?>>To Renovate</option>
                         </select>
                     </div>
-                    
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Available From</label>
-                        <input type="date" name="available_from" value="<?php echo htmlspecialchars($offer['available_from'] ?? ''); ?>" 
+                        <input type="date" name="available_from" value="<?php echo htmlspecialchars($offer['available_from'] ?? ''); ?>"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition">
                     </div>
-                    
+
                     <!-- Amenities Section -->
                     <div class="md:col-span-2 mt-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Udogodnienia</h2>
                     </div>
-                    
+
                     <div class="mb-4 md:col-span-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         <div class="flex items-center">
-                            <input type="checkbox" id="has_balcony" name="has_balcony" value="1" <?php echo $offer['has_balcony'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="has_balcony" name="has_balcony" value="1" <?php echo $offer['has_balcony'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="has_balcony" class="ml-2 text-gray-700 text-sm">Balcony</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="has_elevator" name="has_elevator" value="1" <?php echo $offer['has_elevator'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="has_elevator" name="has_elevator" value="1" <?php echo $offer['has_elevator'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="has_elevator" class="ml-2 text-gray-700 text-sm">Elevator</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="parking" name="parking" value="1" <?php echo $offer['parking'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="parking" name="parking" value="1" <?php echo $offer['parking'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="parking" class="ml-2 text-gray-700 text-sm">Parking</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="garage" name="garage" value="1" <?php echo $offer['garage'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="garage" name="garage" value="1" <?php echo $offer['garage'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="garage" class="ml-2 text-gray-700 text-sm">Garage</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="garden" name="garden" value="1" <?php echo $offer['garden'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="garden" name="garden" value="1" <?php echo $offer['garden'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="garden" class="ml-2 text-gray-700 text-sm">Garden</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="furnished" name="furnished" value="1" <?php echo $offer['furnished'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="furnished" name="furnished" value="1" <?php echo $offer['furnished'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="furnished" class="ml-2 text-gray-700 text-sm">Furnished</label>
                         </div>
-                        
+
                         <div class="flex items-center">
-                            <input type="checkbox" id="pets_allowed" name="pets_allowed" value="1" <?php echo $offer['pets_allowed'] ? 'checked' : ''; ?> 
+                            <input type="checkbox" id="pets_allowed" name="pets_allowed" value="1" <?php echo $offer['pets_allowed'] ? 'checked' : ''; ?>
                                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
                             <label for="pets_allowed" class="ml-2 text-gray-700 text-sm">Pets Allowed</label>
                         </div>
                     </div>
-                    
+
                     <div class="mb-4 md:col-span-2">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Heating Type*</label>
                         <select name="heating_type" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition appearance-none bg-white" required>
@@ -245,16 +245,16 @@
                             <option value="other" <?php echo $offer['heating_type'] == 'other' ? 'selected' : ''; ?>>Other</option>
                         </select>
                     </div>
-                    
+
                     <!-- Images Section -->
                     <div class="md:col-span-2 mt-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Zdjęcia</h2>
                     </div>
-                    
+
                     <div class="mb-4 md:col-span-2">
                         <label class="block text-gray-700 text-sm font-medium mb-2">Dodaj nowe zdjęcia</label>
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            <input type="file" id="images" name="images[]" accept="image/jpeg,image/png" multiple onchange="updatePrimaryImageOptions()" 
+                            <input type="file" id="images" name="images[]" accept="image/jpeg,image/png" multiple onchange="updatePrimaryImageOptions()"
                                    class="hidden">
                             <label for="images" class="cursor-pointer">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -268,9 +268,9 @@
                         <p class="mt-2 text-sm text-gray-500">Kliknij zdjęcie, aby ustawić je jako główne (wyświetlane jako pierwsze)</p>
                     </div>
                 </div>
-                
+
                 <div class="mt-8 pt-6 border-t border-gray-200">
-                    <button type="submit" class="w-full bg-primary hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-md">
+                    <button type="submit" class="w-full bg-primary hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-md">
                         Zaktualizuj ogłoszenie
                     </button>
                 </div>
@@ -302,25 +302,25 @@
             reader.onload = function(e) {
                 const imgContainer = document.createElement('div');
                 imgContainer.className = 'relative group cursor-pointer';
-                
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.className = 'w-32 h-32 object-cover rounded-lg border-2 ' + 
+                img.className = 'w-32 h-32 object-cover rounded-lg border-2 ' +
                                 (i === 0 ? 'border-primary' : 'border-transparent group-hover:border-gray-300');
                 img.alt = 'Preview image ' + (i + 1);
-                
+
                 const overlay = document.createElement('div');
                 overlay.className = 'absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition';
-                
+
                 const checkIcon = document.createElement('div');
-                checkIcon.className = 'absolute top-2 right-2 bg-white rounded-full p-1 ' + 
+                checkIcon.className = 'absolute top-2 right-2 bg-white rounded-full p-1 ' +
                                      (i === 0 ? 'block' : 'hidden group-hover:block');
                 checkIcon.innerHTML = '<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
-                
+
                 imgContainer.appendChild(img);
                 imgContainer.appendChild(overlay);
                 imgContainer.appendChild(checkIcon);
-                
+
                 imgContainer.addEventListener('click', () => {
                     // Remove border from all images
                     previewContainer.querySelectorAll('img').forEach(image => {
@@ -338,7 +338,7 @@
                     // Update hidden input
                     primaryImageInput.value = i;
                 });
-                
+
                 previewContainer.appendChild(imgContainer);
             };
             reader.readAsDataURL(files[i]);

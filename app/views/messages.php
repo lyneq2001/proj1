@@ -39,7 +39,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
     <?php include 'header.php'; ?>
-    
+
     <div class="container mx-auto px-4 py-8">
         <?php
         $flash = getFlashMessage();
@@ -57,13 +57,13 @@
 
         <div class="max-w-4xl mx-auto">
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Wiadomości</h1>
-            
+
             <?php if (!isLoggedIn()): ?>
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <p class="text-gray-600">Musisz być zalogowany, aby wysyłać i przeglądać wiadomości.</p>
                     <div class="mt-4">
-                        <a href="index.php?action=login" class="text-blue-600 hover:text-blue-800 font-medium">Zaloguj się</a> lub 
-                        <a href="index.php?action=register" class="text-blue-600 hover:text-blue-800 font-medium">zarejestruj</a>
+                        <a href="index.php?action=login" class="text-green-600 hover:text-green-800 font-medium">Zaloguj się</a> lub
+                        <a href="index.php?action=register" class="text-green-600 hover:text-green-800 font-medium">zarejestruj</a>
                     </div>
                 </div>
             <?php else: ?>
@@ -72,33 +72,33 @@
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Wyślij nową wiadomość</h2>
                     <form method="POST" action="index.php?action=send_message">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                        
+
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-medium mb-2">Odbiorca</label>
                             <div class="relative">
-                                <input type="text" id="receiver_username" name="receiver_username" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                <input type="text" id="receiver_username" name="receiver_username"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                        placeholder="Wpisz nazwę użytkownika" autocomplete="off" required>
                                 <div id="autocomplete-suggestions" class="autocomplete-suggestions hidden"></div>
                                 <input type="hidden" id="receiver_id" name="receiver_id">
                             </div>
                         </div>
-                        
+
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-medium mb-2">ID Oferty</label>
-                            <input type="number" name="offer_id" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            <input type="number" name="offer_id"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                    placeholder="Wpisz ID oferty" required>
                         </div>
-                        
+
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-medium mb-2">Treść wiadomości</label>
-                            <textarea name="message" rows="4" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            <textarea name="message" rows="4"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                       placeholder="Napisz swoją wiadomość..." required></textarea>
                         </div>
-                        
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
+
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition">
                             Wyślij wiadomość
                         </button>
                     </form>
@@ -107,7 +107,7 @@
                 <!-- Conversations List -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Twoje konwersacje</h2>
-                    
+
                     <?php
                     $conversations = getConversations($_SESSION['user_id'] ?? 0);
                     if (empty($conversations)):
@@ -123,20 +123,20 @@
                                                 <h3 class="font-medium text-gray-800">Oferta: <?php echo htmlspecialchars($conversation['offer_title']); ?></h3>
                                                 <p class="text-sm text-gray-600">Z: <?php echo htmlspecialchars($conversation['other_user']); ?></p>
                                             </div>
-                                            <a href="index.php?action=view_offer&id=<?php echo $conversation['offer_id']; ?>" 
-                                               class="text-blue-600 hover:text-blue-800 text-sm">
+                                            <a href="index.php?action=view_offer&id=<?php echo $conversation['offer_id']; ?>"
+                                               class="text-green-600 hover:text-green-800 text-sm">
                                                 Zobacz ofertę
                                             </a>
                                         </div>
-                                        
+
                                         <div class="space-y-3 mt-3">
                                             <?php foreach ($conversation['messages'] as $msg): ?>
                                                 <?php if (is_array($msg) && isset($msg['message'], $msg['sent_at'], $msg['sender_id'])): ?>
                                                     <div class="flex <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'justify-end' : 'justify-start'; ?>">
-                                                        <div class="message-bubble <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'; ?> p-3 rounded-lg">
+                                                        <div class="message-bubble <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?> p-3 rounded-lg">
                                                             <p><?php echo htmlspecialchars($msg['message']); ?></p>
-                                                            <p class="text-xs mt-1 <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'text-blue-600' : 'text-gray-500'; ?>">
-                                                                <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'Ty' : htmlspecialchars($conversation['other_user']); ?>, 
+                                                            <p class="text-xs mt-1 <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'text-green-600' : 'text-gray-500'; ?>">
+                                                                <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'Ty' : htmlspecialchars($conversation['other_user']); ?>,
                                                                 <?php echo htmlspecialchars($msg['sent_at']); ?>
                                                             </p>
                                                         </div>
@@ -144,16 +144,16 @@
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
                                         </div>
-                                        
+
                                         <form method="POST" action="index.php?action=send_message" class="mt-4">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                             <input type="hidden" name="receiver_id" value="<?php echo $conversation['other_user_id']; ?>">
                                             <input type="hidden" name="offer_id" value="<?php echo $conversation['offer_id']; ?>">
                                             <div class="flex gap-2">
-                                                <input type="text" name="message" 
-                                                       class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                                <input type="text" name="message"
+                                                       class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                                        placeholder="Odpowiedz..." required>
-                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
                                                     Wyślij
                                                 </button>
                                             </div>
@@ -187,10 +187,10 @@
                 try {
                     const response = await fetch(`index.php?action=search_users&query=${encodeURIComponent(query)}`);
                     if (!response.ok) throw new Error('Network response was not ok');
-                    
+
                     const users = await response.json();
                     suggestionsDiv.innerHTML = '';
-                    
+
                     if (users.length === 0) {
                         suggestionsDiv.style.display = 'none';
                         receiverIdInput.value = '';
