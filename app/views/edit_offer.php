@@ -7,29 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#A0D9A0', // More modern blue
-                        secondary: '#64748b', // Updated gray
-                        accent: '#10b981', // Green
-                        dark: '#1e293b', // Dark slate
-                        light: '#f8fafc' // Lightest gray
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'form': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        'input': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                    }
-                },
-            },
-        }
-    </script>
+
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen">
     <?php include 'header.php'; ?>

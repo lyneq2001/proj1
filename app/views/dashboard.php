@@ -52,38 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            600: '#A0D9A0',
-                            700: '#8CCF83',
-                        },
-                        secondary: {
-                            500: '#6B7280',
-                            600: '#4B5563',
-                        },
-                        accent: {
-                            500: '#A0D9A0',
-                            600: '#8CCF83',
-                        },
-                        dark: '#111827',
-                        light: '#F9FAFB',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
-                    },
-                    boxShadow: {
-                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                    },
-                },
-            },
-        }
-    </script>
+
     <style>
         .conversation-card {
             transition: all 0.3s ease;

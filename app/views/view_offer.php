@@ -17,41 +17,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lightgallery.min.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/lightgallery.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            600: '#A0D9A0',
-                            700: '#8CCF83',
-                        },
-                        secondary: {
-                            500: '#6B7280',
-                            600: '#4B5563',
-                        },
-                        accent: {
-                            500: '#A0D9A0',
-                            600: '#8CCF83',
-                        },
-                        dark: '#111827',
-                        light: '#F9FAFB',
-                        gold: '#A0D9A0',
-                        'dark-blue': '#8CCF83',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
-                        playfair: ['"Playfair Display"', 'serif'],
-                        roboto: ['Roboto', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                    },
-                },
-            },
-        }
-    </script>
+
     <style>
         #map { height: 300px; border-radius: 0.5rem; }
         .gallery-thumbnail {

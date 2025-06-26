@@ -12,37 +12,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'playfair': ['"Playfair Display"', 'serif'],
-                        'roboto': ['Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        'gold': '#A0D9A0',
-                        'dark-blue': '#8CCF83',
-                        primary: {
-                            600: '#A0D9A0',
-                            700: '#8CCF83',
-                        },
-                        secondary: {
-                            500: '#6B7280',
-                            600: '#4B5563',
-                        },
-                        accent: {
-                            500: '#A0D9A0',
-                            600: '#8CCF83',
-                        },
-                        dark: '#111827',
-                        light: '#F9FAFB',
-                    }
-                }
-            }
-        }
-    </script>
+
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 dark:text-white font-roboto">
     <?php include __DIR__ . '/../header.php'; ?>
