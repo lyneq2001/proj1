@@ -22,7 +22,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         'roboto': ['Roboto', 'sans-serif'],
                     },
                     colors: {
-                        'gold': '#D4AF37',
+                        'gold': '#A0D9A0',
                         'dark-blue': '#1E3656',
                         primary: {
                             600: '#1D4ED8',
@@ -33,8 +33,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             600: '#4B5563',
                         },
                         accent: {
-                            500: '#10B981',
-                            600: '#059669',
+                            500: '#A0D9A0',
+                            600: '#8CCF83',
                         },
                         dark: '#111827',
                         light: '#F9FAFB',
@@ -58,7 +58,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     Znajdź idealne miejsce do zamieszkania w kilka chwil.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="index.php?action=search" class="bg-gold hover:bg-yellow-600 text-dark-blue font-medium py-3 px-8 rounded-md transition text-center">
+                    <a href="index.php?action=search" class="bg-gold hover:bg-green-300 text-dark-blue font-medium py-3 px-8 rounded-md transition text-center">
                         Przeglądaj oferty
                     </a>
                     <a href="<?php echo isLoggedIn() ? 'index.php?action=add_offer' : 'index.php?action=login'; ?>" class="border-2 border-white hover:bg-white/20 font-medium py-3 px-8 rounded-md transition text-center">

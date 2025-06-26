@@ -45,7 +45,7 @@ html.dark .mobile-menu {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #D4AF37;
+    background-color: #A0D9A0;
     transition: width 0.3s ease;
 }
 .nav-link:hover:after {
@@ -55,7 +55,7 @@ html.dark .mobile-menu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    background-color: #1E3A8A;
+    background-color: #E7F9EC;
 }
 .mobile-menu.open {
     max-height: 300px;
