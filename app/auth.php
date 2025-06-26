@@ -25,6 +25,28 @@ function getFlashMessage() {
     return null;
 }
 
+function setFormErrors($errors) {
+    $_SESSION['form_errors'] = $errors;
+}
+
+function getFormErrors() {
+    $errors = $_SESSION['form_errors'] ?? [];
+    unset($_SESSION['form_errors']);
+    return $errors;
+}
+
+function setOldInput($data) {
+    $_SESSION['old_input'] = $data;
+}
+
+function getOldInput($field) {
+    return $_SESSION['old_input'][$field] ?? '';
+}
+
+function clearOldInput() {
+    unset($_SESSION['old_input']);
+}
+
 function sendVerificationEmail($email, $token) {
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $link = "http://$host/index.php?action=verify&token=$token";
