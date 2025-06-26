@@ -102,3 +102,45 @@ html.dark .offer-section {
     background-color: #1F2937;
     color: #F9FAFB;
 }
+/* Theme colors */
+:root {
+    --primary-100: #DCFCE7;
+    --primary-600: #A0D9A0;
+    --primary-700: #8CCF83;
+    --secondary-500: #6B7280;
+    --secondary-600: #4B5563;
+    --accent-500: #A0D9A0;
+    --accent-600: #8CCF83;
+    --gold: #A0D9A0;
+    --dark-blue: #8CCF83;
+    --danger: #EF4444;
+    --danger-700: #B91C1C;
+}
+
+.text-primary-100 { color: var(--primary-100); }
+.text-primary-600 { color: var(--primary-600); }
+.text-primary-700 { color: var(--primary-700); }
+.text-secondary-500 { color: var(--secondary-500); }
+.text-secondary-600 { color: var(--secondary-600); }
+.text-dark-blue { color: var(--dark-blue); }
+.text-gold { color: var(--gold); }
+.text-danger { color: var(--danger); }
+.text-danger-700 { color: var(--danger-700); }
+
+.bg-primary-600 { background-color: var(--primary-600); }
+.bg-primary-700 { background-color: var(--primary-700); }
+.bg-dark-blue { background-color: var(--dark-blue); }
+.bg-gold { background-color: var(--gold); }
+.bg-accent-500 { background-color: var(--accent-500); }
+.bg-accent-600 { background-color: var(--accent-600); }
+
+.border-primary-600 { border-color: var(--primary-600); }
+.border-gold { border-color: var(--gold); }
+
+.hover\:bg-primary-700:hover { background-color: var(--primary-700); }
+.hover\:text-primary-700:hover { color: var(--primary-700); }
+.hover\:bg-accent-600:hover { background-color: var(--accent-600); }
+.hover\:text-danger-700:hover { color: var(--danger-700); }
+
+.focus\:border-primary-600:focus { border-color: var(--primary-600); }
+.focus\:ring-primary-600:focus { --tw-ring-color: var(--primary-600); }

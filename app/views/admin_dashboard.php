@@ -58,27 +58,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'playfair': ['"Playfair Display"', 'serif'],
-                        'roboto': ['Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        'gold': '#A0D9A0',
-                        'dark-blue': '#8CCF83',
-                        'primary': '#A0D9A0',
-                        'secondary': '#6B7280',
-                        'accent': '#A0D9A0',
-                        'danger': '#EF4444',
-                    }
-                }
-            }
-        }
-    </script>
+
     <style>
         .card {
             transition: transform 0.2s, box-shadow 0.2s;
