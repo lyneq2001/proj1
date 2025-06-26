@@ -14,8 +14,8 @@
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -58,7 +58,7 @@
             transform: scale(1.02);
         }
         .image-preview-container.primary {
-            box-shadow: 0 0 0 3px #1D4ED8;
+            box-shadow: 0 0 0 3px #A0D9A0;
         }
     </style>
 </head>
@@ -402,7 +402,7 @@
         const previewContainer = document.getElementById('image-preview');
         const primaryImageInput = document.getElementById('primary_image');
         previewContainer.innerHTML = '';
-        
+
         if (imageInput.files.length > 5) {
             alert('Możesz przesłać maksymalnie 5 zdjęć');
             imageInput.value = '';
@@ -416,15 +416,15 @@
                 imgContainer.className = `relative cursor-pointer image-preview-container ${i === 0 ? 'primary' : ''}`;
                 imgContainer.style.width = '150px';
                 imgContainer.style.height = '150px';
-                
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.className = 'w-full h-full object-cover rounded-lg';
                 img.alt = 'Property image ' + (i + 1);
-                
+
                 const overlay = document.createElement('div');
                 overlay.className = 'absolute inset-0 bg-black/20 rounded-lg opacity-0 hover:opacity-100 transition flex items-center justify-center';
-                
+
                 const checkIcon = document.createElement('div');
                 checkIcon.className = 'bg-white rounded-full p-1';
                 checkIcon.innerHTML = `
@@ -432,11 +432,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                 `;
-                
+
                 overlay.appendChild(checkIcon);
                 imgContainer.appendChild(img);
                 imgContainer.appendChild(overlay);
-                
+
                 imgContainer.addEventListener('click', () => {
                     // Remove primary class from all images
                     previewContainer.querySelectorAll('.image-preview-container').forEach(container => {
@@ -447,12 +447,12 @@
                     // Update hidden input
                     primaryImageInput.value = i;
                 });
-                
+
                 previewContainer.appendChild(imgContainer);
             };
             reader.readAsDataURL(imageInput.files[i]);
         }
-        
+
         // Set first image as primary by default
         if (imageInput.files.length > 0) {
             primaryImageInput.value = 0;

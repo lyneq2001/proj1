@@ -14,8 +14,8 @@
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -86,17 +86,17 @@
 
             <form method="POST" action="index.php?action=login" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                
+
                 <div>
                     <label for="email" class="block text-sm font-medium text-secondary-600 mb-1">Adres email</label>
                     <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" placeholder="wpisz@email.com">
                 </div>
-                
+
                 <div>
                     <label for="password" class="block text-sm font-medium text-secondary-600 mb-1">Hasło</label>
                     <input type="password" id="password" name="password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" placeholder="••••••••">
                 </div>
-                
+
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
@@ -104,12 +104,12 @@
                     </div>
                     <a href="index.php?action=forgot_password" class="text-sm text-primary-600 hover:text-primary-700">Zapomniałeś hasła?</a>
                 </div>
-                
+
                 <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition font-medium">
                     Zaloguj się
                 </button>
             </form>
-            
+
             <div class="mt-6 text-center">
                 <p class="text-sm text-secondary-600">
                     Nie masz jeszcze konta?

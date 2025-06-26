@@ -61,17 +61,17 @@ require_once __DIR__ . '/auth.php';
         <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
             <?php if (isLoggedIn()): ?>
                 <?php if (isAdmin()): ?>
-                    <a href="index.php?action=admin_dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Panel administracyjny</a>
-                    <a href="index.php?action=dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Panel użytkownika</a>
+                    <a href="index.php?action=admin_dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Panel administracyjny</a>
+                    <a href="index.php?action=dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Panel użytkownika</a>
                     <div class="py-2 px-2 text-gold">Status: <span class="admin-badge">ADMIN</span></div>
                 <?php else: ?>
-                    <a href="index.php?action=dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Panel</a>
+                    <a href="index.php?action=dashboard" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Panel</a>
                 <?php endif; ?>
-                <a href="index.php?action=add_offer" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Dodaj ogłoszenie</a>
-                <a href="index.php?action=search" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Szukaj</a>
+                <a href="index.php?action=add_offer" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Dodaj ogłoszenie</a>
+                <a href="index.php?action=search" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Szukaj</a>
                 <form method="POST" action="index.php?action=logout" class="inline">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                    <button type="submit" class="w-full text-left py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md flex items-center space-x-2">
+                    <button type="submit" class="w-full text-left py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md flex items-center space-x-2">
                         <span>Wyloguj</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -79,11 +79,11 @@ require_once __DIR__ . '/auth.php';
                     </button>
                 </form>
             <?php else: ?>
-                <a href="index.php?action=search" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Przeglądaj oferty</a>
-                <a href="index.php?action=register" class="py-2 px-2 text-white hover:text-gold hover:bg-blue-800 rounded-md">Rejestracja</a>
-                <a href="index.php?action=login" class="py-2 px-2 text-gold hover:bg-blue-800 rounded-md font-medium">Logowanie</a>
+                <a href="index.php?action=search" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Przeglądaj oferty</a>
+                <a href="index.php?action=register" class="py-2 px-2 text-white hover:text-gold hover:bg-green-800 rounded-md">Rejestracja</a>
+                <a href="index.php?action=login" class="py-2 px-2 text-gold hover:bg-green-800 rounded-md font-medium">Logowanie</a>
             <?php endif; ?>
-            <button class="theme-toggle text-white hover:text-gold hover:bg-blue-800 rounded-md py-2 px-2 flex items-center space-x-2" aria-label="Toggle theme">
+            <button class="theme-toggle text-white hover:text-gold hover:bg-green-800 rounded-md py-2 px-2 flex items-center space-x-2" aria-label="Toggle theme">
                 <svg class="w-5 h-5" id="theme-toggle-dark-mobile" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17.293 13.293A8 8 0 016.707 2.707 6 6 0 1017.293 13.293z" />
                 </svg>

@@ -14,8 +14,8 @@
                 extend: {
                     colors: {
                         primary: {
-                            600: '#1D4ED8',
-                            700: '#1E40AF',
+                            600: '#A0D9A0',
+                            700: '#8CCF83',
                         },
                         secondary: {
                             500: '#6B7280',
@@ -77,7 +77,7 @@
 
             <form method="POST" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                
+
                 <div>
                     <label for="username" class="block text-sm font-medium text-secondary-600 mb-1">Nazwa użytkownika</label>
                     <input type="text" id="username" name="username" required
@@ -85,7 +85,7 @@
                            placeholder="Wprowadź nazwę użytkownika"
                            value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
                 </div>
-                
+
                 <div>
                     <label for="email" class="block text-sm font-medium text-secondary-600 mb-1">Adres email</label>
                     <input type="email" id="email" name="email" required
@@ -93,7 +93,7 @@
                            placeholder="wpisz@email.com"
                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                 </div>
-                
+
                 <div>
                     <label for="password" class="block text-sm font-medium text-secondary-600 mb-1">Hasło</label>
                     <input type="password" id="password" name="password" required
@@ -102,12 +102,12 @@
                            value="<?php echo htmlspecialchars($_POST['password'] ?? ''); ?>">
                     <p class="mt-1 text-xs text-secondary-500">Hasło powinno mieć co najmniej 6 znaków oraz zawierać literę i cyfrę</p>
                 </div>
-                
+
                 <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition font-medium">
                     Zarejestruj się
                 </button>
             </form>
-            
+
             <div class="mt-6 text-center">
                 <p class="text-sm text-secondary-600">
                     Masz już konto?
