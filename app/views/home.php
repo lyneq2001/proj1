@@ -7,6 +7,15 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    (function() {
+        const storedTheme = localStorage.getItem("theme");
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
+            document.documentElement.classList.add("dark");
+        }
+    })();
+    </script>
     <meta name="description" content="Luksusowe apartamenty w najlepszych lokalizacjach.">
     <title>Luxury Apartments | Wynajem apartamentów premium</title>
     <script src="https://cdn.tailwindcss.com"></script>

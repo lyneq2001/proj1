@@ -51,6 +51,15 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    (function() {
+        const storedTheme = localStorage.getItem("theme");
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
+            document.documentElement.classList.add("dark");
+        }
+    })();
+    </script>
     <meta name="description" content="Admin dashboard for managing Luxury Apartments platform.">
     <meta name="keywords" content="admin dashboard, luksusowe apartamenty, wynajem apartamentów">
     <title>Admin Dashboard - Luxury Apartments</title>
