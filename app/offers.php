@@ -611,7 +611,7 @@ function getUserFavorites($userId, $page = 1, $perPage = 10) {
         SELECT o.*, i.file_path AS primary_image
         FROM favorites f
         JOIN offers o ON f.offer_id = o.id
-        LEFT JOIN images i ON o.id = i.offer_id
+        LEFT JOIN images i ON o.id = i.offer_id AND i.is_primary = 1
         WHERE f.user_id = ?
         LIMIT ? OFFSET ?
     ");

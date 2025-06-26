@@ -24,6 +24,20 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     colors: {
                         'gold': '#D4AF37',
                         'dark-blue': '#1E3656',
+                        primary: {
+                            600: '#1D4ED8',
+                            700: '#1E40AF',
+                        },
+                        secondary: {
+                            500: '#6B7280',
+                            600: '#4B5563',
+                        },
+                        accent: {
+                            500: '#10B981',
+                            600: '#059669',
+                        },
+                        dark: '#111827',
+                        light: '#F9FAFB',
                     }
                 }
             }
