@@ -70,3 +70,35 @@ html.dark .mobile-menu {
     margin-left: 0.5rem;
     vertical-align: super;
 }
+html.dark .bg-white,
+html.dark .bg-gray-50 {
+    background-color: #1F2937;
+}
+
+html.dark .bg-gray-100,
+html.dark .bg-gray-200 {
+    background-color: #374151;
+}
+
+html.dark .text-dark,
+html.dark .text-dark-blue {
+    color: #F9FAFB;
+}
+
+html.dark .text-secondary-500,
+html.dark .text-secondary-600,
+html.dark .text-secondary-400 {
+    color: #D1D5DB;
+}
+
+html.dark .border-gray-300,
+html.dark .border-gray-200 {
+    border-color: #4B5563;
+}
+
+html.dark .offer-card,
+html.dark .conversation-card,
+html.dark .offer-section {
+    background-color: #1F2937;
+    color: #F9FAFB;
+}
