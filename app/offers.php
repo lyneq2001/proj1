@@ -126,7 +126,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
 function searchOffers($filters, $page = 1, $perPage = 10) {
     global $pdo;
     $offset = ($page - 1) * $perPage;
-    $query = "SELECT o.*, i.file_path AS primary_image";
+    $query = "SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image";
     $countQuery = "SELECT COUNT(*)";
     $params = [];
     $countParams = [];
@@ -158,8 +158,14 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
         }
     }
     
-    $query .= " FROM offers o 
-               LEFT JOIN images i ON o.id = i.offer_id AND i.is_primary = 1 
+    $query .= " FROM offers o
+               LEFT JOIN (
+                   SELECT offer_id,
+                          MAX(CASE WHEN is_primary = 1 THEN file_path END) AS primary_image,
+                          MIN(file_path) AS first_image
+                   FROM images
+                   GROUP BY offer_id
+               ) img ON o.id = img.offer_id
                WHERE 1=1";
     $countQuery .= " FROM offers o WHERE 1=1";
     
@@ -311,10 +317,16 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
 function getUserOffers($userId, $page = 1, $perPage = 10) {
     global $pdo;
     $offset = ($page - 1) * $perPage;
-    $stmt = $pdo->prepare("SELECT o.*, i.file_path AS primary_image 
-                           FROM offers o 
-                           LEFT JOIN images i ON o.id = i.offer_id AND i.is_primary = 1 
-                           WHERE o.user_id = ? 
+    $stmt = $pdo->prepare("SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
+                           FROM offers o
+                           LEFT JOIN (
+                               SELECT offer_id,
+                                      MAX(CASE WHEN is_primary = 1 THEN file_path END) AS primary_image,
+                                      MIN(file_path) AS first_image
+                               FROM images
+                               GROUP BY offer_id
+                           ) img ON o.id = img.offer_id
+                           WHERE o.user_id = ?
                            LIMIT ? OFFSET ?");
     $stmt->bindValue(1, $userId, PDO::PARAM_INT);
     $stmt->bindValue(2, $perPage, PDO::PARAM_INT);
@@ -606,10 +618,16 @@ function getUserFavorites($userId, $page = 1, $perPage = 10) {
     global $pdo;
     $offset = ($page - 1) * $perPage;
     $stmt = $pdo->prepare("
-        SELECT o.*, i.file_path AS primary_image
+        SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
         FROM favorites f
         JOIN offers o ON f.offer_id = o.id
-        LEFT JOIN images i ON o.id = i.offer_id AND i.is_primary = 1
+        LEFT JOIN (
+            SELECT offer_id,
+                   MAX(CASE WHEN is_primary = 1 THEN file_path END) AS primary_image,
+                   MIN(file_path) AS first_image
+            FROM images
+            GROUP BY offer_id
+        ) img ON o.id = img.offer_id
         WHERE f.user_id = ?
         LIMIT ? OFFSET ?
     ");
