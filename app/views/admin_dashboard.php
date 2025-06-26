@@ -68,11 +68,11 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                         'roboto': ['Roboto', 'sans-serif'],
                     },
                     colors: {
-                        'gold': '#D4AF37',
+                        'gold': '#A0D9A0',
                         'dark-blue': '#1E3656',
                         'primary': '#1D4ED8',
                         'secondary': '#6B7280',
-                        'accent': '#10B981',
+                        'accent': '#A0D9A0',
                         'danger': '#EF4444',
                     }
                 }
