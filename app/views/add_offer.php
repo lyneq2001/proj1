@@ -67,6 +67,8 @@
     <main class="container mx-auto px-4 py-8">
         <?php
         $flash = getFlashMessage();
+        $errors = getFormErrors();
+        clearOldInput();
         if ($flash):
         ?>
             <div class="mb-6 p-4 rounded-lg shadow <?php echo $flash['type'] === 'error' ? 'bg-red-100 text-red-700 border-l-4 border-red-500' : 'bg-green-100 text-green-700 border-l-4 border-green-500'; ?> flex items-start">
@@ -115,22 +117,37 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Tytuł*</label>
-                                <input type="text" name="title" placeholder="np. Nowoczesne mieszkanie w centrum" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <input type="text" name="title" placeholder="np. Nowoczesne mieszkanie w centrum"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['title']) ? 'border-red-500' : ''; ?>"
+                                       value="<?php echo htmlspecialchars(getOldInput('title')); ?>" required>
+                                <?php if (isset($errors['title'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['title']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Typ nieruchomości*</label>
-                                <select name="building_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Wybierz typ</option>
-                                    <option value="apartment">Mieszkanie</option>
-                                    <option value="block">Blok mieszkalny</option>
-                                    <option value="house">Dom wolnostojący</option>
-                                    <option value="studio">Kawalerka</option>
-                                    <option value="loft">Loft</option>
+                                <select name="building_type"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['building_type']) ? 'border-red-500' : ''; ?>"
+                                        required>
+                                    <option value="" disabled <?php echo getOldInput('building_type') == '' ? 'selected' : ''; ?>>Wybierz typ</option>
+                                    <option value="apartment" <?php echo getOldInput('building_type') == 'apartment' ? 'selected' : ''; ?>>Mieszkanie</option>
+                                    <option value="block" <?php echo getOldInput('building_type') == 'block' ? 'selected' : ''; ?>>Blok mieszkalny</option>
+                                    <option value="house" <?php echo getOldInput('building_type') == 'house' ? 'selected' : ''; ?>>Dom wolnostojący</option>
+                                    <option value="studio" <?php echo getOldInput('building_type') == 'studio' ? 'selected' : ''; ?>>Kawalerka</option>
+                                    <option value="loft" <?php echo getOldInput('building_type') == 'loft' ? 'selected' : ''; ?>>Loft</option>
                                 </select>
+                                <?php if (isset($errors['building_type'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['building_type']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4 md:col-span-2">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Opis*</label>
-                                <textarea name="description" placeholder="Opisz nieruchomość..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="4" required></textarea>
+                                <textarea name="description" placeholder="Opisz nieruchomość..."
+                                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['description']) ? 'border-red-500' : ''; ?>"
+                                          rows="4" required><?php echo htmlspecialchars(getOldInput('description')); ?></textarea>
+                                <?php if (isset($errors['description'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['description']); ?></p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -147,11 +164,21 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Miasto*</label>
-                                <input type="text" name="city" id="city" placeholder="np. Warszawa" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <input type="text" name="city" id="city" placeholder="np. Warszawa"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['city']) ? 'border-red-500' : ''; ?>"
+                                       value="<?php echo htmlspecialchars(getOldInput('city')); ?>" required>
+                                <?php if (isset($errors['city'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['city']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Ulica*</label>
-                                <input type="text" name="street" id="street" placeholder="np. Główna 14" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                <input type="text" name="street" id="street" placeholder="np. Główna 14"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['street']) ? 'border-red-500' : ''; ?>"
+                                       value="<?php echo htmlspecialchars(getOldInput('street')); ?>" required>
+                                <?php if (isset($errors['street'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['street']); ?></p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -169,19 +196,31 @@
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Cena (PLN)*</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-3 text-secondary-500">PLN</span>
-                                    <input type="number" step="1" name="price" placeholder="np. 2500" class="w-full pl-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <input type="number" step="1" name="price" placeholder="np. 2500"
+                                           class="w-full pl-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['price']) ? 'border-red-500' : ''; ?>"
+                                           value="<?php echo htmlspecialchars(getOldInput('price')); ?>" required>
+                                    <?php if (isset($errors['price'])): ?>
+                                        <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['price']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Powierzchnia (m²)*</label>
                                 <div class="relative">
                                     <span class="absolute right-3 top-3 text-secondary-500">m²</span>
-                                    <input type="number" name="size" placeholder="np. 65" class="w-full pr-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
+                                    <input type="number" name="size" placeholder="np. 65"
+                                           class="w-full pr-12 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['size']) ? 'border-red-500' : ''; ?>"
+                                           value="<?php echo htmlspecialchars(getOldInput('size')); ?>" required>
+                                    <?php if (isset($errors['size'])): ?>
+                                        <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['size']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Piętro</label>
-                                <input type="number" name="floor" placeholder="np. 3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                <input type="number" name="floor" placeholder="np. 3"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                                       value="<?php echo htmlspecialchars(getOldInput('floor')); ?>">
                             </div>
                         </div>
                     </div>
@@ -197,52 +236,72 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Pokoje*</label>
-                                <select name="rooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Wybierz</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5+">5+</option>
+                                <select name="rooms"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['rooms']) ? 'border-red-500' : ''; ?>" required>
+                                    <option value="" disabled <?php echo getOldInput('rooms') == '' ? 'selected' : ''; ?>>Wybierz</option>
+                                    <option value="1" <?php echo getOldInput('rooms') == '1' ? 'selected' : ''; ?>>1</option>
+                                    <option value="2" <?php echo getOldInput('rooms') == '2' ? 'selected' : ''; ?>>2</option>
+                                    <option value="3" <?php echo getOldInput('rooms') == '3' ? 'selected' : ''; ?>>3</option>
+                                    <option value="4" <?php echo getOldInput('rooms') == '4' ? 'selected' : ''; ?>>4</option>
+                                    <option value="5+" <?php echo getOldInput('rooms') == '5+' ? 'selected' : ''; ?>>5+</option>
                                 </select>
+                                <?php if (isset($errors['rooms'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['rooms']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Łazienki*</label>
-                                <select name="bathrooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4+">4+</option>
+                                <select name="bathrooms"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['bathrooms']) ? 'border-red-500' : ''; ?>" required>
+                                    <option value="" disabled <?php echo getOldInput('bathrooms') == '' ? 'selected' : ''; ?>>Select</option>
+                                    <option value="1" <?php echo getOldInput('bathrooms') == '1' ? 'selected' : ''; ?>>1</option>
+                                    <option value="2" <?php echo getOldInput('bathrooms') == '2' ? 'selected' : ''; ?>>2</option>
+                                    <option value="3" <?php echo getOldInput('bathrooms') == '3' ? 'selected' : ''; ?>>3</option>
+                                    <option value="4+" <?php echo getOldInput('bathrooms') == '4+' ? 'selected' : ''; ?>>4+</option>
                                 </select>
+                                <?php if (isset($errors['bathrooms'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['bathrooms']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Rodzaj ogrzewania*</label>
-                                <select name="heating_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Wybierz</option>
-                                    <option value="gas">Gazowe</option>
-                                    <option value="electric">Elektryczne</option>
-                                    <option value="district">Miejskie</option>
-                                    <option value="other">Inne</option>
+                                <select name="heating_type"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['heating_type']) ? 'border-red-500' : ''; ?>" required>
+                                    <option value="" disabled <?php echo getOldInput('heating_type') == '' ? 'selected' : ''; ?>>Wybierz</option>
+                                    <option value="gas" <?php echo getOldInput('heating_type') == 'gas' ? 'selected' : ''; ?>>Gazowe</option>
+                                    <option value="electric" <?php echo getOldInput('heating_type') == 'electric' ? 'selected' : ''; ?>>Elektryczne</option>
+                                    <option value="district" <?php echo getOldInput('heating_type') == 'district' ? 'selected' : ''; ?>>Miejskie</option>
+                                    <option value="other" <?php echo getOldInput('heating_type') == 'other' ? 'selected' : ''; ?>>Inne</option>
                                 </select>
+                                <?php if (isset($errors['heating_type'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['heating_type']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Stan*</label>
-                                <select name="condition_type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" required>
-                                    <option value="" disabled selected>Wybierz</option>
-                                    <option value="new">Nowe</option>
-                                    <option value="renovated">Po remoncie</option>
-                                    <option value="used">Używane</option>
-                                    <option value="to_renovate">Do remontu</option>
+                                <select name="condition_type"
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition <?php echo isset($errors['condition_type']) ? 'border-red-500' : ''; ?>" required>
+                                    <option value="" disabled <?php echo getOldInput('condition_type') == '' ? 'selected' : ''; ?>>Wybierz</option>
+                                    <option value="new" <?php echo getOldInput('condition_type') == 'new' ? 'selected' : ''; ?>>Nowe</option>
+                                    <option value="renovated" <?php echo getOldInput('condition_type') == 'renovated' ? 'selected' : ''; ?>>Po remoncie</option>
+                                    <option value="used" <?php echo getOldInput('condition_type') == 'used' ? 'selected' : ''; ?>>Używane</option>
+                                    <option value="to_renovate" <?php echo getOldInput('condition_type') == 'to_renovate' ? 'selected' : ''; ?>>Do remontu</option>
                                 </select>
+                                <?php if (isset($errors['condition_type'])): ?>
+                                    <p class="text-red-500 text-sm mt-1"><?php echo htmlspecialchars($errors['condition_type']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Rok budowy</label>
-                                <input type="number" name="year_built" placeholder="np. 2010" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                <input type="number" name="year_built" placeholder="np. 2010"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                                       value="<?php echo htmlspecialchars(getOldInput('year_built')); ?>">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-secondary-600 text-sm font-medium mb-1">Dostępne od</label>
-                                <input type="date" name="available_from" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                <input type="date" name="available_from"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition"
+                                       value="<?php echo htmlspecialchars(getOldInput('available_from')); ?>">
                             </div>
                         </div>
                     </div>
@@ -257,31 +316,31 @@
                         </h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="has_balcony" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="has_balcony" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('has_balcony') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Balkon</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="has_elevator" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="has_elevator" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('has_elevator') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Winda</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="parking" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="parking" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('parking') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Parking</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="garage" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="garage" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('garage') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Garaż</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="garden" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="garden" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('garden') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Ogród</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="furnished" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="furnished" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('furnished') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Umeblowane</span>
                             </label>
                             <label class="checkbox-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer">
-                                <input type="checkbox" name="pets_allowed" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded">
+                                <input type="checkbox" name="pets_allowed" value="1" class="h-5 w-5 text-primary-600 focus:ring-primary-600 border-gray-300 rounded" <?php echo getOldInput('pets_allowed') ? 'checked' : ''; ?> >
                                 <span class="ml-3 text-secondary-600 text-sm font-medium">Zwierzęta dozwolone</span>
                             </label>
                         </div>

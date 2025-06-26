@@ -10,48 +10,45 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
     global $pdo;
 
     // Validate inputs
+    $errors = [];
     if (strlen($title) < 3 || strlen($title) > 100) {
-        setFlashMessage('error', 'Title must be between 3 and 100 characters.');
-        return;
+        $errors['title'] = 'Title must be between 3 and 100 characters.';
     }
     if (empty($description)) {
-        setFlashMessage('error', 'Description is required.');
-        return;
+        $errors['description'] = 'Description is required.';
     }
     if (strlen($city) < 3 || strlen($city) > 100) {
-        setFlashMessage('error', 'City must be between 3 and 100 characters.');
-        return;
+        $errors['city'] = 'City must be between 3 and 100 characters.';
     }
     if (strlen($street) < 3 || strlen($street) > 100) {
-        setFlashMessage('error', 'Street must be between 3 and 100 characters.');
-        return;
+        $errors['street'] = 'Street must be between 3 and 100 characters.';
     }
     if (!is_numeric($price) || $price <= 0 || $price > 1000000 || $price != floor($price)) {
-        setFlashMessage('error', 'Price must be a whole number between 1 and 1,000,000 PLN.');
-        return;
+        $errors['price'] = 'Price must be a whole number between 1 and 1,000,000 PLN.';
     }
     if ($size <= 0 || $size > 10000) {
-        setFlashMessage('error', 'Size must be between 0 and 10,000 m².');
-        return;
+        $errors['size'] = 'Size must be between 0 and 10,000 m².';
     }
-    if (!in_array($building_type, ['apartment', 'block', 'house'])) {
-        setFlashMessage('error', 'Invalid building type.');
-        return;
+    if (!in_array($building_type, ['apartment', 'block', 'house', 'studio', 'loft'])) {
+        $errors['building_type'] = 'Invalid building type.';
     }
     if ($rooms < 1 || $rooms > 50) {
-        setFlashMessage('error', 'Rooms must be between 1 and 50.');
-        return;
+        $errors['rooms'] = 'Rooms must be between 1 and 50.';
     }
     if ($bathrooms < 1 || $bathrooms > 20) {
-        setFlashMessage('error', 'Bathrooms must be between 1 and 20.');
-        return;
+        $errors['bathrooms'] = 'Bathrooms must be between 1 and 20.';
     }
     if (!in_array($heating_type, ['gas', 'electric', 'district', 'other'])) {
-        setFlashMessage('error', 'Invalid heating type.');
-        return;
+        $errors['heating_type'] = 'Invalid heating type.';
     }
     if (!in_array($condition_type, ['new', 'renovated', 'used', 'to_renovate'])) {
-        setFlashMessage('error', 'Invalid condition type.');
+        $errors['condition_type'] = 'Invalid condition type.';
+    }
+
+    if (!empty($errors)) {
+        setFormErrors($errors);
+        setOldInput($_POST);
+        setFlashMessage('error', 'Please correct the errors below.');
         return;
     }
 
@@ -118,6 +115,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
             }
         }
 
+        clearOldInput();
         setFlashMessage('success', 'Offer added successfully.');
         header("Location: index.php");
     } catch (PDOException $e) {
