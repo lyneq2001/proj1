@@ -138,7 +138,10 @@ require_once __DIR__ . '/auth.php';
         updateIcons(theme);
     }
 
-    let storedTheme = localStorage.getItem('theme') || 'light';
+    let storedTheme = localStorage.getItem("theme");
+    if (!storedTheme) {
+        storedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
     applyTheme(storedTheme);
 
     themeButtons.forEach(btn => btn.addEventListener('click', () => {
