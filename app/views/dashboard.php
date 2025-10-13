@@ -58,32 +58,133 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <style>
         .conversation-card {
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 30px 60px -45px rgba(15, 23, 42, 0.3);
         }
         .conversation-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 35px 70px -40px rgba(30, 64, 175, 0.25);
         }
         .message-bubble {
             max-width: 80%;
+            border-radius: 1rem;
         }
         .unread-badge {
             min-width: 1.5rem;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
         }
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
         .tab-content.active {
             display: block;
         }
+        .tab-button {
+            transition: all 0.3s ease;
+            position: relative;
+            border-bottom: 2px solid transparent;
+        }
         .tab-button.active {
-            border-bottom: 2px solid #A0D9A0;
-            color: #A0D9A0;
+            border-bottom-color: #1d4ed8;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #1d4ed8, #1e3a8a);
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 30px 60px -45px rgba(15, 23, 42, 0.3);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 35px 70px -40px rgba(30, 64, 175, 0.25);
+        }
+        .offer-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 30px 60px -45px rgba(15, 23, 42, 0.3);
+        }
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 35px 70px -40px rgba(30, 64, 175, 0.35);
+        }
+        .user-avatar {
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page-heading {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .page-heading__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            background: rgba(30, 64, 175, 0.12);
+            color: var(--primary-700);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 1rem;
+        }
+        .page-heading__eyebrow::before {
+            content: '';
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, var(--accent-500), var(--accent-600));
+        }
+        .page-heading__title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-700);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        .page-heading__subtitle {
+            color: var(--secondary-500);
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1.25rem;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 30px 60px -45px rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <main class="page-shell">
-        <div class="container mx-auto px-4">
+    
+    <main class="page-shell py-12">
+        <div class="container mx-auto px-4 sm:px-6">
+            <!-- Page Heading -->
             <div class="page-heading">
                 <span class="page-heading__eyebrow">Panel użytkownika</span>
                 <h1 class="page-heading__title">Witaj, <?php echo htmlspecialchars($user['username'] ?? 'Użytkowniku'); ?></h1>
@@ -94,93 +195,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $flash = getFlashMessage();
             if ($flash):
             ?>
-                <div class="glass-panel mb-8 p-5 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
+                <div class="glass-panel mb-8 p-6 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
                     </svg>
-                    <div class="font-medium leading-relaxed"><?php echo htmlspecialchars($flash['message']); ?></div>
+                    <div class="font-medium leading-relaxed text-lg"><?php echo htmlspecialchars($flash['message']); ?></div>
                 </div>
             <?php endif; ?>
 
-        <div class="flex flex-col md:flex-row gap-8">
+        <div class="flex flex-col lg:flex-row gap-8">
             <!-- Sidebar -->
-            <aside class="w-full md:w-72 flex-shrink-0">
+            <aside class="w-full lg:w-80 flex-shrink-0">
+                <!-- User Profile Card -->
                 <div class="glass-panel p-6 mb-6">
                     <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-16 h-16 rounded-full bg-primary-600 flex items-center justify-center text-white text-2xl font-bold">
+                        <div class="w-16 h-16 rounded-full user-avatar flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                             <?php echo strtoupper(substr($user['username'] ?? 'U', 0, 1)); ?>
                         </div>
                         <div>
-                            <h2 class="font-bold text-dark"><?php echo htmlspecialchars($user['username'] ?? 'N/A'); ?></h2>
-                            <p class="text-secondary-500 text-sm"><?php echo htmlspecialchars($user['email'] ?? 'N/A'); ?></p>
+                            <h2 class="font-bold text-slate-800 text-xl"><?php echo htmlspecialchars($user['username'] ?? 'N/A'); ?></h2>
+                            <p class="text-slate-600 text-sm"><?php echo htmlspecialchars($user['email'] ?? 'N/A'); ?></p>
                         </div>
                     </div>
-                    <div class="space-y-2">
-                        <a href="index.php?action=add_offer" class="flex items-center space-x-2 text-primary-600 hover:text-primary-700 font-medium">
+                    <div class="space-y-3">
+                        <a href="index.php?action=add_offer" class="flex items-center space-x-3 text-slate-700 hover:text-blue-600 font-medium p-3 rounded-xl hover:bg-blue-50 transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            <span>Add New Offer</span>
+                            <span class="font-semibold">Dodaj nowe ogłoszenie</span>
                         </a>
-                        <a href="index.php?action=search" class="flex items-center space-x-2 text-secondary-600 hover:text-dark font-medium">
+                        <a href="index.php?action=search" class="flex items-center space-x-3 text-slate-700 hover:text-blue-600 font-medium p-3 rounded-xl hover:bg-blue-50 transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            <span>Browse Offers</span>
+                            <span class="font-semibold">Przeglądaj oferty</span>
                         </a>
                     </div>
                 </div>
 
+                <!-- Quick Stats -->
                 <div class="glass-panel p-6">
-                    <h3 class="font-semibold text-dark mb-4">Szybkie statystyki</h3>
+                    <h3 class="font-semibold text-slate-800 text-lg mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Szybkie statystyki
+                    </h3>
                     <div class="space-y-4">
-                        <div>
-                            <p class="text-secondary-500 text-sm">Aktywne oferty</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['active_offers'] ?? 0); ?></p>
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-slate-600 font-medium">Aktywne oferty</p>
+                            <p class="text-2xl font-bold text-blue-600"><?php echo (int)($userStats['active_offers'] ?? 0); ?></p>
                         </div>
-                        <div>
-                            <p class="text-secondary-500 text-sm">Oferty w przygotowaniu</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['inactive_offers'] ?? 0); ?></p>
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-slate-600 font-medium">Oferty w przygotowaniu</p>
+                            <p class="text-2xl font-bold text-amber-600"><?php echo (int)($userStats['inactive_offers'] ?? 0); ?></p>
                         </div>
-                        <div>
-                            <p class="text-secondary-500 text-sm">Ulubione ogłoszenia</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['favorites'] ?? 0); ?></p>
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-slate-600 font-medium">Ulubione ogłoszenia</p>
+                            <p class="text-2xl font-bold text-emerald-600"><?php echo (int)($userStats['favorites'] ?? 0); ?></p>
                         </div>
-                        <div>
-                            <p class="text-secondary-500 text-sm">Nieprzeczytane wiadomości</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['unread_messages'] ?? 0); ?></p>
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                            <p class="text-slate-600 font-medium">Nieprzeczytane wiadomości</p>
+                            <p class="text-2xl font-bold text-purple-600"><?php echo (int)($userStats['unread_messages'] ?? 0); ?></p>
                         </div>
                     </div>
                 </div>
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1 space-y-10">
-                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-panel p-5 border-t-4 border-blue-200">
-                        <p class="text-sm text-secondary-500">Łączna liczba wyświetleń</p>
-                        <p class="text-2xl font-bold text-dark mt-2"><?php echo number_format((int)($userStats['total_views'] ?? 0)); ?></p>
+            <div class="flex-1 space-y-8">
+                <!-- Stats Overview -->
+                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stat-card p-6 border-l-4 border-blue-500">
+                        <p class="text-sm text-slate-600 font-medium mb-2">Łączna liczba wyświetleń</p>
+                        <p class="text-3xl font-bold text-slate-800"><?php echo number_format((int)($userStats['total_views'] ?? 0)); ?></p>
                     </div>
-                    <div class="glass-panel p-5 border-t-4 border-indigo-200">
-                        <p class="text-sm text-secondary-500">Aktywne konwersacje</p>
-                        <p class="text-2xl font-bold text-dark mt-2"><?php echo count($conversations); ?></p>
+                    <div class="stat-card p-6 border-l-4 border-indigo-500">
+                        <p class="text-sm text-slate-600 font-medium mb-2">Aktywne konwersacje</p>
+                        <p class="text-3xl font-bold text-slate-800"><?php echo count($conversations); ?></p>
                     </div>
-                    <div class="glass-panel p-5 border-t-4 border-amber-200">
-                        <p class="text-sm text-secondary-500">Ulubione oferty</p>
-                        <p class="text-2xl font-bold text-dark mt-2"><?php echo count($favorites); ?></p>
+                    <div class="stat-card p-6 border-l-4 border-amber-500">
+                        <p class="text-sm text-slate-600 font-medium mb-2">Ulubione oferty</p>
+                        <p class="text-3xl font-bold text-slate-800"><?php echo count($favorites); ?></p>
                     </div>
-                    <div class="glass-panel p-5 border-t-4 <?php echo $userPendingReports ? 'border-red-300' : 'border-slate-200'; ?>">
-                        <p class="text-sm text-secondary-500">Zgłoszenia w toku</p>
-                        <p class="text-2xl font-bold text-dark mt-2"><?php echo (int)$userPendingReports; ?></p>
+                    <div class="stat-card p-6 border-l-4 <?php echo $userPendingReports ? 'border-red-500' : 'border-slate-400'; ?>">
+                        <p class="text-sm text-slate-600 font-medium mb-2">Zgłoszenia w toku</p>
+                        <p class="text-3xl font-bold <?php echo $userPendingReports ? 'text-red-600' : 'text-slate-600'; ?>"><?php echo (int)$userPendingReports; ?></p>
                     </div>
                 </section>
 
                 <?php if ($userPendingReports): ?>
-                    <div class="glass-panel p-4 flex items-center space-x-3 text-red-700 border border-red-200/60 bg-red-50/60">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="glass-panel p-6 flex items-center space-x-4 text-red-700 border border-red-200 bg-red-50/80 rounded-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" />
                         </svg>
-                        <span>Masz <?php echo (int)$userPendingReports; ?> zgłoszeń oczekujących na decyzję administratora.</span>
+                        <div>
+                            <p class="font-semibold">Masz <?php echo (int)$userPendingReports; ?> zgłoszeń oczekujących na decyzję administratora.</p>
+                            <p class="text-sm text-red-600 mt-1">Status Twoich zgłoszeń możesz śledzić w tym panelu.</p>
+                        </div>
                     </div>
                 <?php endif; ?>
 
@@ -196,44 +308,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $stmt->execute([$receiver_id]);
                     $receiver = $stmt->fetch(PDO::FETCH_ASSOC);
                     ?>
-                    <section class="mb-8 glass-panel p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold text-dark">Send Message</h2>
-                            <a href="index.php?action=dashboard" class="text-secondary-500 hover:text-dark">
+                    <section class="glass-panel p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-playfair font-bold text-slate-800">Wyślij wiadomość</h2>
+                            <a href="index.php?action=dashboard" class="text-slate-500 hover:text-slate-700 p-2 rounded-lg hover:bg-slate-100 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </a>
                         </div>
                         <?php if (!$offer || !$receiver): ?>
-                            <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-                                Invalid offer or recipient.
+                            <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                                <p class="font-semibold">Nieprawidłowa oferta lub odbiorca.</p>
                             </div>
                         <?php else: ?>
-                            <form method="POST" action="index.php?action=dashboard" class="max-w-2xl">
+                            <form method="POST" action="index.php?action=dashboard" class="max-w-2xl space-y-6">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                 <input type="hidden" name="send_message" value="1">
                                 <input type="hidden" name="receiver_id" value="<?php echo $receiver_id; ?>">
                                 <input type="hidden" name="offer_id" value="<?php echo $offer_id; ?>">
-                                <div class="mb-4">
-                                    <label class="block text-secondary-500 text-sm font-medium mb-1">To</label>
-                                    <div class="rounded-lg border border-slate-200 bg-white p-3 text-sm text-secondary-600"><?php echo htmlspecialchars($receiver['username']); ?></div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-slate-700 text-sm font-semibold mb-3">Odbiorca</label>
+                                        <div class="rounded-xl border border-slate-200 bg-white p-4 text-slate-800 font-medium"><?php echo htmlspecialchars($receiver['username']); ?></div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-700 text-sm font-semibold mb-3">Dotyczące oferty</label>
+                                        <div class="rounded-xl border border-slate-200 bg-white p-4 text-slate-800 font-medium"><?php echo htmlspecialchars($offer['title']); ?></div>
+                                    </div>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="block text-secondary-500 text-sm font-medium mb-1">About Offer</label>
-                                    <div class="rounded-lg border border-slate-200 bg-white p-3 text-sm text-secondary-600"><?php echo htmlspecialchars($offer['title']); ?></div>
+                                
+                                <div>
+                                    <label class="block text-slate-700 text-sm font-semibold mb-3">Wiadomość</label>
+                                    <textarea name="message" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition bg-white/80 text-lg" rows="5" required placeholder="Napisz wiadomość do właściciela..."></textarea>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="block text-secondary-500 text-sm font-medium mb-1">Message</label>
-                                    <textarea name="message" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition bg-white" rows="4" required placeholder="Napisz wiadomość do właściciela..."></textarea>
-                                </div>
-                                <div class="flex justify-end space-x-3">
-                                    <a href="index.php?action=dashboard" class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-white transition">Anuluj</a>
-                                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center space-x-2">
+                                
+                                <div class="flex justify-end space-x-4">
+                                    <a href="index.php?action=dashboard" class="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-all duration-300 font-semibold">
+                                        Anuluj
+                                    </a>
+                                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 flex items-center space-x-3">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                         </svg>
-                                        <span>Send Message</span>
+                                        <span>Wyślij wiadomość</span>
                                     </button>
                                 </div>
                             </form>
@@ -242,29 +361,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <?php endif; ?>
 
                 <!-- Tabs Navigation -->
-                <div class="border-b border-gray-200 mb-6">
+                <div class="border-b border-slate-200 mb-8">
                     <nav class="flex space-x-8">
-                        <button class="tab-button py-3 px-1 font-medium text-secondary-600 hover:text-dark active" data-tab="offers">Your Offers</button>
-                        <button class="tab-button py-3 px-1 font-medium text-secondary-600 hover:text-dark" data-tab="favorites">Favorites</button>
-                        <button class="tab-button py-3 px-1 font-medium text-secondary-600 hover:text-dark" data-tab="messages">Messages</button>
+                        <button class="tab-button py-4 px-1 font-semibold text-slate-600 hover:text-blue-600 active" data-tab="offers">
+                            Twoje oferty
+                        </button>
+                        <button class="tab-button py-4 px-1 font-semibold text-slate-600 hover:text-blue-600" data-tab="favorites">
+                            Ulubione
+                        </button>
+                        <button class="tab-button py-4 px-1 font-semibold text-slate-600 hover:text-blue-600" data-tab="messages">
+                            Wiadomości
+                        </button>
                     </nav>
                 </div>
 
                 <!-- Offers Tab -->
                 <div id="offers-tab" class="tab-content active">
                     <?php if (empty($offers)): ?>
-                        <div class="glass-panel p-8 text-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="glass-panel p-12 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-slate-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
-                            <h3 class="text-xl font-semibold text-dark mb-2">No offers created yet</h3>
-                            <p class="text-secondary-500 mb-4">Start by adding your first property to rent</p>
-                            <a href="index.php?action=add_offer" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
-                                Add New Offer
+                            <h3 class="text-2xl font-playfair font-bold text-slate-800 mb-4">Brak utworzonych ofert</h3>
+                            <p class="text-slate-600 text-lg mb-8">Rozpocznij od dodania swojej pierwszej nieruchomości do wynajęcia</p>
+                            <a href="index.php?action=add_offer" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                                Dodaj nową ofertę
                             </a>
                         </div>
                     <?php else: ?>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             <?php foreach ($offers as $offer): ?>
                                 <?php
                                 $is_valid_offer = is_array($offer) && isset(
@@ -278,62 +403,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 );
                                 if (!$is_valid_offer):
                                 ?>
-                                    <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid offer data.</div>
+                                    <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200">Nieprawidłowe dane oferty.</div>
                                 <?php else: ?>
-                                    <div class="glass-panel overflow-hidden hover:shadow-card-hover transition">
+                                    <div class="offer-card overflow-hidden">
                                         <?php if (!empty($offer['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
-                                                <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
-                                                <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                    <span class="text-sm font-medium px-2">Łącznie: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?></span>
+                                                <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                    <span class="text-sm font-semibold px-2 text-slate-700">
+                                                        Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                    </span>
                                                 </div>
                                             </div>
                                         <?php else: ?>
-                                            <div class="w-full h-48 bg-gray-100 flex items-center justify-center relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <div class="w-full h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                    <span class="text-sm font-medium px-2">Łącznie: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?></span>
+                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                    <span class="text-sm font-semibold px-2 text-slate-700">
+                                                        Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                    </span>
                                                 </div>
                                             </div>
                                         <?php endif; ?>
-                                        <div class="p-5">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <h3 class="text-lg font-semibold text-dark truncate"><?php echo htmlspecialchars($offer['title']); ?></h3>
-                                                <span class="text-lg font-bold text-primary-600 whitespace-nowrap"><?php echo htmlspecialchars($offer['price']); ?> PLN</span>
+                                        <div class="p-6">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <h3 class="text-xl font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($offer['title']); ?></h3>
+                                                <span class="text-2xl font-bold text-blue-600 whitespace-nowrap ml-4"><?php echo htmlspecialchars(number_format((float)$offer['price'], 0, ',', ' ')); ?> PLN</span>
                                             </div>
-                                            <p class="text-secondary-500 text-sm mb-3">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <p class="text-slate-600 text-base mb-3 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
                                                 <?php echo htmlspecialchars($offer['city']); ?>, <?php echo htmlspecialchars($offer['street']); ?>
                                             </p>
-                                            <p class="text-secondary-500 text-sm mb-4">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <p class="text-slate-600 text-base mb-4 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                 </svg>
                                                 <?php echo htmlspecialchars($offer['size']); ?> m²
                                             </p>
-                                            <p class="text-secondary-500 text-sm mb-4 line-clamp-2"><?php echo htmlspecialchars($offer['description']); ?></p>
-                                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                                                <div class="flex space-x-2">
-                                                    <a href="index.php?action=edit_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
+                                            <p class="text-slate-600 text-sm mb-4 line-clamp-2 leading-relaxed"><?php echo htmlspecialchars($offer['description']); ?></p>
+                                            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                                                <div class="flex space-x-4">
+                                                    <a href="index.php?action=edit_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center transition-colors">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                         </svg>
-                                                        Edit
+                                                        Edytuj
                                                     </a>
-                                                    <a href="index.php?action=delete_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-red-600 hover:text-red-700 font-medium flex items-center" onclick="return confirm('Are you sure you want to delete this offer?');">
+                                                    <a href="index.php?action=delete_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-red-600 hover:text-red-700 font-semibold flex items-center transition-colors" onclick="return confirm('Czy na pewno chcesz usunąć tę ofertę?');">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
-                                                        Delete
+                                                        Usuń
                                                     </a>
                                                 </div>
-                                                <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-accent-600 px-3 py-1 rounded-lg transition font-medium">
-                                                    View
+                                                <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                                                    Zobacz
                                                 </a>
                                             </div>
                                         </div>
@@ -347,18 +476,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Favorites Tab -->
                 <div id="favorites-tab" class="tab-content">
                     <?php if (empty($favorites)): ?>
-                        <div class="glass-panel p-8 text-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="glass-panel p-12 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-slate-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                            <h3 class="text-xl font-semibold text-dark mb-2">No favorite offers yet</h3>
-                            <p class="text-secondary-500 mb-4">Save interesting offers to find them easily later</p>
-                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
-                                Browse Offers
+                            <h3 class="text-2xl font-playfair font-bold text-slate-800 mb-4">Brak ulubionych ofert</h3>
+                            <p class="text-slate-600 text-lg mb-8">Zapisz interesujące oferty, aby łatwo je znaleźć później</p>
+                            <a href="index.php?action=search" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                                Przeglądaj oferty
                             </a>
                         </div>
                     <?php else: ?>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             <?php foreach ($favorites as $favorite): ?>
                                 <?php
                                 $is_valid_favorite = is_array($favorite) && isset(
@@ -372,54 +501,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 );
                                 if (!$is_valid_favorite):
                                 ?>
-                                    <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid favorite offer data.</div>
+                                    <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200">Nieprawidłowe dane ulubionej oferty.</div>
                                 <?php else: ?>
-                                    <div class="glass-panel overflow-hidden hover:shadow-card-hover transition">
+                                    <div class="offer-card overflow-hidden">
                                         <?php if (!empty($favorite['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
-                                                <img src="<?php echo htmlspecialchars($favorite['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
-                                                <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                    <span class="text-sm font-medium px-2">Łącznie: <?php echo htmlspecialchars($favorite['visits']); ?> • 24h: <?php echo htmlspecialchars($favorite['views_last_24h'] ?? 0); ?></span>
+                                                <img src="<?php echo htmlspecialchars($favorite['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                    <span class="text-sm font-semibold px-2 text-slate-700">
+                                                        Wyświetlenia: <?php echo htmlspecialchars($favorite['visits']); ?> • 24h: <?php echo htmlspecialchars($favorite['views_last_24h'] ?? 0); ?>
+                                                    </span>
                                                 </div>
                                             </div>
                                         <?php else: ?>
-                                            <div class="w-full h-48 bg-gray-100 flex items-center justify-center relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <div class="w-full h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                    <span class="text-sm font-medium px-2">Łącznie: <?php echo htmlspecialchars($favorite['visits']); ?> • 24h: <?php echo htmlspecialchars($favorite['views_last_24h'] ?? 0); ?></span>
+                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                    <span class="text-sm font-semibold px-2 text-slate-700">
+                                                        Wyświetlenia: <?php echo htmlspecialchars($favorite['visits']); ?> • 24h: <?php echo htmlspecialchars($favorite['views_last_24h'] ?? 0); ?>
+                                                    </span>
                                                 </div>
                                             </div>
                                         <?php endif; ?>
-                                        <div class="p-5">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <h3 class="text-lg font-semibold text-dark truncate"><?php echo htmlspecialchars($favorite['title']); ?></h3>
-                                                <span class="text-lg font-bold text-primary-600 whitespace-nowrap"><?php echo htmlspecialchars($favorite['price']); ?> PLN</span>
+                                        <div class="p-6">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <h3 class="text-xl font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($favorite['title']); ?></h3>
+                                                <span class="text-2xl font-bold text-blue-600 whitespace-nowrap ml-4"><?php echo htmlspecialchars(number_format((float)$favorite['price'], 0, ',', ' ')); ?> PLN</span>
                                             </div>
-                                            <p class="text-secondary-500 text-sm mb-3">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <p class="text-slate-600 text-base mb-3 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
                                                 <?php echo htmlspecialchars($favorite['city']); ?>, <?php echo htmlspecialchars($favorite['street']); ?>
                                             </p>
-                                            <p class="text-secondary-500 text-sm mb-4">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <p class="text-slate-600 text-base mb-4 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                 </svg>
                                                 <?php echo htmlspecialchars($favorite['size']); ?> m²
                                             </p>
-                                            <p class="text-secondary-500 text-sm mb-4 line-clamp-2"><?php echo htmlspecialchars($favorite['description']); ?></p>
-                                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-                                                <a href="index.php?action=toggle_favorite&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-red-600 hover:text-red-700 font-medium flex items-center">
+                                            <p class="text-slate-600 text-sm mb-4 line-clamp-2 leading-relaxed"><?php echo htmlspecialchars($favorite['description']); ?></p>
+                                            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                                                <a href="index.php?action=toggle_favorite&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-red-600 hover:text-red-700 font-semibold flex items-center transition-colors">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
-                                                    Remove
+                                                    Usuń z ulubionych
                                                 </a>
-                                                <a href="index.php?action=view_offer&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-accent-600 px-3 py-1 rounded-lg transition font-medium">
-                                                    View Details
+                                                <a href="index.php?action=view_offer&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                                                    Zobacz szczegóły
                                                 </a>
                                             </div>
                                         </div>
@@ -433,18 +566,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Messages Tab -->
                 <div id="messages-tab" class="tab-content">
                     <?php if (empty($conversations)): ?>
-                        <div class="glass-panel p-8 text-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="glass-panel p-12 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-slate-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
-                            <h3 class="text-xl font-semibold text-dark mb-2">No messages yet</h3>
-                            <p class="text-secondary-500 mb-4">Start a conversation by contacting offer owners</p>
-                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
-                                Browse Offers
+                            <h3 class="text-2xl font-playfair font-bold text-slate-800 mb-4">Brak wiadomości</h3>
+                            <p class="text-slate-600 text-lg mb-8">Rozpocznij konwersację, kontaktując się z właścicielami ofert</p>
+                            <a href="index.php?action=search" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
+                                Przeglądaj oferty
                             </a>
                         </div>
                     <?php else: ?>
-                        <div class="space-y-4">
+                        <div class="space-y-6">
                             <?php foreach ($conversations as $index => $conversation): ?>
                                 <?php
                                 $is_valid_conversation = is_array($conversation) && isset(
@@ -458,35 +591,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 ) && is_array($conversation['messages']);
                                 if (!$is_valid_conversation):
                                 ?>
-                                    <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid conversation data.</div>
+                                    <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200">Nieprawidłowe dane konwersacji.</div>
                                 <?php else: ?>
-                                    <div class="glass-panel overflow-hidden conversation-card" data-index="<?php echo $index; ?>">
-                                        <div class="p-5 flex justify-between items-center cursor-pointer">
+                                    <div class="conversation-card overflow-hidden" data-index="<?php echo $index; ?>">
+                                        <div class="p-6 flex justify-between items-center cursor-pointer hover:bg-slate-50/50 transition-colors">
                                             <div class="flex items-center space-x-4">
-                                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-secondary-500">
+                                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-blue-600 font-bold text-lg">
                                                     <?php echo strtoupper(substr($conversation['other_user'], 0, 1)); ?>
                                                 </div>
                                                 <div>
-                                                    <h3 class="font-semibold text-dark"><?php echo htmlspecialchars($conversation['offer_title']); ?></h3>
-                                                    <p class="text-secondary-500 text-sm">With <?php echo htmlspecialchars($conversation['other_user']); ?></p>
-                                                    <p class="text-secondary-400 text-xs mt-1">
-                                                        <?php echo $conversation['is_owner'] ? 'You are the owner' : 'You are interested'; ?>
+                                                    <h3 class="font-semibold text-slate-800 text-lg"><?php echo htmlspecialchars($conversation['offer_title']); ?></h3>
+                                                    <p class="text-slate-600">Z <?php echo htmlspecialchars($conversation['other_user']); ?></p>
+                                                    <p class="text-slate-500 text-sm mt-1">
+                                                        <?php echo $conversation['is_owner'] ? 'Jesteś właścicielem' : 'Jesteś zainteresowany'; ?>
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center space-x-3">
+                                            <div class="flex items-center space-x-4">
                                                 <?php if ($conversation['unread_count'] > 0): ?>
-                                                    <span class="unread-badge bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                                                    <span class="unread-badge text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg">
                                                         <?php echo $conversation['unread_count']; ?>
                                                     </span>
                                                 <?php endif; ?>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary-400 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div class="conversation-content hidden px-5 pb-5">
-                                            <div class="max-h-96 overflow-y-auto space-y-4 mb-4 border-t border-gray-100 pt-4">
+                                        <div class="conversation-content hidden px-6 pb-6">
+                                            <div class="max-h-96 overflow-y-auto space-y-4 mb-6 border-t border-slate-100 pt-6">
                                                 <?php foreach ($conversation['messages'] as $msg): ?>
                                                     <?php
                                                     $is_valid_message = is_array($msg) && isset(
@@ -496,12 +629,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                     );
                                                     if (!$is_valid_message):
                                                     ?>
-                                                        <div class="bg-red-50 text-red-700 p-3 rounded-lg">Invalid message data.</div>
+                                                        <div class="bg-red-50 text-red-700 p-4 rounded-2xl">Nieprawidłowe dane wiadomości.</div>
                                                     <?php else: ?>
                                                         <div class="flex <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'justify-end' : 'justify-start'; ?>">
-                                                            <div class="max-w-xs md:max-w-md p-3 rounded-lg message-bubble <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'bg-primary-600 text-white' : 'bg-gray-100 text-dark'; ?>">
-                                                                <p class="text-sm"><?php echo htmlspecialchars($msg['message']); ?></p>
-                                                                <p class="text-xs <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'text-primary-100' : 'text-secondary-500'; ?> mt-1">
+                                                            <div class="max-w-xs md:max-w-md p-4 rounded-2xl message-bubble <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white' : 'bg-slate-100 text-slate-800'; ?> shadow-sm">
+                                                                <p class="text-sm leading-relaxed"><?php echo htmlspecialchars($msg['message']); ?></p>
+                                                                <p class="text-xs <?php echo $msg['sender_id'] == $_SESSION['user_id'] ? 'text-blue-100' : 'text-slate-500'; ?> mt-2">
                                                                     <?php echo htmlspecialchars($msg['sent_at']); ?>
                                                                 </p>
                                                             </div>
@@ -510,13 +643,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                 <?php endforeach; ?>
                                             </div>
                                             <!-- Reply Form -->
-                                            <form method="POST" action="index.php?action=dashboard" class="flex items-start space-x-2">
+                                            <form method="POST" action="index.php?action=dashboard" class="flex items-start space-x-4">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                                 <input type="hidden" name="send_message" value="1">
                                                 <input type="hidden" name="receiver_id" value="<?php echo htmlspecialchars($conversation['other_user_id']); ?>">
                                                 <input type="hidden" name="offer_id" value="<?php echo htmlspecialchars($conversation['offer_id']); ?>">
-                                                <textarea name="message" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="2" placeholder="Reply to <?php echo htmlspecialchars($conversation['other_user']); ?>..." required></textarea>
-                                                <button type="submit" class="h-full px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center">
+                                                <textarea name="message" class="flex-1 p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition bg-white/80" rows="3" placeholder="Odpowiedz <?php echo htmlspecialchars($conversation['other_user']); ?>..." required></textarea>
+                                                <button type="submit" class="h-full px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105 flex items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                                     </svg>
