@@ -6,34 +6,22 @@ $isHomePage = $action === 'home';
 
 $headerClasses = [
     'primary-header',
-    $isHomePage ? 'header-home' : 'header-default',
-    'sticky top-0 z-50',
+    'header-home',
+    'relative z-40',
     'backdrop-blur-xl',
-    'border-b',
+    'border-b border-white/10',
     'transition-all duration-500',
-    $isHomePage
-        ? 'bg-gradient-to-r from-slate-900/80 via-blue-900/70 to-indigo-900/80 text-white shadow-[0_20px_45px_-25px_rgba(30,64,175,0.65)] border-white/10'
-        : 'bg-white/95 text-dark-blue shadow-nav border-slate-200/60'
+    'bg-gradient-to-r from-slate-900/80 via-blue-900/70 to-indigo-900/80 text-white shadow-[0_20px_45px_-25px_rgba(30,64,175,0.65)]'
 ];
 
-$desktopLinkClass = 'nav-link font-medium transition-colors duration-300 ' . ($isHomePage ? 'text-slate-100 hover:text-white' : 'text-slate-700 hover:text-blue-700');
-$secondaryLinkClass = 'nav-link font-medium transition-colors duration-300 ' . ($isHomePage ? 'text-slate-200 hover:text-white/95' : 'text-slate-600 hover:text-blue-700');
-$primaryCtaClass = $isHomePage
-    ? 'bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl border border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-medium backdrop-blur'
-    : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-medium';
-$logoutButtonClass = $isHomePage
-    ? 'flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl border border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group backdrop-blur'
-    : 'flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-5 py-2.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group';
+$desktopLinkClass = 'nav-link font-medium transition-colors duration-300 text-slate-100 hover:text-white';
+$secondaryLinkClass = 'nav-link font-medium transition-colors duration-300 text-slate-200 hover:text-white/95';
+$primaryCtaClass = 'bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl border border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 font-medium backdrop-blur';
+$logoutButtonClass = 'flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl border border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group backdrop-blur';
 
-$mobileMenuClasses = 'mobile-menu md:hidden transition-all duration-300 ' . ($isHomePage
-    ? 'mobile-menu-home bg-gradient-to-b from-slate-900/95 via-blue-900/90 to-indigo-900/95 backdrop-blur-2xl border-white/10'
-    : 'mobile-menu-default bg-white/95 border-slate-200/60 shadow-inner');
-$mobileLinkClass = $isHomePage
-    ? 'py-3 px-4 text-white hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-white/10 hover:border-white/20'
-    : 'py-3 px-4 text-slate-700 hover:text-blue-700 hover:bg-slate-100 rounded-xl transition-all duration-300 border border-slate-200 hover:border-slate-300';
-$mobileAccentButtonClass = $isHomePage
-    ? 'py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all duration-300 border border-white/20 text-center'
-    : 'py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-medium rounded-xl transition-all duration-300 shadow-lg text-center';
+$mobileMenuClasses = 'mobile-menu md:hidden transition-all duration-300 mobile-menu-home bg-gradient-to-b from-slate-900/95 via-blue-900/90 to-indigo-900/95 backdrop-blur-2xl border-white/10';
+$mobileLinkClass = 'py-3 px-4 text-white hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 border border-white/10 hover:border-white/20';
+$mobileAccentButtonClass = 'py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all duration-300 border border-white/20 text-center';
 ?>
 
 <header class="<?php echo implode(' ', array_filter($headerClasses)); ?>">
@@ -99,8 +87,8 @@ $mobileAccentButtonClass = $isHomePage
         </div>
 
         <!-- Mobile menu button -->
-        <button id="menu-toggle" class="md:hidden focus:outline-none p-2 rounded-lg <?php echo $isHomePage ? 'bg-white/10 hover:bg-white/20 border border-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'; ?> transition-colors duration-300 group">
-            <svg class="w-6 h-6 <?php echo $isHomePage ? 'text-white group-hover:text-white' : 'text-slate-700 group-hover:text-blue-700'; ?> transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button id="menu-toggle" class="md:hidden focus:outline-none p-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors duration-300 group">
+            <svg class="w-6 h-6 text-white group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
         </button>
@@ -122,7 +110,7 @@ $mobileAccentButtonClass = $isHomePage
                 <a href="index.php?action=search" class="<?php echo $mobileLinkClass; ?>">Szukaj</a>
                 <form method="POST" action="index.php?action=logout" class="inline">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                    <button type="submit" class="<?php echo $isHomePage ? 'w-full text-left py-3 px-4 text-white hover:bg-red-500/20 rounded-xl transition-all duration-300 border border-white/10 hover:border-red-400/40 flex items-center justify-between group' : 'w-full text-left py-3 px-4 text-slate-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 border border-slate-200 hover:border-red-200 flex items-center justify-between group'; ?>">
+                    <button type="submit" class="w-full text-left py-3 px-4 text-white hover:bg-red-500/20 rounded-xl transition-all duration-300 border border-white/10 hover:border-red-400/40 flex items-center justify-between group">
                         <span>Wyloguj</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -148,26 +136,18 @@ $mobileAccentButtonClass = $isHomePage
         const button = document.getElementById('menu-toggle');
         if (menu.classList.contains('open')) {
             button.innerHTML = `
-                <svg class="w-6 h-6 <?php echo $isHomePage ? 'text-white group-hover:text-white' : 'text-slate-700 group-hover:text-blue-700'; ?> transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-6 h-6 text-white group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             `;
-            <?php if ($isHomePage): ?>
             button.classList.add('bg-white/20');
-            <?php else: ?>
-            button.classList.add('bg-blue-100');
-            <?php endif; ?>
         } else {
             button.innerHTML = `
-                <svg class="w-6 h-6 <?php echo $isHomePage ? 'text-white group-hover:text-white' : 'text-slate-700 group-hover:text-blue-700'; ?> transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-6 h-6 text-white group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             `;
-            <?php if ($isHomePage): ?>
             button.classList.remove('bg-white/20');
-            <?php else: ?>
-            button.classList.remove('bg-blue-100');
-            <?php endif; ?>
         }
     });
 
@@ -181,15 +161,11 @@ $mobileAccentButtonClass = $isHomePage
         if (!isClickInsideMenu && !isClickOnButton && menu.classList.contains('open')) {
             menu.classList.remove('open');
             button.innerHTML = `
-                <svg class="w-6 h-6 <?php echo $isHomePage ? 'text-white group-hover:text-white' : 'text-slate-700 group-hover:text-blue-700'; ?> transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-6 h-6 text-white group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             `;
-            <?php if ($isHomePage): ?>
             button.classList.remove('bg-white/20');
-            <?php else: ?>
-            button.classList.remove('bg-blue-100');
-            <?php endif; ?>
         }
     });
 </script>
