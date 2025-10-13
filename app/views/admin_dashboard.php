@@ -53,15 +53,6 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <meta name="description" content="Admin dashboard for managing Luxury Apartments platform.">
     <meta name="keywords" content="admin dashboard, luksusowe apartamenty, wynajem apartamentów">
     <title>Admin Dashboard - Luxury Apartments</title>
@@ -101,7 +92,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-roboto">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
 
     <main class="container mx-auto px-4 py-8">
@@ -360,7 +351,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                                                 <option value="resolved" <?php echo ($report['status'] ?? '') === 'resolved' ? 'selected' : ''; ?>>Zamknięte</option>
                                             </select>
                                             <textarea name="admin_note" rows="2" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Notatka (opcjonalnie)"><?php echo htmlspecialchars($report['admin_note'] ?? ''); ?></textarea>
-                                            <button type="submit" class="w-full bg-primary text-white px-3 py-1 rounded text-xs hover:bg-primary-700 transition">Zapisz zmiany</button>
+                                            <button type="submit" class="w-full bg-accent-500 text-white px-3 py-1 rounded text-xs hover:bg-accent-600 transition">Zapisz zmiany</button>
                                         </form>
                                     </td>
                                 </tr>

@@ -3,15 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Find Apartments - Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -47,7 +38,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php
@@ -217,7 +208,7 @@
                                     <option value="size_desc" <?php echo ($_GET['sort'] ?? '') == 'size_desc' ? 'selected' : ''; ?>>Powierzchnia: malejąco</option>
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white p-2 rounded-lg transition font-medium">
+                            <button type="submit" class="w-full bg-primary-600 hover:bg-accent-600 text-white p-2 rounded-lg transition font-medium">
                                 Zastosuj filtry
                             </button>
                             <?php if (!empty($_GET)): ?>
@@ -244,7 +235,7 @@
                         </svg>
                         <h3 class="text-xl font-semibold text-dark mb-2">Brak wyników</h3>
                         <p class="text-secondary-500 mb-4">Spróbuj zmienić filtry wyszukiwania</p>
-                        <button id="show-filters" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium lg:hidden">
+                        <button id="show-filters" class="px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium lg:hidden">
                             Pokaż filtry
                         </button>
                     </div>
@@ -334,7 +325,7 @@
                                 </a>
                                 <?php if (isLoggedIn() && $offer['user_id'] != $_SESSION['user_id']): ?>
                                     <div class="px-5 pb-5 flex justify-between items-center">
-                                        <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition font-medium">
+                                        <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-accent-600 px-4 py-2 rounded-lg transition font-medium">
                                             Kontakt z właścicielem
                                         </a>
                                         <?php if (isFavorite($_SESSION['user_id'], $offer['id'])): ?>

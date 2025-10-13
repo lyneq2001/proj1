@@ -50,15 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Dashboard - Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -89,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php
@@ -233,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 </div>
                                 <div class="flex justify-end space-x-3">
                                     <a href="index.php?action=dashboard" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</a>
-                                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium flex items-center space-x-2">
+                                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                         </svg>
@@ -263,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </svg>
                             <h3 class="text-xl font-semibold text-dark mb-2">No offers created yet</h3>
                             <p class="text-secondary-500 mb-4">Start by adding your first property to rent</p>
-                            <a href="index.php?action=add_offer" class="inline-block px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
+                            <a href="index.php?action=add_offer" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
                                 Add New Offer
                             </a>
                         </div>
@@ -336,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                         Delete
                                                     </a>
                                                 </div>
-                                                <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded-lg transition font-medium">
+                                                <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-accent-600 px-3 py-1 rounded-lg transition font-medium">
                                                     View
                                                 </a>
                                             </div>
@@ -357,7 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </svg>
                             <h3 class="text-xl font-semibold text-dark mb-2">No favorite offers yet</h3>
                             <p class="text-secondary-500 mb-4">Save interesting offers to find them easily later</p>
-                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
+                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
                                 Browse Offers
                             </a>
                         </div>
@@ -422,7 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                     </svg>
                                                     Remove
                                                 </a>
-                                                <a href="index.php?action=view_offer&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-primary-700 px-3 py-1 rounded-lg transition font-medium">
+                                                <a href="index.php?action=view_offer&offer_id=<?php echo $favorite['id']; ?>" class="text-sm text-white bg-primary-600 hover:bg-accent-600 px-3 py-1 rounded-lg transition font-medium">
                                                     View Details
                                                 </a>
                                             </div>
@@ -443,7 +434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </svg>
                             <h3 class="text-xl font-semibold text-dark mb-2">No messages yet</h3>
                             <p class="text-secondary-500 mb-4">Start a conversation by contacting offer owners</p>
-                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
+                            <a href="index.php?action=search" class="inline-block px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
                                 Browse Offers
                             </a>
                         </div>
@@ -520,7 +511,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                 <input type="hidden" name="receiver_id" value="<?php echo htmlspecialchars($conversation['other_user_id']); ?>">
                                                 <input type="hidden" name="offer_id" value="<?php echo htmlspecialchars($conversation['offer_id']); ?>">
                                                 <textarea name="message" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="2" placeholder="Reply to <?php echo htmlspecialchars($conversation['other_user']); ?>..." required></textarea>
-                                                <button type="submit" class="h-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium flex items-center">
+                                                <button type="submit" class="h-full px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                                     </svg>

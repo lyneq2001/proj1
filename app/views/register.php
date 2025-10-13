@@ -3,15 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Rejestracja | Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -27,7 +18,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
     <?php include 'header.php'; ?>
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="w-full max-w-md">
@@ -82,7 +73,7 @@
                     <p class="mt-1 text-xs text-secondary-500">Hasło powinno mieć co najmniej 6 znaków oraz zawierać literę i cyfrę</p>
                 </div>
 
-                <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition font-medium">
+                <button type="submit" class="w-full bg-primary-600 hover:bg-accent-600 text-white py-2 px-4 rounded-lg transition font-medium">
                     Zarejestruj się
                 </button>
             </form>

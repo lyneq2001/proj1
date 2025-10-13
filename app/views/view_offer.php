@@ -7,15 +7,6 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <meta name="description" content="View details of <?php echo htmlspecialchars($offer['title'] ?? 'a premium apartment'); ?> for rent on Luxury Apartments.">
     <meta name="keywords" content="luksusowe apartamenty, wynajem apartamentów, premium nieruchomości, <?php echo htmlspecialchars($offer['city'] ?? 'mieszkania'); ?>">
     <title><?php echo htmlspecialchars($offer['title'] ?? 'Offer Details'); ?> - Luxury Apartments</title>
@@ -52,7 +43,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-roboto">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php
@@ -193,7 +184,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 </svg>
                 <h2 class="text-2xl font-bold text-dark-blue mb-2">Ogłoszenie nie znalezione</h2>
                 <p class="text-secondary-500 mb-6">Wybrana oferta nie istnieje lub została usunięta.</p>
-                <a href="index.php?action=search" class="inline-block px-6 py-2 bg-gold hover:bg-green-300 text-dark-blue rounded-lg transition font-medium">
+                <a href="index.php?action=search" class="inline-block px-6 py-2 bg-gold hover:bg-accent-600 hover:text-white text-dark-blue rounded-lg transition-colors duration-300 font-medium">
                     Przeglądaj dostępne oferty
                 </a>
             </div>
@@ -476,7 +467,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     <!-- Action Buttons -->
                     <?php if (isLoggedIn() && $offer['user_id'] != $_SESSION['user_id']): ?>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="flex-1 bg-gold hover:bg-green-300 text-dark-blue px-6 py-3 rounded-lg transition font-medium flex items-center justify-center">
+                            <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="flex-1 bg-gold hover:bg-accent-600 hover:text-white text-dark-blue px-6 py-3 rounded-lg transition-colors duration-300 font-medium flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>

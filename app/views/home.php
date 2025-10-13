@@ -7,15 +7,6 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <meta name="description" content="Luksusowe apartamenty w najlepszych lokalizacjach.">
     <title>Luxury Apartments | Wynajem apartamentów premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +14,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     <link rel="stylesheet" href="styles.css">
 
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white font-roboto">
+<body class="bg-slate-50 text-slate-900 font-roboto">
     <?php include __DIR__ . '/../header.php'; ?>
 
     <main>
@@ -37,10 +28,10 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     Znajdź idealne miejsce do zamieszkania w kilka chwil.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="index.php?action=search" class="bg-gold hover:bg-green-300 text-dark-blue font-medium py-3 px-8 rounded-md transition text-center">
+                    <a href="index.php?action=search" class="bg-gold hover:bg-accent-600 hover:text-white text-dark-blue font-medium py-3 px-8 rounded-md transition-colors duration-300 text-center">
                         Przeglądaj oferty
                     </a>
-                    <a href="<?php echo isLoggedIn() ? 'index.php?action=add_offer' : 'index.php?action=login'; ?>" class="border-2 border-white hover:bg-white/20 font-medium py-3 px-8 rounded-md transition text-center">
+                    <a href="<?php echo isLoggedIn() ? 'index.php?action=add_offer' : 'index.php?action=login'; ?>" class="border-2 border-white hover:bg-white/20 font-medium py-3 px-8 rounded-md transition-colors duration-300 text-center">
                         Dodaj ofertę
                     </a>
                 </div>
