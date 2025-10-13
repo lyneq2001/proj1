@@ -50,11 +50,38 @@ body::after {
 }
 
 /* Header Styles */
-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+.primary-header {
+    position: relative;
+    isolation: isolate;
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.primary-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    background: linear-gradient(120deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 64, 175, 0.92) 50%, rgba(30, 64, 175, 0.88) 100%);
+}
+
+.primary-header.header-home::before {
+    opacity: 1;
+}
+
+.primary-header .nav-link {
+    color: inherit;
+}
+
+.primary-header.header-home .nav-link {
+    color: rgba(241, 245, 249, 0.92);
+}
+
+.primary-header.header-home .nav-link:hover,
+.primary-header.header-home .nav-link:focus-visible {
+    color: #fff;
 }
 
 .shadow-nav {
@@ -80,6 +107,10 @@ header {
     transition: width 0.3s ease;
 }
 
+.primary-header.header-home .nav-link:after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(148, 163, 184, 0.8));
+}
+
 .nav-link:hover:after,
 .nav-link:focus-visible:after {
     width: 100%;
@@ -89,8 +120,20 @@ header {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease-out;
-    background: linear-gradient(to bottom, #1e293b, #1e40af);
-    backdrop-filter: blur(16px);
+}
+
+.mobile-menu-home {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 64, 175, 0.92) 100%);
+    backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 28px 45px -32px rgba(30, 64, 175, 0.55);
+}
+
+.mobile-menu-default {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+    box-shadow: 0 25px 40px -32px rgba(15, 23, 42, 0.35);
 }
 
 .mobile-menu.open {
