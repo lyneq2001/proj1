@@ -18,11 +18,18 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-        <div class="register-card bg-white rounded-xl shadow-card p-8">
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Dołącz do nas</span>
+                <h1 class="page-heading__title">Stwórz konto ApartmentRental</h1>
+                <p class="page-heading__subtitle">Zarejestruj się, aby zapisywać ulubione oferty, kontaktować się z właścicielami i publikować swoje mieszkania.</p>
+            </div>
+
+            <div class="max-w-lg mx-auto">
+        <div class="register-card glass-panel p-8">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,7 +91,8 @@
                     <a href="index.php?action=login" class="text-primary-600 hover:text-primary-700 font-medium">Zaloguj się</a>
                 </p>
             </div>
+            </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

@@ -95,37 +95,29 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
 <body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
 
-    <main class="container mx-auto px-4 py-8">
-        <?php
-        $flash = getFlashMessage();
-        if ($flash):
-        ?>
-            <div class="mb-6 p-4 rounded-lg shadow-md <?php echo $flash['type'] === 'error' ? 'bg-red-100 text-red-700 border-l-4 border-red-500' : 'bg-green-100 text-green-700 border-l-4 border-green-500'; ?>">
-                <div class="flex items-center">
-                    <i class="fas <?php echo $flash['type'] === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'; ?> mr-3"></i>
-                    <span><?php echo htmlspecialchars($flash['message']); ?></span>
-                </div>
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Panel administracyjny</span>
+                <h1 class="page-heading__title">Kontroluj platformę ApartmentRental</h1>
+                <p class="page-heading__subtitle">Monitoruj statystyki, zarządzaj użytkownikami i reaguj na zgłoszenia w jednym miejscu.</p>
             </div>
-        <?php endif; ?>
 
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-playfair font-bold text-dark-blue">
-                <i class="fas fa-tachometer-alt mr-2"></i>Admin Control Panel
-            </h1>
-            <div class="flex items-center space-x-4">
-                <span class="px-3 py-1 bg-dark-blue text-white rounded-full text-sm">
-                    <i class="fas fa-user-shield mr-1"></i> ADMIN
-                </span>
-                <a href="index.php?action=dashboard" class="flex items-center space-x-1 text-primary hover:text-primary-700">
-                    <i class="fas fa-user-circle"></i>
-                    <span>User Dashboard</span>
-                </a>
-            </div>
-        </div>
+            <?php
+            $flash = getFlashMessage();
+            if ($flash):
+            ?>
+                <div class="glass-panel mb-8 p-5 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
+                    </svg>
+                    <div class="font-medium leading-relaxed"><?php echo htmlspecialchars($flash['message']); ?></div>
+                </div>
+        <?php endif; ?>
 
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-gold">
+            <div class="card glass-panel p-6 border-t-4 border-gold">
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-lg font-semibold text-secondary">Użytkownicy</h3>
@@ -144,7 +136,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 </div>
             </div>
 
-            <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-accent">
+            <div class="card glass-panel p-6 border-t-4 border-accent">
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-lg font-semibold text-secondary">Aktywne oferty</h3>
@@ -163,7 +155,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 </div>
             </div>
 
-            <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-primary">
+            <div class="card glass-panel p-6 border-t-4 border-primary">
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-lg font-semibold text-secondary">Aktywność komunikacji</h3>
@@ -182,7 +174,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 </div>
             </div>
 
-            <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 <?php echo ($platformStats['pending_reports'] ?? 0) ? 'border-red-300' : 'border-gray-200'; ?>">
+            <div class="card glass-panel p-6 border-t-4 <?php echo ($platformStats['pending_reports'] ?? 0) ? 'border-red-300' : 'border-gray-200'; ?>">
                 <div class="flex justify-between items-start">
                     <div>
                         <h3 class="text-lg font-semibold text-secondary">Zgłoszenia treści</h3>
@@ -203,7 +195,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         </div>
 
         <!-- Manage Users -->
-        <section id="users-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <section id="users-section" class="mb-8 glass-panel p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-dark-blue">
                     <i class="fas fa-users mr-2"></i>Manage Users
@@ -280,7 +272,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         </section>
 
         <!-- Moderation -->
-        <section id="moderation-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <section id="moderation-section" class="mb-8 glass-panel p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-dark-blue">
                     <i class="fas fa-flag mr-2"></i>Moderacja zgłoszeń
@@ -363,7 +355,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         </section>
 
         <!-- Manage Offers -->
-        <section id="offers-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <section id="offers-section" class="mb-8 glass-panel p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-dark-blue">
                     <i class="fas fa-home mr-2"></i>Manage Offers
@@ -455,7 +447,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         </section>
 
         <!-- Manage Messages -->
-        <section id="messages-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <section id="messages-section" class="mb-8 glass-panel p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-dark-blue">
                     <i class="fas fa-envelope mr-2"></i>Manage Messages
@@ -526,6 +518,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 </div>
             <?php endif; ?>
         </section>
+        </div>
     </main>
 
     <script>

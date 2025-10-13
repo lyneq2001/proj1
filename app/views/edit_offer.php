@@ -9,53 +9,54 @@
     <link rel="stylesheet" href="styles.css">
 
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <main class="container mx-auto px-4 py-8">
-        <?php
-        $flash = getFlashMessage();
-        if ($flash):
-        ?>
-            <div class="mb-6 p-4 rounded-lg shadow-md <?php echo $flash['type'] === 'error' ? 'bg-red-50 text-red-800 border-l-4 border-red-500' : 'bg-green-50 text-green-800 border-l-4 border-green-500'; ?>">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
-                    </svg>
-                    <p class="font-medium"><?php echo htmlspecialchars($flash['message']); ?></p>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <div class="max-w-4xl mx-auto">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Edytuj ogłoszenie</h1>
-                <p class="text-gray-600 mt-1">Zaktualizuj szczegóły ogłoszenia</p>
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Edycja ogłoszenia</span>
+                <h1 class="page-heading__title">Aktualizuj szczegóły nieruchomości</h1>
+                <p class="page-heading__subtitle">Wprowadź zmiany w ofercie, aby utrzymać ją atrakcyjną dla najemców.</p>
             </div>
 
             <?php
+            $flash = getFlashMessage();
+            if ($flash):
+            ?>
+                <div class="glass-panel mb-8 p-5 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
+                    </svg>
+                    <p class="font-medium leading-relaxed"><?php echo htmlspecialchars($flash['message']); ?></p>
+                </div>
+            <?php endif; ?>
+
+        <div class="max-w-4xl mx-auto">
+
+            <?php
             if (!isLoggedIn()) {
-                echo '<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                echo '<div class="glass-panel p-5 border border-red-200 bg-red-50 text-red-700">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                             </svg>
-                                <p class="text-red-700 font-medium">Musisz być zalogowany, aby edytować ogłoszenia.</p>
+                                <p class="font-medium">Musisz być zalogowany, aby edytować ogłoszenia.</p>
                         </div>
                     </div>';
             } else {
                 $offer = getOfferDetails($_GET['offer_id']);
                 if (!$offer || $offer['user_id'] != $_SESSION['user_id']) {
-                    echo '<div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    echo '<div class="glass-panel p-5 border border-red-200 bg-red-50 text-red-700">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                 </svg>
-                                <p class="text-red-700 font-medium">Ogłoszenie nie istnieje lub nie masz uprawnień do jego edycji.</p>
+                                <p class="font-medium">Ogłoszenie nie istnieje lub nie masz uprawnień do jego edycji.</p>
                             </div>
                         </div>';
                 } else {
             ?>
-            <form method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            <form method="POST" enctype="multipart/form-data" class="glass-panel p-8">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                 <input type="hidden" name="primary_image" id="primary_image" value="0">
 
@@ -257,6 +258,7 @@
                 }
             }
             ?>
+        </div>
         </div>
     </main>
 </body>

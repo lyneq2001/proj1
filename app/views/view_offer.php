@@ -45,7 +45,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <main class="container mx-auto px-4 py-8">
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
         <?php
         $offer = getOfferDetails($_GET['offer_id']);
         if ($offer) {
@@ -178,7 +179,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             }
         } else {
         ?>
-            <div class="bg-white rounded-xl shadow-card p-8 text-center">
+            <div class="glass-panel p-8 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -190,8 +191,14 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             </div>
         <?php } ?>
 
-        <?php if ($offer): ?>
-            <!-- Breadcrumbs -->
+<?php if ($offer): ?>
+    <div class="page-heading">
+        <span class="page-heading__eyebrow">Ekskluzywna oferta</span>
+        <h1 class="page-heading__title"><?php echo htmlspecialchars($offer['title']); ?></h1>
+        <p class="page-heading__subtitle"><?php echo htmlspecialchars($offer['city']); ?> • <?php echo htmlspecialchars($offer['size']); ?> m² • <?php echo htmlspecialchars(number_format((float)$offer['price'], 0, ',', ' ')); ?> PLN</p>
+    </div>
+
+    <!-- Breadcrumbs -->
             <nav class="flex mb-6" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
@@ -225,7 +232,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 <!-- Left Column - Images & Map -->
                 <div class="space-y-6">
                     <!-- Gallery -->
-                    <div class="offer-section bg-white rounded-xl shadow-card overflow-hidden">
+                    <div class="offer-section glass-panel overflow-hidden">
                         <?php if (!empty($offer['images']) && $offer['primary_image']): ?>
                             <div id="lightgallery" class="grid grid-cols-1 gap-4">
                                 <!-- Main Image -->
@@ -265,7 +272,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 
                     <!-- Map -->
                     <?php if ($offer['lat'] && $offer['lng']): ?>
-                        <div class="offer-section bg-white rounded-xl shadow-card overflow-hidden">
+                        <div class="offer-section glass-panel overflow-hidden">
                             <div class="p-4 border-b border-gray-200">
                                 <h3 class="font-semibold text-dark-blue flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -281,7 +288,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             </div>
                         </div>
                     <?php else: ?>
-                        <div class="offer-section bg-white rounded-xl shadow-card p-4">
+                        <div class="offer-section glass-panel p-4">
                             <div class="flex items-center text-secondary-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -291,7 +298,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         </div>
                     <?php endif; ?>
                     <?php if (!empty($poiList)): ?>
-                        <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                        <div class="offer-section glass-panel p-6">
                             <h3 class="text-lg font-semibold text-dark-blue mb-4 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -322,7 +329,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 <!-- Right Column - Details -->
                 <div class="space-y-6">
                     <!-- Title & Price -->
-                    <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                    <div class="offer-section glass-panel p-6">
                         <h1 class="text-xl sm:text-2xl font-playfair font-bold text-dark-blue mb-2"><?php echo htmlspecialchars($offer['title']); ?></h1>
                         <div class="flex items-center text-secondary-500 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -340,7 +347,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     </div>
 
                     <!-- Key Features -->
-                    <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                    <div class="offer-section glass-panel p-6">
                         <h3 class="text-lg font-semibold text-dark-blue mb-4">Key Features</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <div class="feature-badge bg-gray-50 p-3 rounded-lg">
@@ -371,7 +378,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     </div>
 
                     <!-- Amenities -->
-                    <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                    <div class="offer-section glass-panel p-6">
                         <h3 class="text-lg font-semibold text-dark-blue mb-4">Amenities</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <?php if ($offer['has_balcony']): ?>
@@ -434,7 +441,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     </div>
 
                     <!-- Description -->
-                    <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                    <div class="offer-section glass-panel p-6">
                         <h3 class="text-lg font-semibold text-dark-blue mb-4">Description</h3>
                         <div class="prose max-w-none text-gray-600">
                             <?php echo nl2br(htmlspecialchars($offer['description'])); ?>
@@ -489,7 +496,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                                 </a>
                             <?php endif; ?>
                         </div>
-                        <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                        <div class="offer-section glass-panel p-6">
                             <h3 class="text-lg font-semibold text-dark-blue mb-3 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" />
@@ -509,6 +516,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 </div>
             </div>
         <?php endif; ?>
+        </div>
     </main>
 
     <script>
