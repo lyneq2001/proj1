@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 $users = getAllUsers();
 $offers = getAllOffers();
 $messages = getAllMessages();
+$reports = getReports();
+$platformStats = getPlatformStatistics();
 
 // Get counts for summary
 global $pdo;
@@ -131,12 +133,13 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
         </div>
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-gold">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-secondary">Total Users</h3>
+                        <h3 class="text-lg font-semibold text-secondary">Użytkownicy</h3>
                         <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format($total_users); ?></p>
+                        <p class="text-xs text-secondary-500 mt-1">Nowi (7 dni): <?php echo number_format((int)($platformStats['new_users_week'] ?? 0)); ?></p>
                     </div>
                     <div class="p-3 rounded-full bg-green-50 text-primary">
                         <i class="fas fa-users text-xl"></i>
@@ -153,8 +156,9 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
             <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-accent">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-secondary">Total Offers</h3>
-                        <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format($total_offers); ?></p>
+                        <h3 class="text-lg font-semibold text-secondary">Aktywne oferty</h3>
+                        <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format((int)($platformStats['active_offers'] ?? 0)); ?></p>
+                        <p class="text-xs text-secondary-500 mt-1">Oczekujące: <?php echo number_format((int)($platformStats['pending_offers'] ?? 0)); ?></p>
                     </div>
                     <div class="p-3 rounded-full bg-green-50 text-accent">
                         <i class="fas fa-home text-xl"></i>
@@ -171,8 +175,9 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
             <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 border-primary">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-secondary">Total Messages</h3>
+                        <h3 class="text-lg font-semibold text-secondary">Aktywność komunikacji</h3>
                         <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format($total_messages); ?></p>
+                        <p class="text-xs text-secondary-500 mt-1">Wiadomości (7 dni): <?php echo number_format((int)($platformStats['messages_week'] ?? 0)); ?></p>
                     </div>
                     <div class="p-3 rounded-full bg-purple-50 text-primary">
                         <i class="fas fa-envelope text-xl"></i>
@@ -181,6 +186,25 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <a href="#messages-section" class="text-primary hover:underline flex items-center">
                         <span>View All</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card bg-white p-6 rounded-lg shadow-md border-t-4 <?php echo ($platformStats['pending_reports'] ?? 0) ? 'border-red-300' : 'border-gray-200'; ?>">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg font-semibold text-secondary">Zgłoszenia treści</h3>
+                        <p class="text-3xl font-bold text-dark-blue mt-2"><?php echo number_format((int)($platformStats['pending_reports'] ?? 0)); ?></p>
+                        <p class="text-xs text-secondary-500 mt-1">Ulubione relacje: <?php echo number_format((int)($platformStats['favorites_total'] ?? 0)); ?></p>
+                    </div>
+                    <div class="p-3 rounded-full bg-red-50 text-red-500">
+                        <i class="fas fa-flag text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <a href="#moderation-section" class="text-primary hover:underline flex items-center">
+                        <span>Moderate</span>
                         <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
@@ -264,6 +288,89 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
             <?php endif; ?>
         </section>
 
+        <!-- Moderation -->
+        <section id="moderation-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-dark-blue">
+                    <i class="fas fa-flag mr-2"></i>Moderacja zgłoszeń
+                </h2>
+                <div class="flex items-center space-x-3 text-sm text-secondary-500">
+                    <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-red-400 mr-2"></span>Oczekuje</span>
+                    <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>W trakcie</span>
+                    <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-full bg-green-400 mr-2"></span>Zamknięte</span>
+                </div>
+            </div>
+
+            <?php if (empty($reports)): ?>
+                <div class="text-center py-8">
+                    <i class="fas fa-flag text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-gray-600">Brak zgłoszeń do moderacji.</p>
+                </div>
+            <?php else: ?>
+                <div class="table-container">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Oferta</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Zgłaszający</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Notatka administratora</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider">Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($reports as $report): ?>
+                                <?php
+                                $statusClass = 'bg-yellow-100 text-yellow-800';
+                                if (($report['status'] ?? '') === 'resolved') {
+                                    $statusClass = 'bg-green-100 text-green-800';
+                                } elseif (($report['status'] ?? '') === 'pending') {
+                                    $statusClass = 'bg-red-100 text-red-800';
+                                }
+                                ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($report['id'] ?? ''); ?></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">
+                                        <div class="font-medium"><?php echo htmlspecialchars($report['offer_title'] ?? ''); ?></div>
+                                        <div class="text-xs text-gray-500 mt-1"><?php echo htmlspecialchars($report['owner_username'] ?? ''); ?></div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        <div><?php echo htmlspecialchars($report['reporter_username'] ?? ''); ?></div>
+                                        <div class="text-xs text-gray-400"><?php echo isset($report['created_at']) ? date('Y-m-d H:i', strtotime($report['created_at'])) : ''; ?></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $statusClass; ?>">
+                                            <?php echo ucfirst($report['status'] ?? 'pending'); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        <?php echo $report['admin_note'] ? htmlspecialchars($report['admin_note']) : '<span class="text-gray-400">Brak notatek</span>'; ?>
+                                        <?php if (!empty($report['handled_by_username'])): ?>
+                                            <div class="text-xs text-gray-400 mt-1">Moderator: <?php echo htmlspecialchars($report['handled_by_username']); ?></div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        <form method="POST" action="index.php?action=moderate_report" class="space-y-2">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                            <input type="hidden" name="report_id" value="<?php echo $report['id'] ?? ''; ?>">
+                                            <select name="status" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <option value="pending" <?php echo ($report['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>Oczekujące</option>
+                                                <option value="in_review" <?php echo ($report['status'] ?? '') === 'in_review' ? 'selected' : ''; ?>>W trakcie analizy</option>
+                                                <option value="resolved" <?php echo ($report['status'] ?? '') === 'resolved' ? 'selected' : ''; ?>>Zamknięte</option>
+                                            </select>
+                                            <textarea name="admin_note" rows="2" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Notatka (opcjonalnie)"><?php echo htmlspecialchars($report['admin_note'] ?? ''); ?></textarea>
+                                            <button type="submit" class="w-full bg-primary text-white px-3 py-1 rounded text-xs hover:bg-primary-700 transition">Zapisz zmiany</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </section>
+
         <!-- Manage Offers -->
         <section id="offers-section" class="mb-8 bg-white p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-4">
@@ -295,12 +402,19 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
+                            <?php $statusOptions = [
+                                'active' => 'Aktywne',
+                                'pending' => 'Oczekujące',
+                                'inactive' => 'Wstrzymane',
+                                'archived' => 'Zarchiwizowane',
+                                'suspended' => 'Zablokowane'
+                            ]; ?>
                             <?php foreach ($offers as $offer): ?>
                                 <tr class="hover:bg-gray-50 offer-row" data-title="<?php echo htmlspecialchars(strtolower($offer['title'] ?? '')); ?>" data-city="<?php echo htmlspecialchars(strtolower($offer['city'] ?? '')); ?>">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($offer['id'] ?? ''); ?></td>
                                     <td class="px-6 py-4 text-sm text-gray-900">
                                         <div class="font-medium"><?php echo htmlspecialchars($offer['title'] ?? 'No Title'); ?></div>
-                                        <div class="text-xs text-gray-500 mt-1">by <?php echo htmlspecialchars($offer['username'] ?? 'Unknown User'); ?></div>
+                                        <div class="text-xs text-gray-500 mt-1">by <?php echo htmlspecialchars($offer['owner_username'] ?? 'Unknown User'); ?></div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
@@ -319,6 +433,18 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                                             <a href="index.php?action=edit_offer&offer_id=<?php echo $offer['id'] ?? ''; ?>" class="action-btn text-gold hover:text-yellow-600" title="Edit Offer">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            <form method="POST" action="index.php?action=update_offer_status" class="flex items-center space-x-2">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                <input type="hidden" name="offer_id" value="<?php echo $offer['id'] ?? ''; ?>">
+                                                <select name="status" class="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-primary focus:border-primary">
+                                                    <?php foreach ($statusOptions as $value => $label): ?>
+                                                        <option value="<?php echo $value; ?>" <?php echo (($offer['status'] ?? '') === $value) ? 'selected' : ''; ?>><?php echo $label; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <button type="submit" class="action-btn text-primary hover:text-primary-700" title="Update Status">
+                                                    <i class="fas fa-save"></i>
+                                                </button>
+                                            </form>
                                             <form method="POST" action="index.php?action=admin_dashboard" onsubmit="return confirm('Are you sure you want to delete this offer?');" class="inline-block">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                                 <input type="hidden" name="action" value="delete_offer">

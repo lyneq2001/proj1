@@ -23,6 +23,8 @@ $favorites_result = getUserFavorites($_SESSION['user_id']);
 $favorites = $favorites_result['offers'] ?? [];
 $conversations = getConversations($_SESSION['user_id']);
 $show_message_form = isset($_GET['offer_id'], $_GET['receiver_id']);
+$userStats = getUserStatistics($_SESSION['user_id']);
+$userPendingReports = $userStats['pending_reports'] ?? 0;
 
 // Handle AJAX request to mark messages as read
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'mark_read') {
@@ -135,16 +137,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <h3 class="font-semibold text-dark mb-4">Quick Stats</h3>
                     <div class="space-y-4">
                         <div>
-                            <p class="text-secondary-500 text-sm">Your Offers</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo count($offers); ?></p>
+                            <p class="text-secondary-500 text-sm">Aktywne oferty</p>
+                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['active_offers'] ?? 0); ?></p>
                         </div>
                         <div>
-                            <p class="text-secondary-500 text-sm">Favorites</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo count($favorites); ?></p>
+                            <p class="text-secondary-500 text-sm">Oferty w przygotowaniu</p>
+                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['inactive_offers'] ?? 0); ?></p>
                         </div>
                         <div>
-                            <p class="text-secondary-500 text-sm">Messages</p>
-                            <p class="text-2xl font-bold text-dark"><?php echo count($conversations); ?></p>
+                            <p class="text-secondary-500 text-sm">Ulubione ogłoszenia</p>
+                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['favorites'] ?? 0); ?></p>
+                        </div>
+                        <div>
+                            <p class="text-secondary-500 text-sm">Nieprzeczytane wiadomości</p>
+                            <p class="text-2xl font-bold text-dark"><?php echo (int)($userStats['unread_messages'] ?? 0); ?></p>
                         </div>
                     </div>
                 </div>
@@ -153,6 +159,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <!-- Main Content -->
             <div class="flex-1">
                 <h1 class="text-3xl font-bold text-dark mb-8">Dashboard Overview</h1>
+
+                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-primary-200">
+                        <p class="text-sm text-secondary-500">Łączna liczba wyświetleń</p>
+                        <p class="text-2xl font-bold text-dark mt-2"><?php echo number_format((int)($userStats['total_views'] ?? 0)); ?></p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-accent-200">
+                        <p class="text-sm text-secondary-500">Aktywne konwersacje</p>
+                        <p class="text-2xl font-bold text-dark mt-2"><?php echo count($conversations); ?></p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-gold">
+                        <p class="text-sm text-secondary-500">Ulubione oferty</p>
+                        <p class="text-2xl font-bold text-dark mt-2"><?php echo count($favorites); ?></p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 <?php echo $userPendingReports ? 'border-red-300' : 'border-secondary-200'; ?>">
+                        <p class="text-sm text-secondary-500">Zgłoszenia w toku</p>
+                        <p class="text-2xl font-bold text-dark mt-2"><?php echo (int)$userPendingReports; ?></p>
+                    </div>
+                </section>
+
+                <?php if ($userPendingReports): ?>
+                    <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-lg flex items-center space-x-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" />
+                        </svg>
+                        <span>Masz <?php echo (int)$userPendingReports; ?> zgłoszeń oczekujących na decyzję administratora.</span>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Send New Message (via Contact Owner) -->
                 <?php if ($show_message_form): ?>

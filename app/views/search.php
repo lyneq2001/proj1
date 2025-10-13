@@ -16,6 +16,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         .offer-card {
@@ -39,6 +40,10 @@
         }
         .toggle-filters {
             transition: all 0.3s ease;
+        }
+        #offers-map {
+            height: 320px;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
@@ -242,6 +247,16 @@
                         </button>
                     </div>
                 <?php else: ?>
+                    <?php if (!empty($mapOffers ?? [])): ?>
+                        <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold text-dark">Mapa aktualnych ofert</h2>
+                                <span class="text-secondary-500 text-sm">Przeciągnij mapę, aby zobaczyć więcej lokalizacji</span>
+                            </div>
+                            <div id="offers-map" class="w-full"></div>
+                            <p class="text-secondary-500 text-xs mt-3">Kliknij pinezkę, aby zobaczyć szczegóły oferty i najbliższy punkt zainteresowania.</p>
+                        </div>
+                    <?php endif; ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         <?php foreach ($offers as $offer): ?>
                             <div class="bg-white rounded-xl shadow-card overflow-hidden offer-card">
@@ -300,6 +315,11 @@
                                             <?php endif; ?>
                                         </div>
                                         <p class="text-secondary-500 text-sm line-clamp-2"><?php echo htmlspecialchars($offer['description']); ?></p>
+                                        <?php if (!empty($offer['lat']) && !empty($offer['lng'])): ?>
+                                            <p class="text-secondary-400 text-xs mt-3 js-poi" data-lat="<?php echo htmlspecialchars($offer['lat']); ?>" data-lng="<?php echo htmlspecialchars($offer['lng']); ?>" data-city="<?php echo htmlspecialchars($offer['city']); ?>">
+                                                Analizuję pobliskie miejsca zainteresowania...
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                 </a>
                                 <?php if (isLoggedIn() && $offer['user_id'] != $_SESSION['user_id']): ?>
@@ -332,7 +352,149 @@
         </div>
     </main>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const mapOffersData = <?php echo json_encode($mapOffers ?? []); ?>;
+        const CITY_POIS = {
+            'warszawa': [
+                { name: 'Pałac Kultury i Nauki', lat: 52.2318381, lng: 21.0067249 },
+                { name: 'Dworzec Centralny', lat: 52.2296756, lng: 21.0012705 },
+                { name: 'Park Łazienkowski', lat: 52.210278, lng: 21.036667 }
+            ],
+            'krakow': [
+                { name: 'Rynek Główny', lat: 50.0619474, lng: 19.9368564 },
+                { name: 'Zamek Królewski na Wawelu', lat: 50.0544302, lng: 19.9352533 },
+                { name: 'Dworzec Główny', lat: 50.0665205, lng: 19.9466149 }
+            ],
+            'wroclaw': [
+                { name: 'Rynek we Wrocławiu', lat: 51.109407, lng: 17.032601 },
+                { name: 'Hala Stulecia', lat: 51.106944, lng: 17.076667 },
+                { name: 'Dworzec Główny', lat: 51.098218, lng: 17.036541 }
+            ],
+            'gdansk': [
+                { name: 'Długi Targ', lat: 54.348036, lng: 18.653639 },
+                { name: 'Stocznia Gdańska', lat: 54.360458, lng: 18.647354 },
+                { name: 'Dworzec Główny', lat: 54.355297, lng: 18.645271 }
+            ],
+            'poznan': [
+                { name: 'Stary Rynek', lat: 52.407, lng: 16.932 },
+                { name: 'Dworzec Poznań Główny', lat: 52.402793, lng: 16.910944 },
+                { name: 'Międzynarodowe Targi Poznańskie', lat: 52.406376, lng: 16.909793 }
+            ]
+        };
+
+        const FALLBACK_POIS = [
+            { name: 'Centrum miasta', offsetLat: 0, offsetLng: 0 },
+            { name: 'Park miejski', offsetLat: 0.01, offsetLng: 0.01 }
+        ];
+
+        function normalizeCity(city) {
+            return (city || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function toRad(value) {
+            return (value * Math.PI) / 180;
+        }
+
+        function distanceKm(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLng = toRad(lng2 - lng1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function getCityPois(city, lat, lng) {
+            const normalized = normalizeCity(city);
+            if (CITY_POIS[normalized]) {
+                return CITY_POIS[normalized];
+            }
+            if (typeof lat === 'number' && typeof lng === 'number') {
+                return FALLBACK_POIS.map(poi => ({
+                    name: poi.name,
+                    lat: lat + (poi.offsetLat || 0),
+                    lng: lng + (poi.offsetLng || 0)
+                }));
+            }
+            return [];
+        }
+
+        function findNearestPoi(city, lat, lng) {
+            const pois = getCityPois(city, lat, lng);
+            if (!pois.length) {
+                return null;
+            }
+            let nearest = null;
+            let bestDistance = Infinity;
+            pois.forEach(poi => {
+                if (typeof poi.lat !== 'number' || typeof poi.lng !== 'number') {
+                    return;
+                }
+                const distance = distanceKm(lat, lng, poi.lat, poi.lng);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    nearest = { ...poi, distance };
+                }
+            });
+            return nearest;
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"]+/g, (match) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;'
+            })[match] || match);
+        }
+
+        if (Array.isArray(mapOffersData) && mapOffersData.length && typeof L !== 'undefined') {
+            const validOffers = mapOffersData.filter(offer => typeof offer.lat === 'number' && typeof offer.lng === 'number');
+            if (validOffers.length) {
+                const map = L.map('offers-map');
+                const [first] = validOffers;
+                map.setView([first.lat, first.lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                const bounds = [];
+                validOffers.forEach(offer => {
+                    const marker = L.marker([offer.lat, offer.lng]).addTo(map);
+                    const nearest = findNearestPoi(offer.city, offer.lat, offer.lng);
+                    const priceText = offer.price ? new Intl.NumberFormat('pl-PL').format(offer.price) + ' PLN' : 'Cena dostępna w ogłoszeniu';
+                    const poiText = nearest ? `<br><em>Najbliżej:</em> ${escapeHtml(nearest.name)} (${nearest.distance.toFixed(1)} km)` : '';
+                    marker.bindPopup(
+                        `<strong>${escapeHtml(offer.title)}</strong><br>${escapeHtml(offer.city)}, ${escapeHtml(offer.street)}<br>${priceText}${poiText}`
+                    );
+                    bounds.push([offer.lat, offer.lng]);
+                });
+
+                if (bounds.length > 1) {
+                    map.fitBounds(bounds, { padding: [32, 32] });
+                }
+            }
+        }
+
+        document.querySelectorAll('.js-poi').forEach(node => {
+            const lat = parseFloat(node.dataset.lat);
+            const lng = parseFloat(node.dataset.lng);
+            const city = node.dataset.city;
+            if (Number.isNaN(lat) || Number.isNaN(lng)) {
+                node.textContent = 'Brak danych lokalizacyjnych.';
+                return;
+            }
+            const nearest = findNearestPoi(city, lat, lng);
+            if (nearest) {
+                node.textContent = `Najbliżej: ${nearest.name} (${nearest.distance.toFixed(1)} km)`;
+            } else {
+                node.textContent = 'Brak danych o pobliskich punktach zainteresowania.';
+            }
+        });
+
         // Toggle filters on mobile
         const toggleFilters = document.getElementById('toggle-filters');
         const showFilters = document.getElementById('show-filters');
