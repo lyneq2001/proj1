@@ -17,11 +17,18 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-        <div class="login-card bg-white rounded-xl shadow-card p-8">
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Twoje konto</span>
+                <h1 class="page-heading__title">Logowanie</h1>
+                <p class="page-heading__subtitle">Zaloguj się, aby zarządzać swoimi ogłoszeniami i wiadomościami.</p>
+            </div>
+
+            <div class="max-w-lg mx-auto">
+        <div class="login-card glass-panel p-8">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,7 +92,8 @@
                     <a href="index.php?action=register" class="text-primary-600 hover:text-primary-700 font-medium">Zarejestruj się</a>
                 </p>
             </div>
+            </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

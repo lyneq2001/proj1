@@ -68,11 +68,8 @@ $mobileAccentButtonClass = $isHomePage
             <?php if (isLoggedIn()): ?>
                 <?php if (isAdmin()): ?>
                     <div class="flex items-center space-x-6">
-                        <a href="index.php?action=admin_dashboard" class="<?php echo $desktopLinkClass; ?> relative group">
+                        <a href="index.php?action=admin_dashboard" class="<?php echo $desktopLinkClass; ?>">
                             Panel administracyjny
-                            <span class="absolute -top-1 -right-8">
-                                <span class="admin-badge bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-2 py-1 rounded-full shadow-lg">ADMIN</span>
-                            </span>
                         </a>
                         <a href="index.php?action=dashboard" class="<?php echo $desktopLinkClass; ?>">Panel użytkownika</a>
                     </div>
@@ -114,9 +111,8 @@ $mobileAccentButtonClass = $isHomePage
         <div class="container mx-auto px-4 py-4 flex flex-col space-y-2">
             <?php if (isLoggedIn()): ?>
                 <?php if (isAdmin()): ?>
-                    <a href="index.php?action=admin_dashboard" class="<?php echo $mobileLinkClass; ?> flex items-center justify-between group">
-                        <span>Panel administracyjny</span>
-                        <span class="admin-badge">ADMIN</span>
+                    <a href="index.php?action=admin_dashboard" class="<?php echo $mobileLinkClass; ?>">
+                        Panel administracyjny
                     </a>
                     <a href="index.php?action=dashboard" class="<?php echo $mobileLinkClass; ?>">Panel użytkownika</a>
                 <?php else: ?>

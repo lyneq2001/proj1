@@ -32,25 +32,32 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <main class="container mx-auto px-4 py-8">
-        <?php
-        $flash = getFlashMessage();
-        $errors = getFormErrors();
-        clearOldInput();
-        if ($flash):
-        ?>
-            <div class="mb-6 p-4 rounded-lg shadow <?php echo $flash['type'] === 'error' ? 'bg-red-100 text-red-700 border-l-4 border-red-500' : 'bg-green-100 text-green-700 border-l-4 border-green-500'; ?> flex items-start">
-                <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
-                </svg>
-                <div><?php echo htmlspecialchars($flash['message']); ?></div>
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Dodawanie ogłoszenia</span>
+                <h1 class="page-heading__title">Stwórz nowe ogłoszenie</h1>
+                <p class="page-heading__subtitle">Uzupełnij szczegóły nieruchomości, aby dotrzeć do zweryfikowanych najemców.</p>
             </div>
-        <?php endif; ?>
+
+            <?php
+            $flash = getFlashMessage();
+            $errors = getFormErrors();
+            clearOldInput();
+            if ($flash):
+            ?>
+                <div class="glass-panel mb-8 p-5 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
+                    </svg>
+                    <div class="font-medium leading-relaxed"><?php echo htmlspecialchars($flash['message']); ?></div>
+                </div>
+            <?php endif; ?>
 
         <?php if (!isLoggedIn()): ?>
-            <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-card text-center">
+            <div class="max-w-2xl mx-auto glass-panel p-8 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -67,17 +74,12 @@
             </div>
         <?php else: ?>
             <div class="max-w-4xl mx-auto">
-                <div class="mb-8 text-center">
-                    <h1 class="text-3xl font-bold text-dark mb-2">Dodaj nowe ogłoszenie</h1>
-                    <p class="text-secondary-500">Uzupełnij dane nieruchomości, aby dodać ogłoszenie</p>
-                </div>
-
                 <form method="POST" enctype="multipart/form-data" class="space-y-6">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                     <input type="hidden" name="primary_image" id="primary_image" value="0">
 
                     <!-- Basic Information Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -123,7 +125,7 @@
                     </div>
 
                     <!-- Location Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -154,7 +156,7 @@
                     </div>
 
                     <!-- Pricing & Size Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -196,7 +198,7 @@
                     </div>
 
                     <!-- Property Features Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -277,7 +279,7 @@
                     </div>
 
                     <!-- Amenities Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -317,7 +319,7 @@
                     </div>
 
                     <!-- Images Section -->
-                    <div class="bg-white rounded-xl shadow-card p-6 form-section">
+                    <div class="glass-panel p-6 form-section">
                         <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -362,6 +364,7 @@
                 </form>
             </div>
         <?php endif; ?>
+        </div>
     </main>
 </body>
 </html>

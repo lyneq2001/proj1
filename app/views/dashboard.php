@@ -80,25 +80,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
     <?php include 'header.php'; ?>
-    <main class="container mx-auto px-4 py-8">
-        <?php
-        $flash = getFlashMessage();
-        if ($flash):
-        ?>
-            <div class="mb-6 p-4 rounded-lg shadow <?php echo $flash['type'] === 'error' ? 'bg-red-100 text-red-700 border-l-4 border-red-500' : 'bg-green-100 text-green-700 border-l-4 border-green-500'; ?> flex items-start">
-                <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
-                </svg>
-                <div><?php echo htmlspecialchars($flash['message']); ?></div>
+    <main class="page-shell">
+        <div class="container mx-auto px-4">
+            <div class="page-heading">
+                <span class="page-heading__eyebrow">Panel użytkownika</span>
+                <h1 class="page-heading__title">Witaj, <?php echo htmlspecialchars($user['username'] ?? 'Użytkowniku'); ?></h1>
+                <p class="page-heading__subtitle">Zarządzaj swoimi ogłoszeniami, ulubionymi nieruchomościami oraz rozmowami z jednego miejsca.</p>
             </div>
-        <?php endif; ?>
+
+            <?php
+            $flash = getFlashMessage();
+            if ($flash):
+            ?>
+                <div class="glass-panel mb-8 p-5 flex items-start gap-4 <?php echo $flash['type'] === 'error' ? 'flash-error' : 'flash-success'; ?>">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $flash['type'] === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M5 13l4 4L19 7'; ?>"></path>
+                    </svg>
+                    <div class="font-medium leading-relaxed"><?php echo htmlspecialchars($flash['message']); ?></div>
+                </div>
+            <?php endif; ?>
 
         <div class="flex flex-col md:flex-row gap-8">
             <!-- Sidebar -->
-            <aside class="w-full md:w-64 flex-shrink-0">
-                <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+            <aside class="w-full md:w-72 flex-shrink-0">
+                <div class="glass-panel p-6 mb-6">
                     <div class="flex items-center space-x-4 mb-6">
                         <div class="w-16 h-16 rounded-full bg-primary-600 flex items-center justify-center text-white text-2xl font-bold">
                             <?php echo strtoupper(substr($user['username'] ?? 'U', 0, 1)); ?>
@@ -124,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-card p-6">
-                    <h3 class="font-semibold text-dark mb-4">Quick Stats</h3>
+                <div class="glass-panel p-6">
+                    <h3 class="font-semibold text-dark mb-4">Szybkie statystyki</h3>
                     <div class="space-y-4">
                         <div>
                             <p class="text-secondary-500 text-sm">Aktywne oferty</p>
@@ -148,30 +155,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1">
-                <h1 class="text-3xl font-bold text-dark mb-8">Dashboard Overview</h1>
-
-                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-primary-200">
+            <div class="flex-1 space-y-10">
+                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 border-t-4 border-blue-200">
                         <p class="text-sm text-secondary-500">Łączna liczba wyświetleń</p>
                         <p class="text-2xl font-bold text-dark mt-2"><?php echo number_format((int)($userStats['total_views'] ?? 0)); ?></p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-accent-200">
+                    <div class="glass-panel p-5 border-t-4 border-indigo-200">
                         <p class="text-sm text-secondary-500">Aktywne konwersacje</p>
                         <p class="text-2xl font-bold text-dark mt-2"><?php echo count($conversations); ?></p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 border-gold">
+                    <div class="glass-panel p-5 border-t-4 border-amber-200">
                         <p class="text-sm text-secondary-500">Ulubione oferty</p>
                         <p class="text-2xl font-bold text-dark mt-2"><?php echo count($favorites); ?></p>
                     </div>
-                    <div class="bg-white rounded-xl shadow-card p-5 border-t-4 <?php echo $userPendingReports ? 'border-red-300' : 'border-secondary-200'; ?>">
+                    <div class="glass-panel p-5 border-t-4 <?php echo $userPendingReports ? 'border-red-300' : 'border-slate-200'; ?>">
                         <p class="text-sm text-secondary-500">Zgłoszenia w toku</p>
                         <p class="text-2xl font-bold text-dark mt-2"><?php echo (int)$userPendingReports; ?></p>
                     </div>
                 </section>
 
                 <?php if ($userPendingReports): ?>
-                    <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-lg flex items-center space-x-3">
+                    <div class="glass-panel p-4 flex items-center space-x-3 text-red-700 border border-red-200/60 bg-red-50/60">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" />
                         </svg>
@@ -191,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $stmt->execute([$receiver_id]);
                     $receiver = $stmt->fetch(PDO::FETCH_ASSOC);
                     ?>
-                    <section class="mb-8 bg-white rounded-xl shadow-card p-6">
+                    <section class="mb-8 glass-panel p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-xl font-semibold text-dark">Send Message</h2>
                             <a href="index.php?action=dashboard" class="text-secondary-500 hover:text-dark">
@@ -201,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </a>
                         </div>
                         <?php if (!$offer || !$receiver): ?>
-                            <div class="bg-red-50 text-red-700 p-4 rounded-lg">
+                            <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
                                 Invalid offer or recipient.
                             </div>
                         <?php else: ?>
@@ -212,18 +217,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <input type="hidden" name="offer_id" value="<?php echo $offer_id; ?>">
                                 <div class="mb-4">
                                     <label class="block text-secondary-500 text-sm font-medium mb-1">To</label>
-                                    <div class="p-3 bg-gray-50 rounded-lg"><?php echo htmlspecialchars($receiver['username']); ?></div>
+                                    <div class="rounded-lg border border-slate-200 bg-white p-3 text-sm text-secondary-600"><?php echo htmlspecialchars($receiver['username']); ?></div>
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-secondary-500 text-sm font-medium mb-1">About Offer</label>
-                                    <div class="p-3 bg-gray-50 rounded-lg"><?php echo htmlspecialchars($offer['title']); ?></div>
+                                    <div class="rounded-lg border border-slate-200 bg-white p-3 text-sm text-secondary-600"><?php echo htmlspecialchars($offer['title']); ?></div>
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-secondary-500 text-sm font-medium mb-1">Message</label>
-                                    <textarea name="message" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition" rows="4" required placeholder="Write your message here..."></textarea>
+                                    <textarea name="message" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition bg-white" rows="4" required placeholder="Napisz wiadomość do właściciela..."></textarea>
                                 </div>
                                 <div class="flex justify-end space-x-3">
-                                    <a href="index.php?action=dashboard" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</a>
+                                    <a href="index.php?action=dashboard" class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-white transition">Anuluj</a>
                                     <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -248,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Offers Tab -->
                 <div id="offers-tab" class="tab-content active">
                     <?php if (empty($offers)): ?>
-                        <div class="bg-white rounded-xl shadow-card p-8 text-center">
+                        <div class="glass-panel p-8 text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
@@ -275,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 ?>
                                     <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid offer data.</div>
                                 <?php else: ?>
-                                    <div class="bg-white rounded-xl shadow-card overflow-hidden hover:shadow-card-hover transition">
+                                    <div class="glass-panel overflow-hidden hover:shadow-card-hover transition">
                                         <?php if (!empty($offer['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
                                                 <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
@@ -342,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Favorites Tab -->
                 <div id="favorites-tab" class="tab-content">
                     <?php if (empty($favorites)): ?>
-                        <div class="bg-white rounded-xl shadow-card p-8 text-center">
+                        <div class="glass-panel p-8 text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
@@ -369,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 ?>
                                     <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid favorite offer data.</div>
                                 <?php else: ?>
-                                    <div class="bg-white rounded-xl shadow-card overflow-hidden hover:shadow-card-hover transition">
+                                    <div class="glass-panel overflow-hidden hover:shadow-card-hover transition">
                                         <?php if (!empty($favorite['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
                                                 <img src="<?php echo htmlspecialchars($favorite['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
@@ -428,7 +433,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Messages Tab -->
                 <div id="messages-tab" class="tab-content">
                     <?php if (empty($conversations)): ?>
-                        <div class="bg-white rounded-xl shadow-card p-8 text-center">
+                        <div class="glass-panel p-8 text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-secondary-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
@@ -455,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 ?>
                                     <div class="bg-red-50 text-red-700 p-4 rounded-lg">Invalid conversation data.</div>
                                 <?php else: ?>
-                                    <div class="bg-white rounded-xl shadow-card overflow-hidden conversation-card" data-index="<?php echo $index; ?>">
+                                    <div class="glass-panel overflow-hidden conversation-card" data-index="<?php echo $index; ?>">
                                         <div class="p-5 flex justify-between items-center cursor-pointer">
                                             <div class="flex items-center space-x-4">
                                                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-secondary-500">
