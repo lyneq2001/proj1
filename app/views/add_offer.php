@@ -3,15 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Add Offer - Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -41,7 +32,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php
@@ -66,7 +57,7 @@
                 <h2 class="text-2xl font-bold text-dark mb-2">Musisz być zalogowany</h2>
                 <p class="text-secondary-500 mb-6">Zaloguj się, aby dodać nowe ogłoszenie.</p>
                 <div class="flex justify-center space-x-4">
-                    <a href="index.php?action=login" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium">
+                    <a href="index.php?action=login" class="px-6 py-2 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium">
                         Zaloguj się
                     </a>
                     <a href="index.php?action=register" class="px-6 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
@@ -361,7 +352,7 @@
                         <a href="index.php?action=dashboard" class="px-6 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg transition font-medium">
                             Anuluj
                         </a>
-                        <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition font-medium flex items-center">
+                        <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-accent-600 text-white rounded-lg transition font-medium flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>

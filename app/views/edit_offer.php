@@ -3,22 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Edytuj ogłoszenie - Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen">
+<body class="bg-slate-50 text-slate-900 min-h-screen">
     <?php include 'header.php'; ?>
     <main class="container mx-auto px-4 py-8">
         <?php
@@ -257,7 +248,7 @@
                 </div>
 
                 <div class="mt-8 pt-6 border-t border-gray-200">
-                    <button type="submit" class="w-full bg-primary hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-md">
+                    <button type="submit" class="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200 shadow-md">
                         Zaktualizuj ogłoszenie
                     </button>
                 </div>

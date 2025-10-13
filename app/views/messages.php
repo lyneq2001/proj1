@@ -3,15 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-    (function() {
-        const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-            document.documentElement.classList.add("dark");
-        }
-    })();
-    </script>
     <title>Wiadomości | Apartment Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -46,7 +37,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:text-white min-h-screen font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
     <?php include 'header.php'; ?>
 
     <div class="container mx-auto px-4 py-8">
@@ -107,7 +98,7 @@
                                       placeholder="Napisz swoją wiadomość..." required></textarea>
                         </div>
 
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                        <button type="submit" class="bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 px-4 rounded-lg transition">
                             Wyślij wiadomość
                         </button>
                     </form>
@@ -162,7 +153,7 @@
                                                 <input type="text" name="message"
                                                        class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                                        placeholder="Odpowiedz..." required>
-                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                                                <button type="submit" class="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg transition">
                                                     Wyślij
                                                 </button>
                                             </div>
