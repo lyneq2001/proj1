@@ -207,6 +207,8 @@
                             <div class="mb-3">
                                 <label class="block text-secondary-500 text-sm font-medium mb-1">Sortuj według</label>
                                 <select name="sort" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 transition">
+                                    <option value="popularity_desc" <?php echo ($_GET['sort'] ?? '') == 'popularity_desc' ? 'selected' : ''; ?>>Popularność: ostatnie 24h</option>
+                                    <option value="popularity_asc" <?php echo ($_GET['sort'] ?? '') == 'popularity_asc' ? 'selected' : ''; ?>>Popularność: od najmniejszej (24h)</option>
                                     <option value="price_asc" <?php echo ($_GET['sort'] ?? '') == 'price_asc' ? 'selected' : ''; ?>>Cena: rosnąco</option>
                                     <option value="price_desc" <?php echo ($_GET['sort'] ?? '') == 'price_desc' ? 'selected' : ''; ?>>Cena: malejąco</option>
                                     <option value="date_asc" <?php echo ($_GET['sort'] ?? '') == 'date_asc' ? 'selected' : ''; ?>>Data: od najstarszych</option>
@@ -265,7 +267,11 @@
                                         <div class="w-full h-48 overflow-hidden relative">
                                             <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover">
                                             <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                <span class="text-sm font-medium px-2"><?php echo htmlspecialchars($offer['visits']); ?> views</span>
+                                                <span class="text-xs font-medium px-2 text-right leading-tight block">
+                                                    Łącznie: <?php echo htmlspecialchars($offer['visits']); ?>
+                                                    <br>
+                                                    24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                </span>
                                             </div>
                                         </div>
                                     <?php else: ?>
@@ -274,7 +280,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                             <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                                <span class="text-sm font-medium px-2"><?php echo htmlspecialchars($offer['visits']); ?> views</span>
+                                                <span class="text-xs font-medium px-2 text-right leading-tight block">
+                                                    Łącznie: <?php echo htmlspecialchars($offer['visits']); ?>
+                                                    <br>
+                                                    24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                </span>
                                             </div>
                                         </div>
                                     <?php endif; ?>

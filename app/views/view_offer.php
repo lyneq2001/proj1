@@ -58,9 +58,9 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         <?php
         $offer = getOfferDetails($_GET['offer_id']);
         if ($offer) {
-            global $pdo;
-            $stmt = $pdo->prepare("UPDATE offers SET visits = visits + 1 WHERE id = ?");
-            $stmt->execute([$offer['id']]);
+            recordOfferView((int)$offer['id']);
+            $offer['visits'] = (int)($offer['visits'] ?? 0) + 1;
+            $offer['views_last_24h'] = (int)($offer['views_last_24h'] ?? 0) + 1;
             // Set primary_image if not set
             $offer['primary_image'] = null;
             foreach ($offer['images'] as $image) {
@@ -243,7 +243,9 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                                         <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Main property image" class="w-full h-full object-cover">
                                     </a>
                                     <div class="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow">
-                                        <span class="text-sm font-medium px-2"><?php echo htmlspecialchars($offer['visits']); ?> views</span>
+                                        <span class="text-sm font-medium px-2">
+                                            <?php echo htmlspecialchars($offer['visits']); ?> wizyt • 24h: <?php echo htmlspecialchars($offer['views_last_24h']); ?>
+                                        </span>
                                     </div>
                                 </div>
 
@@ -340,7 +342,9 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-2xl sm:text-3xl font-bold text-gold"><?php echo htmlspecialchars($offer['price']); ?> PLN</span>
-                            <span class="text-secondary-500 text-sm"><?php echo htmlspecialchars($offer['visits']); ?> views</span>
+                            <span class="text-secondary-500 text-sm">
+                                Łącznie: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h']); ?>
+                            </span>
                         </div>
                     </div>
 
