@@ -159,6 +159,20 @@ switch ($action) {
         $result = searchOffers($filters, $page);
         $offers = $result['offers'];
         $totalOffers = $result['total'];
+        $mapOffers = array_values(array_filter(array_map(function ($offer) {
+            if (!isset($offer['lat'], $offer['lng'])) {
+                return null;
+            }
+            return [
+                'id' => (int)($offer['id'] ?? 0),
+                'title' => $offer['title'] ?? 'Bez tytułu',
+                'lat' => isset($offer['lat']) ? (float)$offer['lat'] : null,
+                'lng' => isset($offer['lng']) ? (float)$offer['lng'] : null,
+                'price' => isset($offer['price']) ? (float)$offer['price'] : null,
+                'city' => $offer['city'] ?? '',
+                'street' => $offer['street'] ?? ''
+            ];
+        }, $offers)));
         include 'views/search.php';
         break;
     case 'search_users':
@@ -173,6 +187,63 @@ switch ($action) {
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($users);
         exit;
+    case 'report_offer':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php");
+            exit;
+        }
+        if (!isLoggedIn()) {
+            setFlashMessage('error', 'Musisz być zalogowany, aby zgłosić ofertę.');
+            header("Location: index.php?action=login");
+            exit;
+        }
+        if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            setFlashMessage('error', 'Nieprawidłowy token bezpieczeństwa.');
+            header("Location: index.php?action=view_offer&offer_id=" . (int)($_POST['offer_id'] ?? 0));
+            exit;
+        }
+        $offerId = (int)($_POST['offer_id'] ?? 0);
+        $reason = $_POST['reason'] ?? '';
+        if ($offerId > 0) {
+            reportOffer($offerId, $_SESSION['user_id'], $reason);
+        } else {
+            setFlashMessage('error', 'Niepoprawne ogłoszenie do zgłoszenia.');
+        }
+        header("Location: index.php?action=view_offer&offer_id=" . $offerId);
+        break;
+    case 'update_offer_status':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isAdmin()) {
+            setFlashMessage('error', 'Brak uprawnień do zmiany statusu.');
+            header("Location: index.php");
+            exit;
+        }
+        if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            setFlashMessage('error', 'Nieprawidłowy token bezpieczeństwa.');
+            header("Location: index.php?action=admin_dashboard");
+            exit;
+        }
+        $offerId = (int)($_POST['offer_id'] ?? 0);
+        $status = $_POST['status'] ?? 'pending';
+        updateOfferStatus($offerId, $status, $_SESSION['user_id']);
+        header("Location: index.php?action=admin_dashboard");
+        break;
+    case 'moderate_report':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isAdmin()) {
+            setFlashMessage('error', 'Brak uprawnień do moderacji zgłoszeń.');
+            header("Location: index.php");
+            exit;
+        }
+        if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            setFlashMessage('error', 'Nieprawidłowy token bezpieczeństwa.');
+            header("Location: index.php?action=admin_dashboard");
+            exit;
+        }
+        $reportId = (int)($_POST['report_id'] ?? 0);
+        $status = $_POST['status'] ?? 'pending';
+        $note = $_POST['admin_note'] ?? '';
+        updateReportStatus($reportId, $status, $_SESSION['user_id'], $note);
+        header("Location: index.php?action=admin_dashboard");
+        break;
     case 'dashboard':
         if (!isLoggedIn()) {
             setFlashMessage('error', 'You must be logged in to view the dashboard.');

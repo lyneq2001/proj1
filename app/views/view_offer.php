@@ -72,6 +72,119 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             if (!$offer['primary_image'] && !empty($offer['images'])) {
                 $offer['primary_image'] = $offer['images'][0]['file_path'];
             }
+
+            if (!function_exists('normalizeCityName')) {
+                function normalizeCityName(?string $city): string
+                {
+                    $city = trim((string)$city);
+                    if ($city === '') {
+                        return '';
+                    }
+                    $lower = mb_strtolower($city, 'UTF-8');
+                    $normalized = iconv('UTF-8', 'ASCII//TRANSLIT', $lower);
+                    if ($normalized === false) {
+                        $normalized = $lower;
+                    }
+                    return preg_replace('/[^a-z0-9]+/', '', $normalized);
+                }
+            }
+
+            if (!function_exists('getPointsOfInterestForCity')) {
+                function getPointsOfInterestForCity(?string $city, ?float $lat = null, ?float $lng = null): array
+                {
+                    $points = [
+                        'warszawa' => [
+                            ['name' => 'Pałac Kultury i Nauki', 'lat' => 52.2318381, 'lng' => 21.0067249],
+                            ['name' => 'Dworzec Centralny', 'lat' => 52.2296756, 'lng' => 21.0012705],
+                            ['name' => 'Park Łazienkowski', 'lat' => 52.210278, 'lng' => 21.036667],
+                        ],
+                        'krakow' => [
+                            ['name' => 'Rynek Główny', 'lat' => 50.0619474, 'lng' => 19.9368564],
+                            ['name' => 'Zamek Królewski na Wawelu', 'lat' => 50.0544302, 'lng' => 19.9352533],
+                            ['name' => 'Dworzec Główny', 'lat' => 50.0665205, 'lng' => 19.9466149],
+                        ],
+                        'wroclaw' => [
+                            ['name' => 'Rynek we Wrocławiu', 'lat' => 51.109407, 'lng' => 17.032601],
+                            ['name' => 'Hala Stulecia', 'lat' => 51.106944, 'lng' => 17.076667],
+                            ['name' => 'Dworzec Główny', 'lat' => 51.098218, 'lng' => 17.036541],
+                        ],
+                        'gdansk' => [
+                            ['name' => 'Długi Targ', 'lat' => 54.348036, 'lng' => 18.653639],
+                            ['name' => 'Stocznia Gdańska', 'lat' => 54.360458, 'lng' => 18.647354],
+                            ['name' => 'Dworzec Główny', 'lat' => 54.355297, 'lng' => 18.645271],
+                        ],
+                        'poznan' => [
+                            ['name' => 'Stary Rynek', 'lat' => 52.407, 'lng' => 16.932],
+                            ['name' => 'Dworzec Poznań Główny', 'lat' => 52.402793, 'lng' => 16.910944],
+                            ['name' => 'Międzynarodowe Targi Poznańskie', 'lat' => 52.406376, 'lng' => 16.909793],
+                        ],
+                    ];
+
+                    $key = normalizeCityName($city);
+                    if (isset($points[$key])) {
+                        return $points[$key];
+                    }
+
+                    if ($lat !== null && $lng !== null) {
+                        return [
+                            ['name' => 'Centrum miasta', 'lat' => $lat, 'lng' => $lng],
+                            ['name' => 'Park miejski', 'lat' => $lat + 0.01, 'lng' => $lng + 0.01],
+                        ];
+                    }
+
+                    return [];
+                }
+
+                function calculateDistanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
+                {
+                    $earthRadius = 6371;
+                    $dLat = deg2rad($lat2 - $lat1);
+                    $dLng = deg2rad($lng2 - $lng1);
+                    $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+                    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    return $earthRadius * $c;
+                }
+
+                function findNearestPointOfInterest(?string $city, float $lat, float $lng): ?array
+                {
+                    $pois = getPointsOfInterestForCity($city, $lat, $lng);
+                    $closest = null;
+                    $distance = PHP_FLOAT_MAX;
+                    foreach ($pois as $poi) {
+                        if (!isset($poi['lat'], $poi['lng'])) {
+                            continue;
+                        }
+                        $currentDistance = calculateDistanceKm($lat, $lng, (float)$poi['lat'], (float)$poi['lng']);
+                        if ($currentDistance < $distance) {
+                            $distance = $currentDistance;
+                            $closest = $poi + ['distance' => $currentDistance];
+                        }
+                    }
+                    return $closest;
+                }
+            }
+
+            $nearestPoi = null;
+            $cityPois = [];
+            $poiList = [];
+            if (!empty($offer['lat']) && !empty($offer['lng'])) {
+                $lat = (float)$offer['lat'];
+                $lng = (float)$offer['lng'];
+                $cityPois = getPointsOfInterestForCity($offer['city'] ?? '', $lat, $lng);
+                $nearestPoi = findNearestPointOfInterest($offer['city'] ?? '', $lat, $lng);
+                foreach ($cityPois as $poi) {
+                    if (!isset($poi['lat'], $poi['lng'])) {
+                        continue;
+                    }
+                    $poiList[] = $poi + [
+                        'distance' => calculateDistanceKm($lat, $lng, (float)$poi['lat'], (float)$poi['lng'])
+                    ];
+                }
+                usort($poiList, function ($a, $b) {
+                    return ($a['distance'] ?? 0) <=> ($b['distance'] ?? 0);
+                });
+                $poiList = array_slice($poiList, 0, 3);
+            }
         } else {
         ?>
             <div class="bg-white rounded-xl shadow-card p-8 text-center">
@@ -182,6 +295,33 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                                 </svg>
                                 <span>Map unavailable: Location not specified</span>
                             </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (!empty($poiList)): ?>
+                        <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                            <h3 class="text-lg font-semibold text-dark-blue mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Nearby points of interest
+                            </h3>
+                            <?php if ($nearestPoi): ?>
+                                <div class="mb-4 p-4 bg-primary-50 border border-primary-100 rounded-lg text-sm text-primary-900">
+                                    <p class="font-medium">Najbliżej: <?php echo htmlspecialchars($nearestPoi['name']); ?></p>
+                                    <p><?php echo number_format($nearestPoi['distance'], 1, ',', ' '); ?> km od nieruchomości</p>
+                                </div>
+                            <?php endif; ?>
+                            <ul class="space-y-3">
+                                <?php foreach ($poiList as $poi): ?>
+                                    <li class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-dark-blue"><?php echo htmlspecialchars($poi['name']); ?></p>
+                                            <p class="text-xs text-secondary-500"><?php echo htmlspecialchars($offer['city']); ?></p>
+                                        </div>
+                                        <span class="text-sm font-semibold text-secondary-500"><?php echo number_format($poi['distance'], 1, ',', ' '); ?> km</span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -353,6 +493,22 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                                     Add to Favorites
                                 </a>
                             <?php endif; ?>
+                        </div>
+                        <div class="offer-section bg-white rounded-xl shadow-card p-6">
+                            <h3 class="text-lg font-semibold text-dark-blue mb-3 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.64 5.64l12.72 12.72M5.64 18.36L18.36 5.64" />
+                                </svg>
+                                Zgłoś naruszenie ogłoszenia
+                            </h3>
+                            <p class="text-sm text-secondary-500 mb-4">Jeśli ogłoszenie narusza regulamin lub budzi Twoje wątpliwości, poinformuj nas, a zespół moderatorów je zweryfikuje.</p>
+                            <form action="index.php?action=report_offer" method="POST" class="space-y-3">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                <input type="hidden" name="offer_id" value="<?php echo (int)$offer['id']; ?>">
+                                <label class="block text-sm font-medium text-secondary-500" for="report-reason">Powód zgłoszenia</label>
+                                <textarea id="report-reason" name="reason" rows="3" required minlength="10" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition" placeholder="Opisz krótko problem, np. podejrzenie oszustwa lub treści niezgodne z regulaminem"></textarea>
+                                <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition font-medium">Wyślij zgłoszenie</button>
+                            </form>
                         </div>
                     <?php endif; ?>
                 </div>

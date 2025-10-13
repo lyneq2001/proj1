@@ -1,6 +1,79 @@
 <?php
 require_once 'config.php';
 require_once 'auth.php';
+require_once __DIR__ . '/notifications.php';
+
+function columnExists(string $table, string $column): bool
+{
+    static $cache = [];
+    $key = $table . '.' . $column;
+    if (isset($cache[$key])) {
+        return $cache[$key];
+    }
+
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?');
+    $stmt->execute([$table, $column]);
+    $exists = (bool)$stmt->fetchColumn();
+    $cache[$key] = $exists;
+
+    return $exists;
+}
+
+function ensureOfferStatusColumn(): void
+{
+    static $checked = false;
+    if ($checked) {
+        return;
+    }
+
+    global $pdo;
+    if (!columnExists('offers', 'status')) {
+        try {
+            $pdo->exec("ALTER TABLE offers ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'pending'");
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    if (!columnExists('offers', 'status_updated_at')) {
+        try {
+            $pdo->exec("ALTER TABLE offers ADD COLUMN status_updated_at DATETIME NULL");
+        } catch (PDOException $e) {
+            // Column may already exist.
+        }
+    }
+
+    $checked = true;
+}
+
+function ensureReportsTable(): void
+{
+    static $initialized = false;
+    if ($initialized) {
+        return;
+    }
+
+    global $pdo;
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS reports (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            offer_id INT NOT NULL,
+            reporter_id INT NOT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'pending',
+            reason TEXT NOT NULL,
+            admin_note TEXT NULL,
+            handled_by INT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_offer (offer_id),
+            INDEX idx_reporter (reporter_id),
+            INDEX idx_status (status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+
+    $initialized = true;
+}
 
 function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
     if (!isLoggedIn()) {
@@ -52,6 +125,8 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
         return;
     }
 
+    ensureOfferStatusColumn();
+
     // Geocode address using Nominatim
     $address = urlencode($city . ', ' . $street);
     $url = "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1";
@@ -74,9 +149,9 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
     }
 
     // Insert offer
-    $stmt = $pdo->prepare("INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, parking, garage, garden, furnished, pets_allowed, heating_type, year_built, condition_type, available_from) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, parking, garage, garden, furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
     try {
-        $stmt->execute([$_SESSION['user_id'], $title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from]);
+        $stmt->execute([$_SESSION['user_id'], $title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, 'active']);
         $offer_id = $pdo->lastInsertId();
 
         // Handle image uploads
@@ -559,6 +634,8 @@ function deleteOffer($offerId) {
     }
     global $pdo;
 
+    ensureReportsTable();
+
     $stmt = $pdo->prepare("DELETE FROM offers WHERE id = ? AND user_id = ?");
     try {
         $pdo->beginTransaction();
@@ -584,6 +661,10 @@ function deleteOffer($offerId) {
         // Delete messages
         $stmt_delete_messages = $pdo->prepare("DELETE FROM messages WHERE offer_id = ?");
         $stmt_delete_messages->execute([$offerId]);
+
+        // Delete reports
+        $stmt_delete_reports = $pdo->prepare("DELETE FROM reports WHERE offer_id = ?");
+        $stmt_delete_reports->execute([$offerId]);
 
         // Delete the offer
         $stmt->execute([$offerId, $_SESSION['user_id']]);
@@ -675,8 +756,8 @@ function sendMessage($receiver_id, $offerId, $message) {
         return;
     }
 
-    // Verify offer exists and get owner
-    $stmt = $pdo->prepare("SELECT user_id FROM offers WHERE id = ?");
+    // Verify offer exists and get owner details
+    $stmt = $pdo->prepare("SELECT o.user_id, o.title, u.email AS owner_email, u.username AS owner_username FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
     $stmt->execute([$offerId]);
     $offer = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$offer) {
@@ -691,9 +772,10 @@ function sendMessage($receiver_id, $offerId, $message) {
     }
 
     // Verify receiver exists
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, email, username FROM users WHERE id = ?");
     $stmt->execute([$receiver_id]);
-    if (!$stmt->fetch()) {
+    $receiver = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$receiver) {
         setFlashMessage('error', 'Invalid recipient.');
         return;
     }
@@ -701,6 +783,19 @@ function sendMessage($receiver_id, $offerId, $message) {
     $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, offer_id, message, is_read) VALUES (?, ?, ?, ?, 0)");
     try {
         $stmt->execute([$_SESSION['user_id'], $receiver_id, $offerId, $message]);
+
+        if ((int)$offer['user_id'] === (int)$receiver_id && !empty($receiver['email'])) {
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $threadLink = "http://$host/index.php?action=dashboard&offer_id=$offerId&receiver_id=" . (int)$_SESSION['user_id'];
+            $emailSubject = 'Nowa wiadomość dotycząca Twojego ogłoszenia';
+            $emailBody = "Cześć " . ($offer['owner_username'] ?? '') . ",\n\n" .
+                "Otrzymałeś nową wiadomość w sprawie ogłoszenia: " . ($offer['title'] ?? 'Twoja oferta') . ".\n" .
+                "Treść wiadomości:\n" . trim($message) . "\n\n" .
+                "Odpowiedz bezpośrednio w panelu: $threadLink\n\n" .
+                "Pozdrawiamy,\nZespół Luxury Apartments";
+            sendSystemEmail($receiver['email'], $emailSubject, $emailBody, 'messages');
+        }
+
         setFlashMessage('success', 'Message sent successfully.');
         header("Location: index.php?action=dashboard");
     } catch (PDOException $e) {
@@ -780,7 +875,8 @@ function deleteUser($userId) {
 
 function getAllOffers() {
     global $pdo;
-    $stmt = $pdo->query("SELECT o.id, o.title, o.city, o.price FROM offers o ORDER BY o.created_at DESC");
+    ensureOfferStatusColumn();
+    $stmt = $pdo->query("SELECT o.id, o.title, o.city, o.price, o.status, o.created_at, o.visits, u.username AS owner_username FROM offers o JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -790,6 +886,7 @@ function deleteOfferAdmin($offerId) {
         return;
     }
     global $pdo;
+    ensureReportsTable();
     try {
         $pdo->beginTransaction();
 
@@ -804,6 +901,10 @@ function deleteOfferAdmin($offerId) {
         // Delete messages
         $stmt_delete_messages = $pdo->prepare("DELETE FROM messages WHERE offer_id = ?");
         $stmt_delete_messages->execute([$offerId]);
+
+        // Delete reports
+        $stmt_delete_reports = $pdo->prepare("DELETE FROM reports WHERE offer_id = ?");
+        $stmt_delete_reports->execute([$offerId]);
 
         // Delete offer
         $stmt = $pdo->prepare("DELETE FROM offers WHERE id = ?");
@@ -820,7 +921,7 @@ function deleteOfferAdmin($offerId) {
 function getAllMessages() {
     global $pdo;
     $stmt = $pdo->query("
-        SELECT m.id, u_sender.username AS sender_username, u_receiver.username AS receiver_username, o.title AS offer_title, m.message
+        SELECT m.id, u_sender.username AS sender_username, u_receiver.username AS receiver_username, o.title AS offer_title, m.message, m.sent_at AS created_at
         FROM messages m
         JOIN users u_sender ON m.sender_id = u_sender.id
         JOIN users u_receiver ON m.receiver_id = u_receiver.id
@@ -842,6 +943,237 @@ function deleteMessage($messageId) {
         setFlashMessage('success', 'Message deleted successfully.');
     } catch (PDOException $e) {
         setFlashMessage('error', 'Failed to delete message: ' . $e->getMessage());
+    }
+}
+
+function updateOfferStatus($offerId, $status, $adminId = null): bool
+{
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return false;
+    }
+
+    $allowedStatuses = ['active', 'pending', 'inactive', 'archived', 'suspended'];
+    if (!in_array($status, $allowedStatuses, true)) {
+        setFlashMessage('error', 'Invalid offer status value.');
+        return false;
+    }
+
+    global $pdo;
+    ensureOfferStatusColumn();
+
+    $stmt = $pdo->prepare("UPDATE offers SET status = ?, status_updated_at = NOW() WHERE id = ?");
+    try {
+        $stmt->execute([$status, $offerId]);
+        if ($stmt->rowCount() === 0) {
+            setFlashMessage('error', 'Offer not found or status unchanged.');
+            return false;
+        }
+
+        $ownerStmt = $pdo->prepare("SELECT u.email, u.username, o.title FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
+        $ownerStmt->execute([$offerId]);
+        $owner = $ownerStmt->fetch(PDO::FETCH_ASSOC);
+        if ($owner && !empty($owner['email'])) {
+            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+            $dashboardLink = "http://$host/index.php?action=dashboard&offer_id=" . (int)$offerId;
+            $subject = 'Aktualizacja statusu Twojego ogłoszenia';
+            $body = "Cześć " . ($owner['username'] ?? '') . ",\n\n" .
+                "Status ogłoszenia \"" . ($owner['title'] ?? 'Twoja oferta') . "\" został zmieniony na: " . strtoupper($status) . ".\n" .
+                "Sprawdź szczegóły i historię zmian w panelu: $dashboardLink\n\n" .
+                "Pozdrawiamy,\nZespół Luxury Apartments";
+            sendSystemEmail($owner['email'], $subject, $body, 'status_change');
+        }
+
+        if ($adminId) {
+            $historyStmt = $pdo->prepare("INSERT INTO offer_status_history (offer_id, status, changed_by, changed_at) VALUES (?, ?, ?, NOW())");
+            try {
+                $historyStmt->execute([$offerId, $status, $adminId]);
+            } catch (PDOException $ignored) {
+                // History table is optional. Ignore if it does not exist.
+            }
+        }
+
+        setFlashMessage('success', 'Offer status updated.');
+        return true;
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Failed to update status: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function getUserStatistics($userId): array
+{
+    global $pdo;
+    ensureOfferStatusColumn();
+    ensureReportsTable();
+
+    $stats = [
+        'active_offers' => 0,
+        'inactive_offers' => 0,
+        'favorites' => 0,
+        'unread_messages' => 0,
+        'total_views' => 0,
+        'pending_reports' => 0
+    ];
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM offers WHERE user_id = ? AND status = 'active'");
+    $stmt->execute([$userId]);
+    $stats['active_offers'] = (int)$stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM offers WHERE user_id = ? AND status != 'active'");
+    $stmt->execute([$userId]);
+    $stats['inactive_offers'] = (int)$stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM favorites WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $stats['favorites'] = (int)$stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0");
+    $stmt->execute([$userId]);
+    $stats['unread_messages'] = (int)$stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(visits), 0) FROM offers WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $stats['total_views'] = (int)$stmt->fetchColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM reports WHERE reporter_id = ? AND status IN ('pending', 'in_review')");
+    $stmt->execute([$userId]);
+    $stats['pending_reports'] = (int)$stmt->fetchColumn();
+
+    return $stats;
+}
+
+function getPlatformStatistics(): array
+{
+    global $pdo;
+    ensureOfferStatusColumn();
+    ensureReportsTable();
+
+    $stats = [
+        'active_offers' => (int)$pdo->query("SELECT COUNT(*) FROM offers WHERE status = 'active'")->fetchColumn(),
+        'pending_offers' => (int)$pdo->query("SELECT COUNT(*) FROM offers WHERE status != 'active'")->fetchColumn(),
+        'pending_reports' => (int)$pdo->query("SELECT COUNT(*) FROM reports WHERE status = 'pending'")->fetchColumn(),
+        'messages_week' => (int)$pdo->query("SELECT COUNT(*) FROM messages WHERE sent_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn(),
+        'favorites_total' => (int)$pdo->query("SELECT COUNT(*) FROM favorites")->fetchColumn(),
+        'new_users_week' => 0
+    ];
+
+    if (columnExists('users', 'created_at')) {
+        $stats['new_users_week'] = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+    }
+
+    return $stats;
+}
+
+function reportOffer($offerId, $reporterId, $reason): void
+{
+    if (!isLoggedIn()) {
+        setFlashMessage('error', 'Musisz być zalogowany, aby zgłosić ofertę.');
+        return;
+    }
+
+    $reason = trim($reason);
+    if (strlen($reason) < 10) {
+        setFlashMessage('error', 'Uzasadnienie musi mieć co najmniej 10 znaków.');
+        return;
+    }
+
+    global $pdo;
+    ensureReportsTable();
+
+    $stmt = $pdo->prepare("SELECT user_id, title FROM offers WHERE id = ?");
+    $stmt->execute([$offerId]);
+    $offer = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$offer) {
+        setFlashMessage('error', 'Ogłoszenie nie istnieje.');
+        return;
+    }
+
+    if ((int)$offer['user_id'] === (int)$reporterId) {
+        setFlashMessage('error', 'Nie możesz zgłosić własnego ogłoszenia.');
+        return;
+    }
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM reports WHERE offer_id = ? AND reporter_id = ? AND status IN ('pending', 'in_review')");
+    $stmt->execute([$offerId, $reporterId]);
+    if ((int)$stmt->fetchColumn() > 0) {
+        setFlashMessage('error', 'To ogłoszenie zostało już zgłoszone i jest w trakcie weryfikacji.');
+        return;
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO reports (offer_id, reporter_id, reason) VALUES (?, ?, ?)");
+        $stmt->execute([$offerId, $reporterId, $reason]);
+        setFlashMessage('success', 'Dziękujemy za zgłoszenie. Administratorzy przyjrzą się sprawie.');
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Nie udało się zapisać zgłoszenia: ' . $e->getMessage());
+    }
+}
+
+function getReports(?string $statusFilter = null): array
+{
+    global $pdo;
+    ensureReportsTable();
+
+    $query = "SELECT r.*, o.title AS offer_title, u_owner.username AS owner_username, u_reporter.username AS reporter_username, u_admin.username AS handled_by_username FROM reports r JOIN offers o ON r.offer_id = o.id JOIN users u_owner ON o.user_id = u_owner.id JOIN users u_reporter ON r.reporter_id = u_reporter.id LEFT JOIN users u_admin ON r.handled_by = u_admin.id";
+    $params = [];
+    if ($statusFilter) {
+        $query .= " WHERE r.status = ?";
+        $params[] = $statusFilter;
+    }
+    $query .= " ORDER BY r.created_at DESC";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function updateReportStatus($reportId, $status, $adminId, string $note = ''): bool
+{
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return false;
+    }
+
+    $allowed = ['pending', 'in_review', 'resolved'];
+    if (!in_array($status, $allowed, true)) {
+        setFlashMessage('error', 'Nieprawidłowy status zgłoszenia.');
+        return false;
+    }
+
+    global $pdo;
+    ensureReportsTable();
+
+    $stmt = $pdo->prepare("UPDATE reports SET status = ?, admin_note = ?, handled_by = ?, updated_at = NOW() WHERE id = ?");
+    try {
+        $stmt->execute([$status, $note !== '' ? $note : null, $adminId, $reportId]);
+        if ($stmt->rowCount() === 0) {
+            setFlashMessage('error', 'Zgłoszenie nie istnieje lub nie zmieniono statusu.');
+            return false;
+        }
+
+        if ($status === 'resolved') {
+            $detailsStmt = $pdo->prepare("SELECT r.reason, r.admin_note, u.email, u.username, o.title FROM reports r JOIN users u ON r.reporter_id = u.id JOIN offers o ON r.offer_id = o.id WHERE r.id = ?");
+            $detailsStmt->execute([$reportId]);
+            $details = $detailsStmt->fetch(PDO::FETCH_ASSOC);
+            if ($details && !empty($details['email'])) {
+                $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                $link = "http://$host/index.php?action=dashboard";
+                $subject = 'Aktualizacja zgłoszenia oferty';
+                $body = "Cześć " . ($details['username'] ?? '') . ",\n\n" .
+                    "Twoje zgłoszenie dotyczące ogłoszenia \"" . ($details['title'] ?? '') . "\" zostało rozpatrzone.\n" .
+                    "Notatka administratora: " . ($details['admin_note'] ?? 'brak dodatkowych informacji') . "\n\n" .
+                    "Dziękujemy za dbanie o jakość ogłoszeń.\n\n" .
+                    "Panel użytkownika: $link";
+                sendSystemEmail($details['email'], $subject, $body, 'moderation');
+            }
+        }
+
+        setFlashMessage('success', 'Status zgłoszenia został zaktualizowany.');
+        return true;
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Nie udało się zaktualizować zgłoszenia: ' . $e->getMessage());
+        return false;
     }
 }
 ?>
