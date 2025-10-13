@@ -75,6 +75,48 @@ function ensureReportsTable(): void
     $initialized = true;
 }
 
+function ensureOfferViewsTable(): void
+{
+    static $initialized = false;
+    if ($initialized) {
+        return;
+    }
+
+    global $pdo;
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS offer_views (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            offer_id INT NOT NULL,
+            viewer_identifier VARCHAR(64) NULL,
+            viewed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_offer_viewed_at (offer_id, viewed_at),
+            CONSTRAINT fk_offer_views_offer FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+
+    $initialized = true;
+}
+
+function recordOfferView(int $offerId): void
+{
+    global $pdo;
+
+    ensureOfferViewsTable();
+
+    $stmt = $pdo->prepare("UPDATE offers SET visits = visits + 1 WHERE id = ?");
+    $stmt->execute([$offerId]);
+
+    $viewerIdentifier = null;
+    if (isset($_SESSION['user_id'])) {
+        $viewerIdentifier = 'user:' . (int)$_SESSION['user_id'];
+    } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+        $viewerIdentifier = 'ip:' . $_SERVER['REMOTE_ADDR'];
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO offer_views (offer_id, viewer_identifier) VALUES (?, ?)");
+    $stmt->execute([$offerId, $viewerIdentifier]);
+}
+
 function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
     if (!isLoggedIn()) {
         setFlashMessage('error', 'Unauthorized.');
@@ -200,8 +242,9 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
 
 function searchOffers($filters, $page = 1, $perPage = 10) {
     global $pdo;
+    ensureOfferViewsTable();
     $offset = ($page - 1) * $perPage;
-    $query = "SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image";
+    $query = "SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image, COALESCE(v.views_last_24h, 0) AS views_last_24h";
     $countQuery = "SELECT COUNT(*)";
     $params = [];
     $countParams = [];
@@ -241,6 +284,12 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
                    FROM images
                    GROUP BY offer_id
                ) img ON o.id = img.offer_id
+               LEFT JOIN (
+                   SELECT offer_id, COUNT(*) AS views_last_24h
+                   FROM offer_views
+                   WHERE viewed_at >= (NOW() - INTERVAL 24 HOUR)
+                   GROUP BY offer_id
+               ) v ON o.id = v.offer_id
                WHERE 1=1";
     $countQuery .= " FROM offers o WHERE 1=1";
     
@@ -355,8 +404,11 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
         case 'size_desc':
             $query .= " ORDER BY o.size DESC";
             break;
-        case 'visits_desc':
-            $query .= " ORDER BY o.visits DESC";
+        case 'popularity_desc':
+            $query .= " ORDER BY COALESCE(v.views_last_24h, 0) DESC, o.visits DESC";
+            break;
+        case 'popularity_asc':
+            $query .= " ORDER BY COALESCE(v.views_last_24h, 0) ASC, o.visits ASC";
             break;
         default:
             $query .= " ORDER BY o.created_at DESC";
@@ -391,8 +443,9 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
 
 function getUserOffers($userId, $page = 1, $perPage = 10) {
     global $pdo;
+    ensureOfferViewsTable();
     $offset = ($page - 1) * $perPage;
-    $stmt = $pdo->prepare("SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
+    $stmt = $pdo->prepare("SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image, COALESCE(v.views_last_24h, 0) AS views_last_24h
                            FROM offers o
                            LEFT JOIN (
                                SELECT offer_id,
@@ -401,6 +454,12 @@ function getUserOffers($userId, $page = 1, $perPage = 10) {
                                FROM images
                                GROUP BY offer_id
                            ) img ON o.id = img.offer_id
+                           LEFT JOIN (
+                               SELECT offer_id, COUNT(*) AS views_last_24h
+                               FROM offer_views
+                               WHERE viewed_at >= (NOW() - INTERVAL 24 HOUR)
+                               GROUP BY offer_id
+                           ) v ON o.id = v.offer_id
                            WHERE o.user_id = ?
                            LIMIT ? OFFSET ?");
     $stmt->bindValue(1, $userId, PDO::PARAM_INT);
@@ -472,10 +531,17 @@ function getConversations($userId) {
 
 function getOfferDetails($offerId) {
     global $pdo;
+    ensureOfferViewsTable();
     $stmt = $pdo->prepare("
-        SELECT o.*, u.username AS owner_username
+        SELECT o.*, u.username AS owner_username, COALESCE(v.views_last_24h, 0) AS views_last_24h
         FROM offers o
         JOIN users u ON o.user_id = u.id
+        LEFT JOIN (
+            SELECT offer_id, COUNT(*) AS views_last_24h
+            FROM offer_views
+            WHERE viewed_at >= (NOW() - INTERVAL 24 HOUR)
+            GROUP BY offer_id
+        ) v ON o.id = v.offer_id
         WHERE o.id = ?
     ");
     $stmt->execute([$offerId]);
@@ -697,9 +763,10 @@ function toggleFavorite($userId, $offerId) {
 
 function getUserFavorites($userId, $page = 1, $perPage = 10) {
     global $pdo;
+    ensureOfferViewsTable();
     $offset = ($page - 1) * $perPage;
     $stmt = $pdo->prepare("
-        SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
+        SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image, COALESCE(v.views_last_24h, 0) AS views_last_24h
         FROM favorites f
         JOIN offers o ON f.offer_id = o.id
         LEFT JOIN (
@@ -709,6 +776,12 @@ function getUserFavorites($userId, $page = 1, $perPage = 10) {
             FROM images
             GROUP BY offer_id
         ) img ON o.id = img.offer_id
+        LEFT JOIN (
+            SELECT offer_id, COUNT(*) AS views_last_24h
+            FROM offer_views
+            WHERE viewed_at >= (NOW() - INTERVAL 24 HOUR)
+            GROUP BY offer_id
+        ) v ON o.id = v.offer_id
         WHERE f.user_id = ?
         LIMIT ? OFFSET ?
     ");
