@@ -629,5 +629,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             });
         <?php endif; ?>
     </script>
+
+    <?php include __DIR__ . '/../ai_assistant_widget.php'; ?>
 </body>
 </html>
