@@ -747,6 +747,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         });
     </script>
 
-    <?php include __DIR__ . '/../ai_assistant_widget.php'; ?>
 </body>
 </html>

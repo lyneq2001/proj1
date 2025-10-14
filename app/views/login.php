@@ -172,6 +172,5 @@
         </div>
     </main>
 
-    <?php include __DIR__ . '/../ai_assistant_widget.php'; ?>
 </body>
 </html>
