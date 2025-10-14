@@ -1189,7 +1189,7 @@ label {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    z-index: 1000;
+    z-index: 2147483000;
     font-family: 'Inter', sans-serif;
 }
 

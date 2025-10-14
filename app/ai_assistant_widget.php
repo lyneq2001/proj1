@@ -84,9 +84,19 @@ class AIAssistant {
     constructor() {
         this.isOpen = false;
         this.messages = [];
+        this.ensureWidgetInBody();
         this.initializeElements();
         this.attachEventListeners();
         this.addWelcomeMessage();
+    }
+
+    ensureWidgetInBody() {
+        const assistantContainer = document.getElementById('ai-assistant');
+        if (!assistantContainer || assistantContainer.parentElement === document.body) {
+            return;
+        }
+
+        document.body.appendChild(assistantContainer);
     }
 
     initializeElements() {
