@@ -1,5 +1,14 @@
 <div id="ai-assistant" class="ai-assistant">
-    <div id="ai-chat-bubble" class="ai-chat-bubble" role="button" tabindex="0" aria-expanded="false" aria-controls="ai-chat-window">
+    <div class="ai-widget-shell" aria-hidden="true"></div>
+    <div
+        id="ai-chat-bubble"
+        class="ai-chat-bubble"
+        role="button"
+        tabindex="0"
+        aria-expanded="false"
+        aria-controls="ai-chat-window"
+        aria-label="Otwórz czat z asystentem AI"
+    >
         <div class="ai-bubble-content">
             <div class="ai-avatar" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,6 +94,7 @@ class AIAssistant {
         this.isOpen = false;
         this.messages = [];
         this.ensureWidgetInBody();
+        this.container = document.getElementById('ai-assistant');
         this.initializeElements();
         this.attachEventListeners();
         this.addWelcomeMessage();
@@ -166,6 +176,8 @@ class AIAssistant {
 
     openChat() {
         this.isOpen = true;
+        this.container?.classList.add('open');
+        this.chatBubble?.classList.add('open');
         this.chatWindow.classList.remove('hidden');
         requestAnimationFrame(() => {
             this.chatWindow.classList.add('active');
@@ -180,6 +192,8 @@ class AIAssistant {
         this.chatWindow.classList.remove('active');
         this.chatWindow.setAttribute('aria-modal', 'false');
         this.chatBubble.setAttribute('aria-expanded', 'false');
+        this.chatBubble?.classList.remove('open');
+        this.container?.classList.remove('open');
         setTimeout(() => {
             this.chatWindow.classList.add('hidden');
         }, 300);
