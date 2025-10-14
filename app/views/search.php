@@ -618,5 +618,7 @@
             if (filtersForm) filtersForm.classList.add('hidden');
         }
     </script>
+
+    <?php include __DIR__ . '/../ai_assistant_widget.php'; ?>
 </body>
 </html>
