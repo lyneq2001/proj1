@@ -170,8 +170,6 @@ $mobileAccentButtonClass = 'py-3 px-4 bg-white/10 hover:bg-white/20 text-white f
     });
 </script>
 
-<?php include __DIR__ . '/ai_assistant_widget.php'; ?>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll("input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]), textarea").forEach(function(elem) {
@@ -189,3 +187,4 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+</script>
