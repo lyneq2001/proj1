@@ -1,0 +1,13 @@
+To: user123@gmail.com
+Subject: Nowa wiadomość dotycząca Twojego ogłoszenia
+
+Cześć user123,
+
+Otrzymałeś nową wiadomość w sprawie ogłoszenia: arhwh.
+Treść wiadomości:
+siema
+
+Odpowiedz bezpośrednio w panelu: http://localhost/index.php?action=dashboard&offer_id=9&receiver_id=13
+
+Pozdrawiamy,
+Zespół Luxury Apartments
