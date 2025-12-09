@@ -6,9 +6,9 @@ return [
     // Konfiguracja dla Ollama (lokalny serwer HTTP)
     // - Zainstaluj Ollama: https://ollama.com/download
     // - Upewnij się, że działa na porcie 11434 (domyślnie `ollama serve`)
-    // - Model pobierzesz poleceniem: `ollama run llama3`
+    // - Model pobierzesz poleceniem: `ollama run llama3.1`
     'ollamaApiUrl' => 'http://127.0.0.1:11434/api/generate',
-    'model' => 'llama3',
+    'model' => 'llama3.1',
 
     // Konfiguracja dla trybu "binary" (np. lokalny llama.cpp)
     // Podaj pełną ścieżkę do pliku wykonywalnego LLM (nie do pliku .gguf z modelem)

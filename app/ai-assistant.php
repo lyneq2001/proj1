@@ -30,6 +30,8 @@ try {
     $reply = $response['reply']
         ?? $response['content']
         ?? $response['text']
+        ?? $response['response']
+        ?? ($response['message']['content'] ?? '')
         ?? '';
 
     echo json_encode([
