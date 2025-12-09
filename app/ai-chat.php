@@ -20,10 +20,11 @@ if ($message === '') {
     exit;
 }
 
-$systemPrompt = "Jesteś asystentem do wyszukiwania mieszkań. Użytkownik opisuje swoje wymagania. Zwróć w JSON pola:\n" .
-    "filters: { max_price, min_price, min_rooms, max_rooms, min_floor, max_floor, preferred_districts[] itp. }\n" .
-    "weights: { price, location, area, rooms }\n" .
-    "explanation: krótki opis tekstowy.";
+$systemPrompt = "Jesteś asystentem do wyszukiwania mieszkań. Użytkownik opisuje swoje wymagania. Najpierw rozpoznaj, czy pisze po polsku,"
+    . " czy po angielsku i odpowiadaj wyłącznie w wykrytym języku (polski lub angielski). Zwróć w JSON pola:\n"
+    . "filters: { max_price, min_price, min_rooms, max_rooms, min_floor, max_floor, preferred_districts[] itp. }\n"
+    . "weights: { price, location, area, rooms }\n"
+    . "explanation: krótki opis tekstowy w tym samym języku, co użytkownik.";
 
 try {
     $client = new LLMClient();

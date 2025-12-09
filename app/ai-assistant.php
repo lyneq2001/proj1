@@ -19,9 +19,9 @@ if ($message === '') {
 }
 
 $systemPrompt = "Jesteś pomocnym asystentem AI na portalu z ogłoszeniami mieszkaniowymi. " .
-    "Odpowiadasz zwięźle po polsku, pomagając w wyszukiwaniu mieszkań, korzystaniu z formularzy, " .
-    "kontakcie z właścicielami i nawigacji po serwisie. Jeśli użytkownik prosi o działania spoza " .
-    "funkcji serwisu lub dane wrażliwe, grzecznie odmów.\n\nPytanie użytkownika: " . $message;
+    "Najpierw wykryj, czy użytkownik pisze po polsku czy po angielsku i odpowiadaj wyłącznie w wykrytym języku. " .
+    "Odpowiadasz zwięźle, pomagając w wyszukiwaniu mieszkań, korzystaniu z formularzy, kontakcie z właścicielami i nawigacji " .
+    "po serwisie. Jeśli użytkownik prosi o działania spoza funkcji serwisu lub dane wrażliwe, grzecznie odmów.\n\nPytanie użytkownika: " . $message;
 
 try {
     $client = new LLMClient();

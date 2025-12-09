@@ -107,6 +107,62 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
             background: rgba(255, 255, 255, 0.95);
         }
+
+        .ai-status-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1d4ed8;
+            background: #e0e7ff;
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .ai-status-dot {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #4338ca;
+            animation: ai-bounce 1.2s ease-in-out infinite;
+        }
+
+        .ai-status-dot::before,
+        .ai-status-dot::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #4338ca;
+            opacity: 0.75;
+        }
+
+        .ai-status-dot::before {
+            left: -14px;
+            animation: ai-bounce 1.2s ease-in-out infinite;
+            animation-delay: -0.25s;
+        }
+
+        .ai-status-dot::after {
+            right: -14px;
+            animation: ai-bounce 1.2s ease-in-out infinite;
+            animation-delay: 0.25s;
+        }
+
+        @keyframes ai-bounce {
+            0%,
+            80%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
@@ -151,6 +207,12 @@
                             <p class="text-sm text-slate-600 mb-3">Opisz wymagania, a AI zaproponuje filtry i wagi wyszukiwania.</p>
                             <textarea id="ai-message" class="w-full p-3 form-input mb-3" rows="3" placeholder="Np. Szukam 3 pokoi na Mokotowie do 800000 zł"></textarea>
                             <button id="ai-send" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold">Wyślij do AI</button>
+                            <div id="ai-status" class="mt-3 hidden" aria-live="polite">
+                                <span class="ai-status-row">
+                                    <span class="ai-status-dot" aria-hidden="true"></span>
+                                    <span id="ai-status-text" class="font-medium">Analizuję Twój opis...</span>
+                                </span>
+                            </div>
                             <div id="ai-response" class="mt-3 text-sm text-slate-700 hidden"></div>
                         </div>
 
@@ -562,7 +624,22 @@
         const aiMessage = document.getElementById('ai-message');
         const aiSend = document.getElementById('ai-send');
         const aiResponse = document.getElementById('ai-response');
+        const aiStatus = document.getElementById('ai-status');
+        const aiStatusText = document.getElementById('ai-status-text');
         const sortSelect = document.querySelector('select[name="sort"]');
+
+        function showAiStatus(message) {
+            if (aiStatus && aiStatusText) {
+                aiStatusText.textContent = message;
+                aiStatus.classList.remove('hidden');
+            }
+        }
+
+        function hideAiStatus() {
+            if (aiStatus) {
+                aiStatus.classList.add('hidden');
+            }
+        }
 
         function applyAiFilters(filters) {
             if (!filters || typeof filters !== 'object') return;
@@ -600,6 +677,11 @@
             aiSend.addEventListener('click', async () => {
                 aiResponse.classList.add('hidden');
                 aiResponse.textContent = '';
+                hideAiStatus();
+
+                aiSend.disabled = true;
+                aiSend.textContent = 'Wysyłanie...';
+                showAiStatus('Analizuję Twój opis i dobieram filtry...');
 
                 const payload = new URLSearchParams({ message: aiMessage.value });
 
@@ -632,6 +714,9 @@
                 }
 
                 aiResponse.classList.remove('hidden');
+                hideAiStatus();
+                aiSend.disabled = false;
+                aiSend.textContent = 'Wyślij do AI';
             });
         }
 
