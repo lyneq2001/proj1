@@ -762,7 +762,8 @@ class AIAssistant {
     }
 
     async requestAiResponse(message) {
-        const response = await fetch('ai-assistant.php', {
+        const aiEndpoint = new URL('ai-assistant.php', window.location.origin);
+        const response = await fetch(aiEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

@@ -686,7 +686,8 @@
                 const payload = new URLSearchParams({ message: aiMessage.value });
 
                 try {
-                    const res = await fetch('ai-chat.php', {
+                    const aiEndpoint = new URL('ai-chat.php', window.location.origin);
+                    const res = await fetch(aiEndpoint, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
