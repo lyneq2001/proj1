@@ -3,6 +3,13 @@ session_start();
 require_once 'config.php';
 require_once 'auth.php';
 require_once 'offers.php';
+require_once __DIR__ . '/AI/LLMClient.php';
+require_once __DIR__ . '/AI/AISortingService.php';
+require_once __DIR__ . '/AI/UserPreferencesService.php';
+
+use App\AI\AISortingService;
+use App\AI\LLMClient;
+use App\AI\UserPreferencesService;
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'home';
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -159,6 +166,26 @@ switch ($action) {
         $result = searchOffers($filters, $page);
         $offers = $result['offers'];
         $totalOffers = $result['total'];
+
+        $aiFilters = $_SESSION['ai_filters'] ?? [];
+        $aiWeights = $_SESSION['ai_weights'] ?? [];
+
+        if (in_array($filters['sort'], ['ai', 'ai_personalized'], true)) {
+            try {
+                $llmClient = new LLMClient();
+                $sortingService = new AISortingService($llmClient);
+                $userPreferences = [];
+
+                if ($filters['sort'] === 'ai_personalized' && isset($_SESSION['user_id'])) {
+                    $preferencesService = new UserPreferencesService($pdo);
+                    $userPreferences = $preferencesService->getPreferences((int)$_SESSION['user_id']);
+                }
+
+                $offers = $sortingService->sortOffers($offers, $aiFilters, $aiWeights, $userPreferences);
+            } catch (Throwable $e) {
+                error_log('AI sorting failed: ' . $e->getMessage());
+            }
+        }
         $mapOffers = array_values(array_filter(array_map(function ($offer) {
             if (!isset($offer['lat'], $offer['lng'])) {
                 return null;

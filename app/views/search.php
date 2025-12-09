@@ -146,6 +146,14 @@
                             </button>
                         </div>
 
+                        <div class="filter-section p-4 mb-6">
+                            <h3 class="font-semibold text-slate-800 mb-3">Asystent AI</h3>
+                            <p class="text-sm text-slate-600 mb-3">Opisz wymagania, a AI zaproponuje filtry i wagi wyszukiwania.</p>
+                            <textarea id="ai-message" class="w-full p-3 form-input mb-3" rows="3" placeholder="Np. Szukam 3 pokoi na Mokotowie do 800000 zł"></textarea>
+                            <button id="ai-send" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-semibold">Wyślij do AI</button>
+                            <div id="ai-response" class="mt-3 text-sm text-slate-700 hidden"></div>
+                        </div>
+
                         <form method="GET" action="index.php" id="filters-form" class="space-y-6">
                             <input type="hidden" name="action" value="search">
 
@@ -302,6 +310,8 @@
                                         <option value="date_desc" <?php echo ($_GET['sort'] ?? '') == 'date_desc' ? 'selected' : ''; ?>>Data: od najnowszych</option>
                                         <option value="size_asc" <?php echo ($_GET['sort'] ?? '') == 'size_asc' ? 'selected' : ''; ?>>Powierzchnia: rosnąco</option>
                                         <option value="size_desc" <?php echo ($_GET['sort'] ?? '') == 'size_desc' ? 'selected' : ''; ?>>Powierzchnia: malejąco</option>
+                                        <option value="ai" <?php echo ($_GET['sort'] ?? '') == 'ai' ? 'selected' : ''; ?>>Inteligentne (AI)</option>
+                                        <option value="ai_personalized" <?php echo ($_GET['sort'] ?? '') == 'ai_personalized' ? 'selected' : ''; ?>>Personalizowane (AI + historia)</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white p-4 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
@@ -547,6 +557,82 @@
                 '>': '&gt;',
                 '"': '&quot;'
             })[match] || match);
+        }
+
+        const aiMessage = document.getElementById('ai-message');
+        const aiSend = document.getElementById('ai-send');
+        const aiResponse = document.getElementById('ai-response');
+        const sortSelect = document.querySelector('select[name="sort"]');
+
+        function applyAiFilters(filters) {
+            if (!filters || typeof filters !== 'object') return;
+            const mapping = {
+                max_price: 'max_price',
+                min_price: 'min_price',
+                min_rooms: 'min_rooms',
+                max_rooms: 'max_rooms',
+                min_floor: 'min_floor',
+                max_floor: 'max_floor'
+            };
+
+            Object.entries(mapping).forEach(([key, inputName]) => {
+                if (filters[key] !== undefined) {
+                    const input = document.querySelector(`[name="${inputName}"]`);
+                    if (input) {
+                        input.value = filters[key];
+                    }
+                }
+            });
+
+            if (Array.isArray(filters.preferred_districts) && filters.preferred_districts.length) {
+                const cityInput = document.querySelector('[name="city"]');
+                if (cityInput) {
+                    cityInput.value = filters.preferred_districts[0];
+                }
+            }
+
+            if (sortSelect) {
+                sortSelect.value = 'ai';
+            }
+        }
+
+        if (aiSend && aiMessage && aiResponse) {
+            aiSend.addEventListener('click', async () => {
+                aiResponse.classList.add('hidden');
+                aiResponse.textContent = '';
+
+                const payload = new URLSearchParams({ message: aiMessage.value });
+
+                try {
+                    const res = await fetch('ai-chat.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: payload,
+                    });
+                    const data = await res.json();
+                    if (data.error) {
+                        aiResponse.textContent = data.error;
+                    } else {
+                        aiResponse.innerHTML = '';
+                        if (data.reply) {
+                            aiResponse.innerHTML += `<div class="font-semibold mb-1">${escapeHtml(data.reply)}</div>`;
+                        }
+                        if (data.filters) {
+                            aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Filtry: ${escapeHtml(JSON.stringify(data.filters))}</div>`;
+                            applyAiFilters(data.filters);
+                        }
+                        if (data.weights) {
+                            aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Wagi: ${escapeHtml(JSON.stringify(data.weights))}</div>`;
+                        }
+                    }
+                } catch (error) {
+                    aiResponse.textContent = 'Nie udało się połączyć z AI.';
+                }
+
+                aiResponse.classList.remove('hidden');
+            });
         }
 
         if (Array.isArray(mapOffersData) && mapOffersData.length && typeof L !== 'undefined') {
