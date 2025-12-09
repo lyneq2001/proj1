@@ -5,7 +5,6 @@ require_once __DIR__ . '/notifications.php';
 require_once __DIR__ . '/AI/UserPreferencesService.php';
 
 use App\AI\UserPreferencesService;
-use Throwable;
 
 function columnExists(string $table, string $column): bool
 {
