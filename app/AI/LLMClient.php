@@ -14,7 +14,7 @@ class LLMClient
 
     public function __construct()
     {
-        $configPath = __DIR__ . '/../../config/llm-config.php';
+        $configPath = __DIR__ . '/../config/llm-config.php';
         if (!file_exists($configPath)) {
             throw new RuntimeException('Missing LLM configuration file at ' . $configPath);
         }
@@ -27,7 +27,7 @@ class LLMClient
         $this->maxOffersForAiScoring = (int)($config['maxOffersForAiScoring'] ?? 100);
 
         if ($this->binaryPath === '' || $this->modelPath === '') {
-            throw new RuntimeException('binaryPath and modelPath must be provided in config/llm-config.php');
+            throw new RuntimeException('binaryPath and modelPath must be provided in app/config/llm-config.php');
         }
     }
 
