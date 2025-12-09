@@ -2,6 +2,10 @@
 require_once 'config.php';
 require_once 'auth.php';
 require_once __DIR__ . '/notifications.php';
+require_once __DIR__ . '/AI/UserPreferencesService.php';
+
+use App\AI\UserPreferencesService;
+use Throwable;
 
 function columnExists(string $table, string $column): bool
 {
@@ -115,6 +119,15 @@ function recordOfferView(int $offerId): void
 
     $stmt = $pdo->prepare("INSERT INTO offer_views (offer_id, viewer_identifier) VALUES (?, ?)");
     $stmt->execute([$offerId, $viewerIdentifier]);
+
+    if (isset($_SESSION['user_id'])) {
+        try {
+            $preferences = new UserPreferencesService($pdo);
+            $preferences->recordAction((int)$_SESSION['user_id'], $offerId, 'view');
+        } catch (Throwable $e) {
+            error_log('Could not record view in user history: ' . $e->getMessage());
+        }
+    }
 }
 
 function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
@@ -757,6 +770,14 @@ function toggleFavorite($userId, $offerId) {
     } else {
         $stmt = $pdo->prepare("INSERT INTO favorites (user_id, offer_id) VALUES (?, ?)");
         $stmt->execute([$userId, $offerId]);
+
+        try {
+            $preferences = new UserPreferencesService($pdo);
+            $preferences->recordAction((int)$userId, (int)$offerId, 'favorite');
+        } catch (Throwable $e) {
+            error_log('Could not record favorite in user history: ' . $e->getMessage());
+        }
+
         return true; // Favorited
     }
 }
