@@ -686,7 +686,7 @@
                 const payload = new URLSearchParams({ message: aiMessage.value });
 
                 try {
-                    const aiEndpoint = new URL('ai-chat.php', window.location.origin);
+                    const aiEndpoint = 'ai-chat.php';
                     const res = await fetch(aiEndpoint, {
                         method: 'POST',
                         headers: {
@@ -694,24 +694,33 @@
                         },
                         body: payload,
                     });
-                    const data = await res.json();
-                    if (data.error) {
-                        aiResponse.textContent = data.error;
-                    } else {
-                        aiResponse.innerHTML = '';
-                        if (data.reply) {
-                            aiResponse.innerHTML += `<div class="font-semibold mb-1">${escapeHtml(data.reply)}</div>`;
-                        }
-                        if (data.filters) {
-                            aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Filtry: ${escapeHtml(JSON.stringify(data.filters))}</div>`;
-                            applyAiFilters(data.filters);
-                        }
-                        if (data.weights) {
-                            aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Wagi: ${escapeHtml(JSON.stringify(data.weights))}</div>`;
-                        }
+
+                    const rawResponse = await res.text();
+                    let data;
+
+                    try {
+                        data = JSON.parse(rawResponse);
+                    } catch (parseError) {
+                        throw new Error('Nie udało się odczytać odpowiedzi AI.');
+                    }
+
+                    if (!res.ok || data.error) {
+                        throw new Error(data?.error || 'AI niedostępne. Spróbuj ponownie.');
+                    }
+
+                    aiResponse.innerHTML = '';
+                    if (data.reply) {
+                        aiResponse.innerHTML += `<div class="font-semibold mb-1">${escapeHtml(data.reply)}</div>`;
+                    }
+                    if (data.filters) {
+                        aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Filtry: ${escapeHtml(JSON.stringify(data.filters))}</div>`;
+                        applyAiFilters(data.filters);
+                    }
+                    if (data.weights) {
+                        aiResponse.innerHTML += `<div class="mt-1 text-slate-600">Wagi: ${escapeHtml(JSON.stringify(data.weights))}</div>`;
                     }
                 } catch (error) {
-                    aiResponse.textContent = 'Nie udało się połączyć z AI.';
+                    aiResponse.textContent = error?.message || 'Nie udało się połączyć z AI.';
                 }
 
                 aiResponse.classList.remove('hidden');
