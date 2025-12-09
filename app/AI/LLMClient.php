@@ -118,7 +118,7 @@ class LLMClient
             throw new RuntimeException('Invalid JSON received from LLM.');
         }
 
-        return $decoded;
+        return $this->normalizeResponse($decoded);
     }
 
     private function chatWithOllama(string $prompt): array
@@ -173,6 +173,43 @@ class LLMClient
             throw new RuntimeException('Invalid JSON received from Ollama.');
         }
 
-        return $decoded;
+        return $this->normalizeResponse($decoded);
+    }
+
+    private function normalizeResponse(array $response): array
+    {
+        if (!isset($response['reply']) || !is_string($response['reply']) || trim($response['reply']) === '') {
+            $candidates = [];
+
+            if (isset($response['response']) && is_string($response['response'])) {
+                $candidates[] = $response['response'];
+            }
+
+            if (isset($response['content']) && is_string($response['content'])) {
+                $candidates[] = $response['content'];
+            }
+
+            if (isset($response['text']) && is_string($response['text'])) {
+                $candidates[] = $response['text'];
+            }
+
+            if (isset($response['message']['content']) && is_string($response['message']['content'])) {
+                $candidates[] = $response['message']['content'];
+            }
+
+            $candidates = array_filter(array_map('trim', $candidates), fn(string $value) => $value !== '');
+            $reply = '';
+
+            foreach ($candidates as $candidate) {
+                $reply = $candidate;
+                break;
+            }
+
+            if ($reply !== '') {
+                $response['reply'] = $reply;
+            }
+        }
+
+        return $response;
     }
 }
