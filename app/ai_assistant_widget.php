@@ -762,7 +762,7 @@ class AIAssistant {
     }
 
     async requestAiResponse(message) {
-        const aiEndpoint = new URL('ai-assistant.php', window.location.origin);
+        const aiEndpoint = 'ai-assistant.php';
         const response = await fetch(aiEndpoint, {
             method: 'POST',
             headers: {
@@ -771,13 +771,17 @@ class AIAssistant {
             body: new URLSearchParams({ message }),
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        const rawBody = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(rawBody);
+        } catch (error) {
+            throw new Error('Nie udało się odczytać odpowiedzi AI.');
         }
 
-        const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error);
+        if (!response.ok || data.error) {
+            throw new Error(data?.error || `AI niedostępne (kod ${response.status}).`);
         }
 
         if (typeof data.reply === 'string' && data.reply.trim() !== '') {
