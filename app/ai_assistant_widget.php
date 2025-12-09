@@ -707,13 +707,7 @@ class AIAssistant {
         this.chatInput.value = '';
         this.updateCharCounter();
 
-        this.showTypingIndicator();
-
-        window.setTimeout(() => {
-            this.removeTypingIndicator();
-            const response = this.generateAIResponse(message);
-            this.addBotMessage(response);
-        }, 1000 + Math.random() * 1000);
+        await this.handleAiResponse(message);
     }
 
     showTypingIndicator() {
@@ -749,32 +743,47 @@ class AIAssistant {
         indicator?.remove();
     }
 
-    handleQuickQuestion(question) {
-        this.showTypingIndicator();
-
-        window.setTimeout(() => {
-            this.removeTypingIndicator();
-            const response = this.generateAIResponse(question);
-            this.addBotMessage(response);
-        }, 1000 + Math.random() * 1000);
+    async handleQuickQuestion(question) {
+        await this.handleAiResponse(question);
     }
 
-    generateAIResponse(userMessage) {
-        const responses = {
-            'jak dodać nowe ogłoszenie?': 'Aby dodać nowe ogłoszenie:\n\n1. Kliknij "Dodaj ogłoszenie" w panelu użytkownika\n2. Wypełnij formularz z danymi nieruchomości\n3. Dodaj zdjęcia (maksymalnie 5)\n4. Ustaw główne zdjęcie\n5. Opublikuj ogłoszenie\n\nCzy chcesz, aby przeprowadzić Cię przez ten proces krok po kroku?',
-            'jak skontaktować się z właścicielem?': 'Aby skontaktować się z właścicielem:\n\n1. Znajdź interesującą ofertę\n2. Kliknij "Kontakt z właścicielem"\n3. Napisz wiadomość w otwartym czacie\n4. Czekaj na odpowiedź\n\nWszystkie rozmowy są zapisywane w Twoim panelu wiadomości.',
-            'jak zapisać ofertę do ulubionych?': 'Aby zapisać ofertę do ulubionych:\n\n1. Znajdź ofertę, którą chcesz zapisać\n2. Kliknij przycisk "Zapisz" (ikona serca)\n3. Oferta pojawi się w zakładce "Ulubione"\n\nMożesz później łatwo wrócić do zapisanych ofert w swoim panelu.',
-            default: `Rozumiem, że potrzebujesz pomocy z: "${userMessage}". Niestety, jestem jeszcze w fazie rozwoju i moje możliwości są ograniczone. W przyszłości będę mógł pomóc Ci w:\n\n• Wyszukiwaniu idealnych nieruchomości\n• Analizie cen rynkowych\n• Negocjacji warunków\n• Organizacji oglądania\n\nNa razie mogę odpowiedzieć na podstawowe pytania dotyczące funkcjonalności strony.`,
-        };
+    async handleAiResponse(message) {
+        this.showTypingIndicator();
 
-        const lowerMessage = userMessage.toLowerCase();
-        for (const [key, response] of Object.entries(responses)) {
-            if (key !== 'default' && lowerMessage.includes(key)) {
-                return response;
-            }
+        try {
+            const botReply = await this.requestAiResponse(message);
+            this.addBotMessage(botReply);
+        } catch (error) {
+            console.error('AI assistant error:', error);
+            this.addBotMessage('Przepraszam, nie mogę teraz odpowiedzieć. Spróbuj ponownie później.');
+        } finally {
+            this.removeTypingIndicator();
+        }
+    }
+
+    async requestAiResponse(message) {
+        const response = await fetch('ai-assistant.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ message }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
 
-        return responses.default;
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        if (typeof data.reply === 'string' && data.reply.trim() !== '') {
+            return data.reply;
+        }
+
+        return 'Przepraszam, nie udało mi się wygenerować odpowiedzi.';
     }
 
     updateCharCounter() {
