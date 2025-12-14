@@ -45,7 +45,7 @@
             transition: all 0.3s ease;
         }
         #offers-map {
-            height: 400px;
+            height: 520px;
             border-radius: 1rem;
             border: 1px solid rgba(148, 163, 184, 0.2);
         }
@@ -149,35 +149,6 @@
             right: -14px;
             animation: ai-bounce 1.2s ease-in-out infinite;
             animation-delay: 0.25s;
-        }
-
-        .view-toggle {
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            padding: 0.65rem 1.1rem;
-            border-radius: 0.85rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
-            color: #475569;
-            background: white;
-        }
-
-        .view-toggle:hover {
-            color: #1d4ed8;
-            border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 10px 25px -10px rgba(30, 64, 175, 0.4);
-        }
-
-        .view-toggle.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 14px 28px -14px rgba(59, 130, 246, 0.6);
-        }
-
-        .view-toggle:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            box-shadow: none;
         }
 
         @keyframes ai-bounce {
@@ -420,18 +391,14 @@
 
                 <!-- Main Content -->
                 <div class="flex-1">
-                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-8">
                     <div>
                         <h1 class="text-3xl font-playfair font-bold text-slate-800">Dostępne oferty</h1>
                         <p class="text-slate-600 text-lg font-semibold">
                             Znaleziono <span class="text-blue-600"><?php echo count($offers); ?></span> ofert
                         </p>
                     </div>
-
-                    <div class="inline-flex bg-white/80 border border-slate-200 rounded-xl shadow-sm p-1 gap-2">
-                        <button class="view-toggle active" data-view-target="list">Widok listy</button>
-                        <button class="view-toggle<?php echo empty($mapOffers ?? []) ? ' opacity-70 cursor-not-allowed' : ''; ?>" data-view-target="map" <?php echo empty($mapOffers ?? []) ? 'disabled' : ''; ?>>Mapa ofert</button>
-                    </div>
+                    <p class="text-slate-500 text-sm md:text-base max-w-xl">Mapa i lista ofert są widoczne jednocześnie, aby łatwo porównywać lokalizacje i szczegóły mieszkań.</p>
                 </div>
 
                     <?php if (empty($offers)): ?>
@@ -446,110 +413,114 @@
                             </button>
                         </div>
                     <?php else: ?>
-                    <?php if (!empty($mapOffers ?? [])): ?>
-                        <div id="map-view" class="glass-panel p-6 mb-8 hidden">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-2xl font-playfair font-bold text-slate-800">Mapa aktualnych ofert</h2>
-                                <span class="text-slate-600 text-sm font-medium">Przeciągnij mapę, aby zobaczyć więcej lokalizacji</span>
-                            </div>
-                            <div id="offers-map" class="w-full"></div>
-                            <p class="text-slate-500 text-sm mt-4 font-medium">Kliknij pinezkę, aby zobaczyć szczegóły oferty i najbliższy punkt zainteresowania.</p>
-                        </div>
-                    <?php endif; ?>
-
-                    <div id="list-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            <?php foreach ($offers as $offer): ?>
-                                <div class="offer-card overflow-hidden">
-                                    <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="block">
-                                        <?php if (!empty($offer['primary_image'])): ?>
-                                            <div class="w-full h-48 overflow-hidden relative">
-                                                <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                                                    <span class="text-sm font-semibold px-2 text-slate-700">
-                                                        Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="w-full h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                                                    <span class="text-sm font-semibold px-2 text-slate-700">
-                                                        Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-                                        <div class="p-6">
-                                            <div class="flex justify-between items-start mb-3">
-                                                <h3 class="text-xl font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($offer['title']); ?></h3>
-                                                <span class="text-2xl font-bold text-blue-600 whitespace-nowrap ml-4"><?php echo htmlspecialchars(number_format((float)$offer['price'], 0, ',', ' ')); ?> PLN</span>
-                                            </div>
-                                            <p class="text-slate-600 text-base mb-3 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                <?php echo htmlspecialchars($offer['city']); ?>, <?php echo htmlspecialchars($offer['street']); ?>
-                                            </p>
-                                            <div class="flex flex-wrap gap-2 mb-4">
-                                                <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                                    </svg>
-                                                    <?php echo htmlspecialchars($offer['size']); ?> m²
-                                                </span>
-                                                <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                    </svg>
-                                                    <?php echo htmlspecialchars($offer['rooms']); ?> pokoi
-                                                </span>
-                                                <?php if ($offer['has_balcony']): ?>
-                                                    <span class="text-sm bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">
-                                                        Balkon
-                                                    </span>
+                        <div class="grid xl:grid-cols-3 gap-6 items-start">
+                            <div class="xl:col-span-2 space-y-6">
+                                <div id="list-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                                    <?php foreach ($offers as $offer): ?>
+                                        <div class="offer-card overflow-hidden">
+                                            <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="block">
+                                                <?php if (!empty($offer['primary_image'])): ?>
+                                                    <div class="w-full h-48 overflow-hidden relative">
+                                                        <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                            <span class="text-sm font-semibold px-2 text-slate-700">
+                                                                Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="w-full h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                                                            <span class="text-sm font-semibold px-2 text-slate-700">
+                                                                Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                 <?php endif; ?>
-                                                <?php if ($offer['has_elevator']): ?>
-                                                    <span class="text-sm bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">
-                                                        Winda
-                                                    </span>
-                                                <?php endif; ?>
-                                            </div>
-                                            <p class="text-slate-600 text-sm line-clamp-2 leading-relaxed mb-4"><?php echo htmlspecialchars($offer['description']); ?></p>
-                                            <?php if (!empty($offer['lat']) && !empty($offer['lng'])): ?>
-                                                <p class="text-slate-500 text-sm font-medium js-poi" data-lat="<?php echo htmlspecialchars($offer['lat']); ?>" data-lng="<?php echo htmlspecialchars($offer['lng']); ?>" data-city="<?php echo htmlspecialchars($offer['city']); ?>">
-                                                    Analizuję pobliskie miejsca zainteresowania...
-                                                </p>
-                                            <?php endif; ?>
-                                        </div>
-                                    </a>
-                                    <?php if (isLoggedIn() && $offer['user_id'] != $_SESSION['user_id']): ?>
-                                        <div class="px-6 pb-6 flex justify-between items-center">
-                                            <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
-                                                Kontakt z właścicielem
+                                                <div class="p-6">
+                                                    <div class="flex justify-between items-start mb-3">
+                                                        <h3 class="text-xl font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($offer['title']); ?></h3>
+                                                        <span class="text-2xl font-bold text-blue-600 whitespace-nowrap ml-4"><?php echo htmlspecialchars(number_format((float)$offer['price'], 0, ',', ' ')); ?> PLN</span>
+                                                    </div>
+                                                    <p class="text-slate-600 text-base mb-3 flex items-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                        <?php echo htmlspecialchars($offer['city']); ?>, <?php echo htmlspecialchars($offer['street']); ?>
+                                                    </p>
+                                                    <div class="flex flex-wrap gap-2 mb-4">
+                                                        <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                            </svg>
+                                                            <?php echo htmlspecialchars($offer['size']); ?> m²
+                                                        </span>
+                                                        <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                            </svg>
+                                                            <?php echo htmlspecialchars($offer['rooms']); ?> pokoi
+                                                        </span>
+                                                        <?php if ($offer['has_balcony']): ?>
+                                                            <span class="text-sm bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">
+                                                                Balkon
+                                                            </span>
+                                                        <?php endif; ?>
+                                                        <?php if ($offer['has_elevator']): ?>
+                                                            <span class="text-sm bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">
+                                                                Winda
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <p class="text-slate-600 text-sm line-clamp-2 leading-relaxed mb-4"><?php echo htmlspecialchars($offer['description']); ?></p>
+                                                    <?php if (!empty($offer['lat']) && !empty($offer['lng'])): ?>
+                                                        <p class="text-slate-500 text-sm font-medium js-poi" data-lat="<?php echo htmlspecialchars($offer['lat']); ?>" data-lng="<?php echo htmlspecialchars($offer['lng']); ?>" data-city="<?php echo htmlspecialchars($offer['city']); ?>">
+                                                            Analizuję pobliskie miejsca zainteresowania...
+                                                        </p>
+                                                    <?php endif; ?>
+                                                </div>
                                             </a>
-                                            <?php if (isFavorite($_SESSION['user_id'], $offer['id'])): ?>
-                                                <a href="index.php?action=toggle_favorite&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                    Usuń
-                                                </a>
-                                            <?php else: ?>
-                                                <a href="index.php?action=toggle_favorite&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                    </svg>
-                                                    Zapisz
-                                                </a>
+                                            <?php if (isLoggedIn() && $offer['user_id'] != $_SESSION['user_id']): ?>
+                                                <div class="px-6 pb-6 flex justify-between items-center">
+                                                    <a href="index.php?action=dashboard&offer_id=<?php echo $offer['id']; ?>&receiver_id=<?php echo $offer['user_id']; ?>" class="text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
+                                                        Kontakt z właścicielem
+                                                    </a>
+                                                    <?php if (isFavorite($_SESSION['user_id'], $offer['id'])): ?>
+                                                        <a href="index.php?action=toggle_favorite&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                            Usuń
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <a href="index.php?action=toggle_favorite&offer_id=<?php echo $offer['id']; ?>" class="text-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 px-4 py-2 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                            </svg>
+                                                            Zapisz
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
                                             <?php endif; ?>
                                         </div>
-                                    <?php endif; ?>
+                                    <?php endforeach; ?>
                                 </div>
-                            <?php endforeach; ?>
+                            </div>
+
+                            <?php if (!empty($mapOffers ?? [])): ?>
+                                <div id="map-view" class="glass-panel p-6 sticky top-4">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <h2 class="text-2xl font-playfair font-bold text-slate-800">Mapa aktualnych ofert</h2>
+                                        <span class="text-slate-600 text-sm font-medium">Przeciągnij mapę, aby zobaczyć więcej lokalizacji</span>
+                                    </div>
+                                    <div id="offers-map" class="w-full"></div>
+                                    <p class="text-slate-500 text-sm mt-4 font-medium">Kliknij pinezkę, aby zobaczyć szczegóły oferty i najbliższy punkt zainteresowania.</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -559,37 +530,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ... (pozostały kod JavaScript pozostaje bez zmian)
         const mapOffersData = <?php echo json_encode($mapOffers ?? []); ?>;
         let offersMap;
-
-        const viewToggleButtons = document.querySelectorAll('[data-view-target]');
-        const listView = document.getElementById('list-view');
-        const mapView = document.getElementById('map-view');
-
-        viewToggleButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                if (button.disabled) {
-                    return;
-                }
-
-                const target = button.dataset.viewTarget;
-                viewToggleButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                if (target === 'map' && mapView) {
-                    listView?.classList.add('hidden');
-                    mapView.classList.remove('hidden');
-
-                    if (offersMap) {
-                        setTimeout(() => offersMap.invalidateSize(), 75);
-                    }
-                } else {
-                    mapView?.classList.add('hidden');
-                    listView?.classList.remove('hidden');
-                }
-            });
-        });
         const CITY_POIS = {
             'warszawa': [
                 { name: 'Pałac Kultury i Nauki', lat: 52.2318381, lng: 21.0067249 },
