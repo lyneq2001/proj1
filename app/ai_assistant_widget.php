@@ -519,11 +519,16 @@ class AIAssistant {
     constructor() {
         this.isOpen = false;
         this.messages = [];
+        this.storageKey = 'aiAssistantState';
         this.ensureWidgetInBody();
         this.container = document.getElementById('ai-assistant');
         this.initializeElements();
+        this.loadState();
         this.attachEventListeners();
-        this.addWelcomeMessage();
+        this.renderAllMessages();
+        if (this.isOpen) {
+            this.openChat(false);
+        }
     }
 
     ensureWidgetInBody() {
@@ -543,6 +548,40 @@ class AIAssistant {
         this.sendButton = document.getElementById('ai-send-message');
         this.chatMessages = document.getElementById('ai-chat-messages');
         this.charCounter = document.querySelector('.ai-char-counter');
+
+        if (this.chatMessages) {
+            this.chatMessages.innerHTML = '';
+        }
+    }
+
+    loadState() {
+        const savedState = sessionStorage.getItem(this.storageKey);
+
+        if (savedState) {
+            try {
+                const parsed = JSON.parse(savedState);
+                this.messages = Array.isArray(parsed.messages) ? parsed.messages : [];
+                this.isOpen = Boolean(parsed.isOpen);
+            } catch (error) {
+                console.warn('AI assistant state restore failed:', error);
+                this.messages = [];
+            }
+        }
+
+        if (this.messages.length === 0) {
+            this.addWelcomeMessage();
+        }
+
+        this.saveState();
+    }
+
+    saveState() {
+        const state = {
+            messages: this.messages,
+            isOpen: this.isOpen,
+        };
+
+        sessionStorage.setItem(this.storageKey, JSON.stringify(state));
     }
 
     attachEventListeners() {
@@ -569,17 +608,6 @@ class AIAssistant {
 
         this.chatInput?.addEventListener('input', () => this.updateCharCounter());
 
-        document.querySelectorAll('.ai-quick-question').forEach((button) => {
-            button.addEventListener('click', (e) => {
-                const question = e.currentTarget.getAttribute('data-question');
-                if (!question) {
-                    return;
-                }
-                this.addUserMessage(question);
-                this.handleQuickQuestion(question);
-            });
-        });
-
         document.addEventListener('click', (e) => {
             if (
                 this.isOpen &&
@@ -600,7 +628,7 @@ class AIAssistant {
         }
     }
 
-    openChat() {
+    openChat(shouldFocus = true) {
         this.isOpen = true;
         this.container?.classList.add('open');
         this.chatBubble?.classList.add('open');
@@ -610,7 +638,10 @@ class AIAssistant {
             this.chatWindow.setAttribute('aria-modal', 'true');
             this.chatBubble.setAttribute('aria-expanded', 'true');
         });
-        this.chatInput?.focus();
+        if (shouldFocus) {
+            this.chatInput?.focus();
+        }
+        this.saveState();
     }
 
     closeChat() {
@@ -623,13 +654,19 @@ class AIAssistant {
         setTimeout(() => {
             this.chatWindow.classList.add('hidden');
         }, 300);
+        this.saveState();
     }
 
     addWelcomeMessage() {
         const welcomeMessage = {
             type: 'bot',
             content: 'Cześć! Jestem Twoim asystentem AI. Jak mogę Ci pomóc w sprawach związanych z nieruchomościami?',
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
+            quickQuestions: [
+                'Jak dodać nowe ogłoszenie?',
+                'Jak skontaktować się z właścicielem?',
+                'Jak zapisać ofertę do ulubionych?',
+            ],
         };
         this.messages.push(welcomeMessage);
     }
@@ -638,20 +675,22 @@ class AIAssistant {
         const message = {
             type: 'user',
             content,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
         };
         this.messages.push(message);
         this.renderMessage(message);
+        this.saveState();
     }
 
     addBotMessage(content) {
         const message = {
             type: 'bot',
             content,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
         };
         this.messages.push(message);
         this.renderMessage(message);
+        this.saveState();
     }
 
     renderMessage(message) {
@@ -686,11 +725,40 @@ class AIAssistant {
         text.textContent = message.content;
         content.appendChild(text);
 
+        if (message.type === 'bot' && Array.isArray(message.quickQuestions) && message.quickQuestions.length > 0) {
+            const quickQuestions = document.createElement('div');
+            quickQuestions.className = 'ai-quick-questions';
+            quickQuestions.setAttribute('role', 'list');
+
+            message.quickQuestions.forEach((question) => {
+                const button = document.createElement('button');
+                button.className = 'ai-quick-question';
+                button.setAttribute('data-question', question);
+                button.textContent = question;
+                button.addEventListener('click', () => {
+                    this.addUserMessage(question);
+                    this.handleQuickQuestion(question);
+                });
+                quickQuestions.appendChild(button);
+            });
+
+            content.appendChild(quickQuestions);
+        }
+
         messageElement.appendChild(avatar);
         messageElement.appendChild(content);
 
         this.chatMessages.appendChild(messageElement);
         this.scrollToBottom();
+    }
+
+    renderAllMessages() {
+        if (!this.chatMessages) {
+            return;
+        }
+
+        this.chatMessages.innerHTML = '';
+        this.messages.forEach((message) => this.renderMessage(message));
     }
 
     async sendMessage() {
