@@ -145,9 +145,24 @@ class DatabaseContextProvider
     private function tableExists(string $table): bool
     {
         $table = $this->sanitizeIdentifier($table);
-        $stmt = $this->pdo->prepare('SHOW TABLES LIKE ?');
-        $stmt->execute([$table]);
-        return (bool)$stmt->fetchColumn();
+
+        try {
+            $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+            if ($driver === 'sqlite') {
+                $stmt = $this->pdo->prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1");
+                $stmt->execute([$table]);
+                return (bool)$stmt->fetchColumn();
+            }
+
+            // Default to MySQL-compatible lookup
+            $stmt = $this->pdo->prepare('SHOW TABLES LIKE ?');
+            $stmt->execute([$table]);
+            return (bool)$stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log('AI DatabaseContextProvider tableExists error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function columnExists(string $table, string $column): bool
@@ -155,9 +170,32 @@ class DatabaseContextProvider
         $table = $this->sanitizeIdentifier($table);
         $column = $this->sanitizeIdentifier($column);
 
-        $stmt = $this->pdo->prepare("SHOW COLUMNS FROM `{$table}` LIKE ?");
-        $stmt->execute([$column]);
-        return (bool)$stmt->fetchColumn();
+        try {
+            $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+            if ($driver === 'sqlite') {
+                $stmt = $this->pdo->prepare("PRAGMA table_info(`{$table}`)");
+                $stmt->execute();
+
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    if (($row['name'] ?? '') === $column) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // Default to MySQL-compatible lookup
+            $stmt = $this->pdo->prepare(
+                'SELECT 1 FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ? LIMIT 1'
+            );
+            $stmt->execute([$table, $column]);
+            return (bool)$stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log('AI DatabaseContextProvider columnExists error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function safeCount(string $query): int
