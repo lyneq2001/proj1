@@ -76,38 +76,37 @@ if ($isHomePage) {
         <?php endif; ?>
 
         <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-6">
-            <?php if (isLoggedIn()): ?>
-                <?php if (isAdmin()): ?>
-                    <div class="flex items-center space-x-6">
-                        <a href="index.php?action=admin_dashboard" class="<?php echo $desktopLinkClass; ?>">
-                            Panel administracyjny
-                        </a>
-                        <a href="index.php?action=dashboard" class="<?php echo $desktopLinkClass; ?>">Panel użytkownika</a>
-                    </div>
-                <?php else: ?>
-                    <a href="index.php?action=dashboard" class="<?php echo $desktopLinkClass; ?>">Panel</a>
+        <div class="hidden md:flex items-center justify-between flex-1 ml-8">
+            <div class="flex items-center space-x-6 text-sm">
+                <a href="index.php?action=home" class="<?php echo $desktopLinkClass; ?>">Strona główna</a>
+                <a href="index.php?action=search" class="<?php echo $desktopLinkClass; ?>">Oferty</a>
+                <?php if (isLoggedIn()): ?>
+                    <?php if (isAdmin()): ?>
+                        <a href="index.php?action=admin_dashboard" class="<?php echo $desktopLinkClass; ?>">Panel administracyjny</a>
+                    <?php endif; ?>
+                    <a href="index.php?action=dashboard" class="<?php echo $desktopLinkClass; ?>">Panel użytkownika</a>
+                    <a href="index.php?action=add_offer" class="<?php echo $desktopLinkClass; ?>">Dodaj ogłoszenie</a>
                 <?php endif; ?>
-                <a href="index.php?action=add_offer" class="<?php echo $desktopLinkClass; ?>">Dodaj ogłoszenie</a>
-                <a href="index.php?action=search" class="<?php echo $desktopLinkClass; ?>">Szukaj</a>
-                <form method="POST" action="index.php?action=logout" class="inline">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                    <button type="submit" class="<?php echo $logoutButtonClass; ?>">
-                        <span class="font-medium">Wyloguj</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                        </svg>
-                    </button>
-                </form>
-            <?php else: ?>
-                <a href="index.php?action=search" class="<?php echo $secondaryLinkClass; ?>">Przeglądaj oferty</a>
-                <div class="flex items-center space-x-4">
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <?php if (isLoggedIn()): ?>
+                    <form method="POST" action="index.php?action=logout" class="inline">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                        <button type="submit" class="<?php echo $logoutButtonClass; ?>">
+                            <span class="font-medium">Wyloguj</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </button>
+                    </form>
+                <?php else: ?>
                     <a href="index.php?action=register" class="<?php echo $desktopLinkClass; ?>">Rejestracja</a>
                     <a href="index.php?action=login" class="<?php echo $primaryCtaClass; ?>">
                         Logowanie
                     </a>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- Mobile menu button -->
@@ -122,6 +121,7 @@ if ($isHomePage) {
     <div id="mobile-menu" class="<?php echo $mobileMenuClasses; ?>">
         <div class="container mx-auto px-4 py-4 flex flex-col space-y-2">
             <?php if (isLoggedIn()): ?>
+                <a href="index.php?action=home" class="<?php echo $mobileLinkClass; ?>">Strona główna</a>
                 <?php if (isAdmin()): ?>
                     <a href="index.php?action=admin_dashboard" class="<?php echo $mobileLinkClass; ?>">
                         Panel administracyjny
@@ -130,8 +130,8 @@ if ($isHomePage) {
                 <?php else: ?>
                     <a href="index.php?action=dashboard" class="<?php echo $mobileLinkClass; ?>">Panel</a>
                 <?php endif; ?>
+                <a href="index.php?action=search" class="<?php echo $mobileLinkClass; ?>">Oferty</a>
                 <a href="index.php?action=add_offer" class="<?php echo $mobileLinkClass; ?>">Dodaj ogłoszenie</a>
-                <a href="index.php?action=search" class="<?php echo $mobileLinkClass; ?>">Szukaj</a>
                 <form method="POST" action="index.php?action=logout" class="inline">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                     <button type="submit" class="<?php echo $mobileLogoutButtonClass; ?>">
@@ -142,7 +142,8 @@ if ($isHomePage) {
                     </button>
                 </form>
             <?php else: ?>
-                <a href="index.php?action=search" class="<?php echo $mobileLinkClass; ?>">Przeglądaj oferty</a>
+                <a href="index.php?action=home" class="<?php echo $mobileLinkClass; ?>">Strona główna</a>
+                <a href="index.php?action=search" class="<?php echo $mobileLinkClass; ?>">Oferty</a>
                 <a href="index.php?action=register" class="<?php echo $mobileLinkClass; ?>">Rejestracja</a>
                 <a href="index.php?action=login" class="<?php echo $mobileAccentButtonClass; ?>">
                     Logowanie
