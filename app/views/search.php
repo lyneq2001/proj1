@@ -151,6 +151,35 @@
             animation-delay: 0.25s;
         }
 
+        .view-toggle {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 0.65rem 1.1rem;
+            border-radius: 0.85rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            color: #475569;
+            background: white;
+        }
+
+        .view-toggle:hover {
+            color: #1d4ed8;
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px -10px rgba(30, 64, 175, 0.4);
+        }
+
+        .view-toggle.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 14px 28px -14px rgba(59, 130, 246, 0.6);
+        }
+
+        .view-toggle:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
         @keyframes ai-bounce {
             0%,
             80%,
@@ -391,12 +420,19 @@
 
                 <!-- Main Content -->
                 <div class="flex-1">
-                    <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+                    <div>
                         <h1 class="text-3xl font-playfair font-bold text-slate-800">Dostępne oferty</h1>
                         <p class="text-slate-600 text-lg font-semibold">
                             Znaleziono <span class="text-blue-600"><?php echo count($offers); ?></span> ofert
                         </p>
                     </div>
+
+                    <div class="inline-flex bg-white/80 border border-slate-200 rounded-xl shadow-sm p-1 gap-2">
+                        <button class="view-toggle active" data-view-target="list">Widok listy</button>
+                        <button class="view-toggle<?php echo empty($mapOffers ?? []) ? ' opacity-70 cursor-not-allowed' : ''; ?>" data-view-target="map" <?php echo empty($mapOffers ?? []) ? 'disabled' : ''; ?>>Mapa ofert</button>
+                    </div>
+                </div>
 
                     <?php if (empty($offers)): ?>
                         <div class="glass-panel p-12 text-center">
@@ -410,18 +446,18 @@
                             </button>
                         </div>
                     <?php else: ?>
-                        <?php if (!empty($mapOffers ?? [])): ?>
-                            <div class="glass-panel p-6 mb-8">
-                                <div class="flex justify-between items-center mb-6">
-                                    <h2 class="text-2xl font-playfair font-bold text-slate-800">Mapa aktualnych ofert</h2>
-                                    <span class="text-slate-600 text-sm font-medium">Przeciągnij mapę, aby zobaczyć więcej lokalizacji</span>
-                                </div>
-                                <div id="offers-map" class="w-full"></div>
-                                <p class="text-slate-500 text-sm mt-4 font-medium">Kliknij pinezkę, aby zobaczyć szczegóły oferty i najbliższy punkt zainteresowania.</p>
+                    <?php if (!empty($mapOffers ?? [])): ?>
+                        <div id="map-view" class="glass-panel p-6 mb-8 hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-playfair font-bold text-slate-800">Mapa aktualnych ofert</h2>
+                                <span class="text-slate-600 text-sm font-medium">Przeciągnij mapę, aby zobaczyć więcej lokalizacji</span>
                             </div>
-                        <?php endif; ?>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div id="offers-map" class="w-full"></div>
+                            <p class="text-slate-500 text-sm mt-4 font-medium">Kliknij pinezkę, aby zobaczyć szczegóły oferty i najbliższy punkt zainteresowania.</p>
+                        </div>
+                    <?php endif; ?>
+
+                    <div id="list-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             <?php foreach ($offers as $offer): ?>
                                 <div class="offer-card overflow-hidden">
                                     <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="block">
@@ -525,6 +561,35 @@
     <script>
         // ... (pozostały kod JavaScript pozostaje bez zmian)
         const mapOffersData = <?php echo json_encode($mapOffers ?? []); ?>;
+        let offersMap;
+
+        const viewToggleButtons = document.querySelectorAll('[data-view-target]');
+        const listView = document.getElementById('list-view');
+        const mapView = document.getElementById('map-view');
+
+        viewToggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (button.disabled) {
+                    return;
+                }
+
+                const target = button.dataset.viewTarget;
+                viewToggleButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                if (target === 'map' && mapView) {
+                    listView?.classList.add('hidden');
+                    mapView.classList.remove('hidden');
+
+                    if (offersMap) {
+                        setTimeout(() => offersMap.invalidateSize(), 75);
+                    }
+                } else {
+                    mapView?.classList.add('hidden');
+                    listView?.classList.remove('hidden');
+                }
+            });
+        });
         const CITY_POIS = {
             'warszawa': [
                 { name: 'Pałac Kultury i Nauki', lat: 52.2318381, lng: 21.0067249 },
@@ -733,16 +798,16 @@
         if (Array.isArray(mapOffersData) && mapOffersData.length && typeof L !== 'undefined') {
             const validOffers = mapOffersData.filter(offer => typeof offer.lat === 'number' && typeof offer.lng === 'number');
             if (validOffers.length) {
-                const map = L.map('offers-map');
+                offersMap = L.map('offers-map');
                 const [first] = validOffers;
-                map.setView([first.lat, first.lng], 13);
+                offersMap.setView([first.lat, first.lng], 13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-                }).addTo(map);
+                }).addTo(offersMap);
 
                 const bounds = [];
                 validOffers.forEach(offer => {
-                    const marker = L.marker([offer.lat, offer.lng]).addTo(map);
+                    const marker = L.marker([offer.lat, offer.lng]).addTo(offersMap);
                     const nearest = findNearestPoi(offer.city, offer.lat, offer.lng);
                     const priceText = offer.price ? new Intl.NumberFormat('pl-PL').format(offer.price) + ' PLN' : 'Cena dostępna w ogłoszeniu';
                     const poiText = nearest ? `<br><em>Najbliżej:</em> ${escapeHtml(nearest.name)} (${nearest.distance.toFixed(1)} km)` : '';
@@ -753,7 +818,7 @@
                 });
 
                 if (bounds.length > 1) {
-                    map.fitBounds(bounds, { padding: [32, 32] });
+                    offersMap.fitBounds(bounds, { padding: [32, 32] });
                 }
             }
         }
