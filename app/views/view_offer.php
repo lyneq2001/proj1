@@ -254,6 +254,11 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                 });
                 $poiList = array_slice($poiList, 0, 3);
             }
+
+            $aiRecommendations = [];
+            if (isLoggedIn()) {
+                $aiRecommendations = getAiRecommendedOffers((int)$_SESSION['user_id'], (int)$offer['id'], 3);
+            }
         } else {
         ?>
             <div class="glass-panel p-12 text-center max-w-2xl mx-auto">
@@ -600,6 +605,56 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             <?php endif; ?>
         </div>
     </div>
+
+    <?php if (!empty($aiRecommendations)): ?>
+        <section class="mt-16">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <p class="text-sm uppercase tracking-[0.2em] text-slate-500 font-semibold">Rekomendacje AI</p>
+                    <h2 class="text-3xl font-playfair font-bold text-slate-800">Oferty dopasowane do Twoich wyszukiwań</h2>
+                </div>
+                <span class="inline-flex items-center gap-2 rounded-full bg-indigo-600/10 text-indigo-700 text-xs font-semibold px-3 py-1">
+                    <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+                    AI
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <?php foreach ($aiRecommendations as $recommendation): ?>
+                    <div class="offer-card overflow-hidden">
+                        <a href="index.php?action=view_offer&offer_id=<?php echo $recommendation['id']; ?>" class="block">
+                            <div class="relative h-48">
+                                <?php if (!empty($recommendation['primary_image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($recommendation['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-slate-100 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                <?php endif; ?>
+                                <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">
+                                    AI
+                                </span>
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <div class="flex items-start justify-between gap-3">
+                                    <h3 class="text-lg font-semibold text-slate-800"><?php echo htmlspecialchars($recommendation['title']); ?></h3>
+                                    <span class="text-lg font-bold text-blue-600 whitespace-nowrap"><?php echo htmlspecialchars(number_format((float)$recommendation['price'], 0, ',', ' ')); ?> PLN</span>
+                                </div>
+                                <p class="text-sm text-slate-600"><?php echo htmlspecialchars($recommendation['city']); ?>, <?php echo htmlspecialchars($recommendation['street']); ?></p>
+                                <div class="flex items-center gap-3 text-sm text-slate-600">
+                                    <span><?php echo htmlspecialchars($recommendation['size']); ?> m²</span>
+                                    <span>•</span>
+                                    <span><?php echo htmlspecialchars($recommendation['rooms']); ?> pokoi</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    <?php endif; ?>
         <?php endif; ?>
         </div>
     </main>

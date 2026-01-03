@@ -580,6 +580,128 @@ function getOfferDetails($offerId) {
     return $offer;
 }
 
+function getAiRecommendedOffers(int $userId, int $currentOfferId, int $limit = 3): array
+{
+    global $pdo;
+
+    new UserPreferencesService($pdo);
+    $historyStmt = $pdo->prepare(
+        "SELECT o.size, o.rooms, o.city, o.building_type
+         FROM user_offer_history h
+         JOIN offers o ON h.offer_id = o.id
+         WHERE h.user_id = ?
+         ORDER BY h.created_at DESC
+         LIMIT 50"
+    );
+    $historyStmt->execute([$userId]);
+    $history = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($history)) {
+        return [];
+    }
+
+    $sizes = array_filter(array_map('floatval', array_column($history, 'size')));
+    $rooms = array_filter(array_map('intval', array_column($history, 'rooms')));
+    $buildingCounts = [];
+    $cityCounts = [];
+    foreach ($history as $row) {
+        if (!empty($row['building_type'])) {
+            $buildingCounts[$row['building_type']] = ($buildingCounts[$row['building_type']] ?? 0) + 1;
+        }
+        if (!empty($row['city'])) {
+            $cityCounts[$row['city']] = ($cityCounts[$row['city']] ?? 0) + 1;
+        }
+    }
+
+    arsort($buildingCounts);
+    arsort($cityCounts);
+    $preferredBuilding = array_key_first($buildingCounts);
+    $preferredCity = array_key_first($cityCounts);
+    $avgSize = !empty($sizes) ? array_sum($sizes) / count($sizes) : null;
+    $avgRooms = !empty($rooms) ? array_sum($rooms) / count($rooms) : null;
+
+    $filters = [];
+    $params = [$currentOfferId, $userId];
+
+    if ($preferredBuilding) {
+        $filters[] = "o.building_type = ?";
+        $params[] = $preferredBuilding;
+    }
+
+    if ($avgSize) {
+        $sizeMin = max(1, $avgSize * 0.8);
+        $sizeMax = $avgSize * 1.2;
+        $filters[] = "o.size BETWEEN ? AND ?";
+        $params[] = $sizeMin;
+        $params[] = $sizeMax;
+    }
+
+    if ($avgRooms) {
+        $roomMin = max(1, floor($avgRooms - 1));
+        $roomMax = ceil($avgRooms + 1);
+        $filters[] = "o.rooms BETWEEN ? AND ?";
+        $params[] = $roomMin;
+        $params[] = $roomMax;
+    }
+
+    if ($preferredCity) {
+        $filters[] = "o.city = ?";
+        $params[] = $preferredCity;
+    }
+
+    $filterSql = $filters ? ' AND ' . implode(' AND ', $filters) : '';
+    $limit = max(1, $limit);
+    $orderBy = $avgSize ? "ABS(o.size - ?)" : "o.created_at DESC";
+    if ($avgSize) {
+        $params[] = $avgSize;
+    }
+
+    $query = "
+        SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
+        FROM offers o
+        LEFT JOIN (
+            SELECT offer_id,
+                   MAX(CASE WHEN is_primary = 1 THEN file_path END) AS primary_image,
+                   MIN(file_path) AS first_image
+            FROM images
+            GROUP BY offer_id
+        ) img ON o.id = img.offer_id
+        WHERE o.id != ?
+          AND o.user_id != ?
+          {$filterSql}
+        ORDER BY {$orderBy}
+        LIMIT {$limit}";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    $offers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($offers) >= $limit) {
+        return $offers;
+    }
+
+    $fallbackLimit = $limit - count($offers);
+    $fallbackQuery = "
+        SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image
+        FROM offers o
+        LEFT JOIN (
+            SELECT offer_id,
+                   MAX(CASE WHEN is_primary = 1 THEN file_path END) AS primary_image,
+                   MIN(file_path) AS first_image
+            FROM images
+            GROUP BY offer_id
+        ) img ON o.id = img.offer_id
+        WHERE o.id != ?
+          AND o.user_id != ?
+        ORDER BY o.created_at DESC
+        LIMIT {$fallbackLimit}";
+    $fallbackStmt = $pdo->prepare($fallbackQuery);
+    $fallbackStmt->execute([$currentOfferId, $userId]);
+    $fallbackOffers = $fallbackStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_merge($offers, $fallbackOffers);
+}
+
 function editOffer($offerId, $title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
     if (!isLoggedIn()) {
         setFlashMessage('error', 'Unauthorized.');
