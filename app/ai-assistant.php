@@ -21,6 +21,7 @@ if ($message === '') {
 }
 
 $databaseContext = 'Dane z bazy są tymczasowo niedostępne. Jeśli użytkownik pyta o liczby lub dane, poinformuj o braku dostępu.';
+$snapshot = [];
 
 try {
     $contextProvider = new DatabaseContextProvider($pdo);
@@ -28,6 +29,101 @@ try {
     $databaseContext = $contextProvider->formatSnapshotForPrompt($snapshot);
 } catch (\Throwable $e) {
     error_log('AI assistant DB context error: ' . $e->getMessage());
+}
+
+function detectLanguage(string $message): string
+{
+    if (preg_match('/[ąćęłńóśżź]/i', $message)) {
+        return 'pl';
+    }
+
+    if (preg_match('/\b(ile|ofert|mieszkan|mieszkaniowych|mieszkania|oferty)\b/i', $message)) {
+        return 'pl';
+    }
+
+    return 'en';
+}
+
+function isOfferCountQuestion(string $message): bool
+{
+    $hasCountKeyword = preg_match('/\b(ile|liczba|count|how many|number of)\b/i', $message);
+    $hasOfferKeyword = preg_match('/\b(ofert|oferty|offer|offers|listings|listing|mieszkan|mieszkania|mieszkaniowych|apartment|apartments)\b/i', $message);
+
+    return (bool)($hasCountKeyword && $hasOfferKeyword);
+}
+
+function buildOfferCountReply(array $counts, ?int $userOfferCount, string $language): ?string
+{
+    $total = $counts['offers_total'] ?? null;
+    $active = $counts['offers_active'] ?? null;
+    $pending = $counts['offers_pending'] ?? null;
+
+    if ($total === null && $userOfferCount === null) {
+        return null;
+    }
+
+    if ($language === 'pl') {
+        $parts = [];
+
+        if ($userOfferCount !== null) {
+            $parts[] = "Na Twoim koncie jest {$userOfferCount} ofert.";
+        }
+
+        if ($total !== null) {
+            $parts[] = "Łącznie na stronie jest {$total} ofert.";
+        }
+
+        if ($active !== null && $pending !== null) {
+            $parts[] = "Aktywne: {$active}, oczekujące/nieaktywne: {$pending}.";
+        }
+
+        return implode(' ', $parts);
+    }
+
+    $parts = [];
+
+    if ($userOfferCount !== null) {
+        $parts[] = "You have {$userOfferCount} offers in your account.";
+    }
+
+    if ($total !== null) {
+        $parts[] = "There are {$total} offers on the site.";
+    }
+
+    if ($active !== null && $pending !== null) {
+        $parts[] = "Active: {$active}, pending/inactive: {$pending}.";
+    }
+
+    return implode(' ', $parts);
+}
+
+if (isOfferCountQuestion($message)) {
+    $language = detectLanguage($message);
+    $userOfferCount = null;
+
+    if (isset($_SESSION['user_id'])) {
+        try {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM offers WHERE user_id = ?');
+            $stmt->execute([$_SESSION['user_id']]);
+            $userOfferCount = (int)$stmt->fetchColumn();
+        } catch (\Throwable $e) {
+            error_log('AI assistant offer count error: ' . $e->getMessage());
+        }
+    }
+
+    $reply = buildOfferCountReply($snapshot['counts'] ?? [], $userOfferCount, $language);
+
+    if ($reply !== null) {
+        echo json_encode(['reply' => $reply]);
+        exit;
+    }
+
+    $fallback = $language === 'pl'
+        ? 'Nie mam teraz dostępu do liczby ofert w bazie. Spróbuj ponownie za chwilę.'
+        : 'I cannot access the offer counts right now. Please try again later.';
+
+    echo json_encode(['reply' => $fallback]);
+    exit;
 }
 
 $systemPrompt = "Jesteś pomocnym asystentem AI na portalu z ogłoszeniami mieszkaniowymi. " .
