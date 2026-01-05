@@ -120,7 +120,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen font-roboto">
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../header.php'; ?>
     
     <main class="page-shell py-12">
         <div class="container mx-auto px-4 sm:px-6">
