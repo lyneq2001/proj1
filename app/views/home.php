@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
         body { font-family: 'Inter', sans-serif; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; }
         .hero-bg {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=2050&q=80') center/cover no-repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), #1f2937; /* Ciemnoszare tło zamiast zdjęcia */
         }
     </style>
 </head>
@@ -25,7 +25,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
 
 <main class="min-h-screen">
 
-    <!-- Hero Section -->
+    <!-- Hero Section – bez zdjęcia w tle -->
     <section class="hero-bg py-32 md:py-48 lg:py-64 text-white">
         <div class="container mx-auto px-6 text-center">
             <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in">
