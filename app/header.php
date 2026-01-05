@@ -14,7 +14,7 @@ $isAdmin = isAdmin();
         </a>
 
         <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-8">
+        <div class="flex flex-wrap items-center gap-4 sm:gap-6 md:gap-8">
             <a href="index.php?action=search" class="font-medium hover:text-amber-400 transition">Oferty</a>
             
             <?php if ($isLoggedIn): ?>
@@ -38,63 +38,7 @@ $isAdmin = isAdmin();
             <?php endif; ?>
         </div>
 
-        <!-- Mobile Menu Button -->
-        <button id="mobile-toggle" class="md:hidden p-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </button>
     </nav>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-2xl border-t border-white/10">
-        <div class="container mx-auto px-4 py-6 space-y-3">
-            <a href="index.php?action=search" class="block py-3 px-4 rounded-xl hover:bg-white/10 transition">Oferty</a>
-            
-            <?php if ($isLoggedIn): ?>
-                <a href="index.php?action=add_offer" class="block py-3 px-4 rounded-xl hover:bg-white/10 transition">Dodaj ofertę</a>
-                <?php if ($isAdmin): ?>
-                    <a href="index.php?action=admin_dashboard" class="block py-3 px-4 rounded-xl hover:bg-white/10 transition">Panel admina</a>
-                <?php endif; ?>
-                <a href="index.php?action=dashboard" class="block py-3 px-4 rounded-xl hover:bg-white/10 transition">Konto</a>
-                
-                <form method="POST" action="index.php?action=logout">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                    <button type="submit" class="w-full text-left py-3 px-4 rounded-xl hover:bg-red-500/20 transition">
-                        Wyloguj się
-                    </button>
-                </form>
-            <?php else: ?>
-                <a href="index.php?action=register" class="block py-3 px-4 rounded-xl hover:bg-white/10 transition">Rejestracja</a>
-                <a href="index.php?action=login" class="block py-3 px-4 rounded-xl bg-amber-500 text-gray-900 font-semibold hover:bg-amber-400 transition">
-                    Zaloguj się
-                </a>
-            <?php endif; ?>
-        </div>
-    </div>
 </header>
-
-<script>
-    const toggle = document.getElementById('mobile-toggle');
-    const menu = document.getElementById('mobile-menu');
-    const icon = document.getElementById('menu-icon');
-
-    toggle.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-        if (menu.classList.contains('hidden')) {
-            icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-        } else {
-            icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
-        }
-    });
-
-    // Zamknij po kliknięciu poza menu
-    document.addEventListener('click', (e) => {
-        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
-            icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-        }
-    });
-</script>
 
 <?php include_once __DIR__ . '/ai_assistant_widget.php'; ?>
