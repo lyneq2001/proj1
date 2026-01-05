@@ -755,25 +755,41 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
         return;
     }
 
-    // Geocode address using Nominatim
-    $address = urlencode($city . ', ' . $street);
-    $url = "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'ApartmentRentalApp/1.0 (your.email@example.com)');
-    $response = curl_exec($ch);
-    curl_close($ch);
-    
-    $data = json_decode($response, true);
-    $lat = null;
-    $lng = null;
-    if (!empty($data)) {
-        $lat = $data[0]['lat'];
-        $lng = $data[0]['lon'];
-    } else {
-        setFlashMessage('error', 'Failed to geocode address.');
+    $stmt = $pdo->prepare("SELECT city, street, lat, lng FROM offers WHERE id = ? AND user_id = ?");
+    $stmt->execute([$offerId, $_SESSION['user_id']]);
+    $existingOffer = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$existingOffer) {
+        setFlashMessage('error', 'Offer not found or unauthorized.');
         return;
+    }
+
+    $existingCity = mb_strtolower(trim($existingOffer['city'] ?? ''));
+    $existingStreet = mb_strtolower(trim($existingOffer['street'] ?? ''));
+    $newCity = mb_strtolower(trim($city));
+    $newStreet = mb_strtolower(trim($street));
+
+    $lat = $existingOffer['lat'];
+    $lng = $existingOffer['lng'];
+
+    if ($existingCity !== $newCity || $existingStreet !== $newStreet || $lat === null || $lng === null) {
+        // Geocode address using Nominatim
+        $address = urlencode($city . ', ' . $street);
+        $url = "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ApartmentRentalApp/1.0 (your.email@example.com)');
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+        if (!empty($data)) {
+            $lat = $data[0]['lat'];
+            $lng = $data[0]['lon'];
+        } else {
+            setFlashMessage('error', 'Failed to geocode address.');
+            return;
+        }
     }
 
     // Update offer
