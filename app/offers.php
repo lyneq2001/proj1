@@ -453,6 +453,106 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
     }
 }
 
+function searchOffersMapData($filters): array
+{
+    global $pdo;
+
+    $query = "SELECT o.id, o.title, o.lat, o.lng, o.price, o.city, o.street FROM offers o WHERE 1=1";
+    $params = [];
+
+    $center_lat = null;
+    $center_lng = null;
+    if (!empty($filters['city']) && !empty($filters['distance_km'])) {
+        $address = urlencode($filters['city']);
+        $url = "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ApartmentRentalApp/1.0 (your.email@example.com)');
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+        if (!empty($data)) {
+            $center_lat = $data[0]['lat'];
+            $center_lng = $data[0]['lon'];
+        }
+    }
+
+    if (!empty($filters['city']) && !empty($filters['distance_km']) && isset($center_lat, $center_lng)) {
+        $query .= " AND (6371 * acos(cos(radians(?)) * cos(radians(o.lat)) * cos(radians(o.lng) - radians(?)) + sin(radians(?)) * sin(radians(o.lat)))) <= ?";
+        $params[] = $center_lat;
+        $params[] = $center_lng;
+        $params[] = $center_lat;
+        $params[] = $filters['distance_km'];
+    }
+
+    if (!empty($filters['city'])) {
+        $query .= " AND o.city LIKE ?";
+        $params[] = "%{$filters['city']}%";
+    }
+    if (!empty($filters['street'])) {
+        $query .= " AND o.street LIKE ?";
+        $params[] = "%{$filters['street']}%";
+    }
+    if (!empty($filters['min_price'])) {
+        $query .= " AND o.price >= ?";
+        $params[] = $filters['min_price'];
+    }
+    if (!empty($filters['max_price'])) {
+        $query .= " AND o.price <= ?";
+        $params[] = $filters['max_price'];
+    }
+    if (!empty($filters['min_size'])) {
+        $query .= " AND o.size >= ?";
+        $params[] = $filters['min_size'];
+    }
+    if (!empty($filters['min_floor'])) {
+        $query .= " AND o.floor >= ?";
+        $params[] = $filters['min_floor'];
+    }
+    if (!empty($filters['max_floor'])) {
+        $query .= " AND o.floor <= ?";
+        $params[] = $filters['max_floor'];
+    }
+    if (isset($filters['has_balcony']) && $filters['has_balcony'] == 1) {
+        $query .= " AND o.has_balcony = 1";
+    }
+    if (isset($filters['has_elevator']) && $filters['has_elevator'] == 1) {
+        $query .= " AND o.has_elevator = 1";
+    }
+    if (!empty($filters['building_type'])) {
+        $query .= " AND o.building_type = ?";
+        $params[] = $filters['building_type'];
+    }
+    if (!empty($filters['min_rooms'])) {
+        $query .= " AND o.rooms >= ?";
+        $params[] = $filters['min_rooms'];
+    }
+    if (!empty($filters['min_bathrooms'])) {
+        $query .= " AND o.bathrooms >= ?";
+        $params[] = $filters['min_bathrooms'];
+    }
+    if (isset($filters['parking']) && $filters['parking'] == 1) {
+        $query .= " AND o.parking = 1";
+    }
+    if (isset($filters['furnished']) && $filters['furnished'] == 1) {
+        $query .= " AND o.furnished = 1";
+    }
+
+    try {
+        $stmt = $pdo->prepare($query);
+        foreach ($params as $index => $param) {
+            $stmt->bindValue($index + 1, $param, is_int($param) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Search failed: ' . $e->getMessage());
+        return [];
+    }
+}
+
 function getUserOffers($userId, $page = 1, $perPage = 10) {
     global $pdo;
     ensureOfferViewsTable();

@@ -395,7 +395,7 @@
                     <div>
                         <h1 class="text-3xl font-playfair font-bold text-slate-800">Dostępne oferty</h1>
                         <p class="text-slate-600 text-lg font-semibold">
-                            Znaleziono <span class="text-blue-600"><?php echo count($offers); ?></span> ofert
+                            Znaleziono <span class="text-blue-600"><?php echo (int)($totalOffers ?? count($offers)); ?></span> ofert
                         </p>
                     </div>
                     <p class="text-slate-500 text-sm md:text-base max-w-xl">Mapa i lista ofert są widoczne jednocześnie, aby łatwo porównywać lokalizacje i szczegóły mieszkań.</p>
@@ -522,6 +522,46 @@
                                 </div>
                             <?php endif; ?>
                         </div>
+                        <?php if (!empty($totalPages) && $totalPages > 1): ?>
+                            <?php
+                            $queryParams = $_GET;
+                            $queryParams['action'] = 'search';
+                            unset($queryParams['page']);
+                            $currentPage = $page ?? 1;
+                            ?>
+                            <div class="mt-10 flex flex-col items-center gap-4">
+                                <p class="text-sm text-slate-500">Strona <?php echo (int)$currentPage; ?> z <?php echo (int)$totalPages; ?></p>
+                                <nav class="flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+                                    <?php if ($currentPage > 1): ?>
+                                        <?php
+                                        $queryParams['page'] = $currentPage - 1;
+                                        $prevUrl = 'index.php?' . http_build_query($queryParams);
+                                        ?>
+                                        <a href="<?php echo htmlspecialchars($prevUrl); ?>" class="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-colors">Poprzednia</a>
+                                    <?php endif; ?>
+
+                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                        <?php
+                                        $queryParams['page'] = $i;
+                                        $pageUrl = 'index.php?' . http_build_query($queryParams);
+                                        $isActive = $i === (int)$currentPage;
+                                        ?>
+                                        <a href="<?php echo htmlspecialchars($pageUrl); ?>"
+                                           class="px-4 py-2 rounded-lg border <?php echo $isActive ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200'; ?> transition-colors">
+                                            <?php echo $i; ?>
+                                        </a>
+                                    <?php endfor; ?>
+
+                                    <?php if ($currentPage < $totalPages): ?>
+                                        <?php
+                                        $queryParams['page'] = $currentPage + 1;
+                                        $nextUrl = 'index.php?' . http_build_query($queryParams);
+                                        ?>
+                                        <a href="<?php echo htmlspecialchars($nextUrl); ?>" class="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-colors">Następna</a>
+                                    <?php endif; ?>
+                                </nav>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
