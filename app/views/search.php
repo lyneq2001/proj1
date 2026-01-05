@@ -753,8 +753,9 @@
                     const nearest = findNearestPoi(offer.city, offer.lat, offer.lng);
                     const priceText = offer.price ? new Intl.NumberFormat('pl-PL').format(offer.price) + ' PLN' : 'Cena dostępna w ogłoszeniu';
                     const poiText = nearest ? `<br><em>Najbliżej:</em> ${escapeHtml(nearest.name)} (${nearest.distance.toFixed(1)} km)` : '';
+                    const offerLink = offer.id ? `<div class="mt-2"><a href="index.php?action=view_offer&offer_id=${offer.id}" class="text-red-700 font-semibold hover:text-red-900">Przejdź do oferty →</a></div>` : '';
                     marker.bindPopup(
-                        `<strong>${escapeHtml(offer.title)}</strong><br>${escapeHtml(offer.city)}, ${escapeHtml(offer.street)}<br>${priceText}${poiText}`
+                        `<strong>${escapeHtml(offer.title)}</strong><br>${escapeHtml(offer.city)}, ${escapeHtml(offer.street)}<br>${priceText}${poiText}${offerLink}`
                     );
                     bounds.push([offer.lat, offer.lng]);
                 });
