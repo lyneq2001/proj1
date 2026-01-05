@@ -755,8 +755,14 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
         return;
     }
 
-    $stmt = $pdo->prepare("SELECT city, street, lat, lng FROM offers WHERE id = ? AND user_id = ?");
-    $stmt->execute([$offerId, $_SESSION['user_id']]);
+    $isAdmin = isAdmin();
+    if ($isAdmin) {
+        $stmt = $pdo->prepare("SELECT user_id, city, street, lat, lng FROM offers WHERE id = ?");
+        $stmt->execute([$offerId]);
+    } else {
+        $stmt = $pdo->prepare("SELECT user_id, city, street, lat, lng FROM offers WHERE id = ? AND user_id = ?");
+        $stmt->execute([$offerId, $_SESSION['user_id']]);
+    }
     $existingOffer = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$existingOffer) {
         setFlashMessage('error', 'Offer not found or unauthorized.');
@@ -793,9 +799,17 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
     }
 
     // Update offer
-    $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, parking = ?, garage = ?, garden = ?, furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ? AND user_id = ?");
+    if ($isAdmin) {
+        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, parking = ?, garage = ?, garden = ?, furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ?");
+    } else {
+        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, parking = ?, garage = ?, garden = ?, furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ? AND user_id = ?");
+    }
     try {
-        $stmt->execute([$title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $offerId, $_SESSION['user_id']]);
+        $params = [$title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $offerId];
+        if (!$isAdmin) {
+            $params[] = $_SESSION['user_id'];
+        }
+        $stmt->execute($params);
 
         // Handle image uploads
         if (!empty($images['name'][0])) {
@@ -837,7 +851,8 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
         }
 
         setFlashMessage('success', 'Offer updated successfully.');
-        header("Location: index.php?action=dashboard");
+        $redirectAction = $isAdmin ? 'admin_dashboard' : 'dashboard';
+        header("Location: index.php?action=" . $redirectAction);
     } catch (PDOException $e) {
         setFlashMessage('error', 'Failed to edit offer: ' . $e->getMessage());
     }

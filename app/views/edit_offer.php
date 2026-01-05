@@ -158,7 +158,7 @@
                         </div>';
                 } else {
                     $offer = getOfferDetails($_GET['offer_id']);
-                    if (!$offer || $offer['user_id'] != $_SESSION['user_id']) {
+                    if (!$offer || ($offer['user_id'] != $_SESSION['user_id'] && !isAdmin())) {
                         echo '<div class="glass-panel p-8 text-center">
                                 <div class="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
                                     <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
