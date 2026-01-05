@@ -168,6 +168,7 @@ switch ($action) {
         header("Location: index.php?action=view_offer&offer_id=" . (int)$_GET['offer_id']);
         break;
     case 'search':
+        $perPage = 10;
         $filters = [
             'city' => $_GET['city'] ?? '',
             'street' => $_GET['street'] ?? '',
@@ -186,9 +187,11 @@ switch ($action) {
             'furnished' => $_GET['furnished'] ?? '',
             'sort' => $_GET['sort'] ?? 'date_desc'
         ];
-        $result = searchOffers($filters, $page);
+        $result = searchOffers($filters, $page, $perPage);
         $offers = $result['offers'];
         $totalOffers = $result['total'];
+        $totalPages = (int)ceil($totalOffers / $perPage);
+        $mapOffers = searchOffersMapData($filters);
 
         $aiFilters = $_SESSION['ai_filters'] ?? [];
         $aiWeights = $_SESSION['ai_weights'] ?? [];
@@ -222,7 +225,7 @@ switch ($action) {
                 'city' => $offer['city'] ?? '',
                 'street' => $offer['street'] ?? ''
             ];
-        }, $offers)));
+        }, $mapOffers)));
         include 'views/search.php';
         break;
     case 'search_users':
