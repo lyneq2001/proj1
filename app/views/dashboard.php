@@ -260,6 +260,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         </div>
                     </div>
                 </div>
+
+                <div class="glass-panel p-6 mt-6">
+                    <h3 class="font-semibold text-slate-800 text-lg mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-6M19 5a9 9 0 00-14 6" />
+                        </svg>
+                        Generator ofert
+                    </h3>
+                    <p class="text-slate-600 text-sm mb-4">
+                        Wprowadź liczbę ogłoszeń do losowego wygenerowania z realistycznymi widełkami cen i udogodnieniami.
+                    </p>
+                    <form method="POST" action="index.php?action=generate_offers" class="space-y-4">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                        <label class="block text-slate-700 text-sm font-semibold" for="offer_count">Liczba ofert</label>
+                        <input
+                            id="offer_count"
+                            type="number"
+                            name="offer_count"
+                            min="1"
+                            max="50"
+                            value="5"
+                            class="w-full p-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition"
+                            required
+                        >
+                        <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                            Wylosuj i dodaj oferty
+                        </button>
+                    </form>
+                </div>
             </aside>
 
             <!-- Main Content -->

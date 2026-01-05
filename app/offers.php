@@ -580,6 +580,200 @@ function getOfferDetails($offerId) {
     return $offer;
 }
 
+function generateRandomOffers(int $count, int $userId): int
+{
+    global $pdo;
+
+    if ($count < 1) {
+        return 0;
+    }
+
+    ensureOfferStatusColumn();
+
+    $cities = [
+        [
+            'name' => 'Warszawa',
+            'lat' => 52.2297,
+            'lng' => 21.0122,
+            'streets' => ['Marszałkowska', 'Puławska', 'Grójecka', 'Aleje Jerozolimskie', 'Nowy Świat'],
+            'price_range' => [80, 140],
+        ],
+        [
+            'name' => 'Kraków',
+            'lat' => 50.0647,
+            'lng' => 19.9450,
+            'streets' => ['Długa', 'Karmelicka', 'Dietla', 'Zakopiańska', 'Wielicka'],
+            'price_range' => [70, 120],
+        ],
+        [
+            'name' => 'Wrocław',
+            'lat' => 51.1079,
+            'lng' => 17.0385,
+            'streets' => ['Legnicka', 'Grabiszyńska', 'Kazimierza Wielkiego', 'Powstańców Śląskich', 'Oławska'],
+            'price_range' => [65, 110],
+        ],
+        [
+            'name' => 'Gdańsk',
+            'lat' => 54.3520,
+            'lng' => 18.6466,
+            'streets' => ['Grunwaldzka', 'Kartuska', 'Słowackiego', 'Chmielna', 'Wita Stwosza'],
+            'price_range' => [70, 115],
+        ],
+        [
+            'name' => 'Poznań',
+            'lat' => 52.4064,
+            'lng' => 16.9252,
+            'streets' => ['Głogowska', 'Grunwaldzka', 'Polna', 'Hetmańska', 'Dąbrowskiego'],
+            'price_range' => [60, 100],
+        ],
+        [
+            'name' => 'Łódź',
+            'lat' => 51.7592,
+            'lng' => 19.4560,
+            'streets' => ['Piotrkowska', 'Zgierska', 'Pabianicka', 'Widzewska', 'Narutowicza'],
+            'price_range' => [45, 85],
+        ],
+    ];
+
+    $buildingTypes = ['apartment', 'block', 'house', 'studio', 'loft'];
+    $heatingTypes = ['gas', 'electric', 'district', 'other'];
+    $conditionTypes = ['new', 'renovated', 'used', 'to_renovate'];
+    $adjectives = ['Nowoczesne', 'Przestronne', 'Przytulne', 'Jasne', 'Stylowe', 'Komfortowe'];
+    $highlights = [
+        'blisko komunikacji miejskiej',
+        'w pobliżu terenów zielonych',
+        'z szybkim dojazdem do centrum',
+        'w spokojnej okolicy',
+        'z pełną infrastrukturą usługową',
+        'w sąsiedztwie kawiarni i restauracji',
+    ];
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, parking, garage, garden, furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())"
+    );
+
+    $created = 0;
+
+    for ($i = 0; $i < $count; $i++) {
+        $city = $cities[array_rand($cities)];
+        $buildingType = $buildingTypes[array_rand($buildingTypes)];
+        $heatingType = $heatingTypes[array_rand($heatingTypes)];
+        $conditionType = $conditionTypes[array_rand($conditionTypes)];
+        $street = $city['streets'][array_rand($city['streets'])];
+        $adjective = $adjectives[array_rand($adjectives)];
+        $highlight = $highlights[array_rand($highlights)];
+
+        switch ($buildingType) {
+            case 'studio':
+                $size = random_int(22, 40);
+                $rooms = 1;
+                $floor = random_int(0, 6);
+                break;
+            case 'house':
+                $size = random_int(85, 220);
+                $rooms = random_int(3, 6);
+                $floor = random_int(0, 2);
+                break;
+            case 'loft':
+                $size = random_int(45, 120);
+                $rooms = random_int(2, 4);
+                $floor = random_int(1, 8);
+                break;
+            case 'block':
+                $size = random_int(35, 85);
+                $rooms = random_int(2, 4);
+                $floor = random_int(0, 10);
+                break;
+            default:
+                $size = random_int(30, 100);
+                $rooms = random_int(2, 4);
+                $floor = random_int(0, 8);
+                break;
+        }
+
+        $bathrooms = $rooms > 3 ? random_int(2, 3) : 1;
+        $hasElevator = $buildingType !== 'house' && $floor >= 3 ? 1 : (random_int(0, 100) > 60 ? 1 : 0);
+        $hasBalcony = $buildingType !== 'house' ? (random_int(0, 100) > 30 ? 1 : 0) : 0;
+        $parking = random_int(0, 100) > 50 ? 1 : 0;
+        $garage = $buildingType === 'house' ? (random_int(0, 100) > 40 ? 1 : 0) : (random_int(0, 100) > 80 ? 1 : 0);
+        $garden = $buildingType === 'house' ? (random_int(0, 100) > 20 ? 1 : 0) : (random_int(0, 100) > 90 ? 1 : 0);
+        $furnished = random_int(0, 100) > 45 ? 1 : 0;
+        $petsAllowed = random_int(0, 100) > 55 ? 1 : 0;
+        $yearBuilt = random_int(1975, 2024);
+        $availableDays = random_int(0, 60);
+        $availableFrom = date('Y-m-d', strtotime("+{$availableDays} days"));
+
+        $pricePerMeter = random_int($city['price_range'][0], $city['price_range'][1]);
+        if ($buildingType === 'studio') {
+            $pricePerMeter = (int)round($pricePerMeter * 1.15);
+        } elseif ($buildingType === 'loft') {
+            $pricePerMeter = (int)round($pricePerMeter * 1.1);
+        } elseif ($buildingType === 'house') {
+            $pricePerMeter = (int)round($pricePerMeter * 0.9);
+        }
+
+        $price = (int)round($size * $pricePerMeter);
+        $price = max(1200, $price);
+
+        $title = sprintf(
+            '%s %d-pokojowe %s w %s',
+            $adjective,
+            $rooms,
+            $buildingType === 'house' ? 'dom' : 'mieszkanie',
+            $city['name']
+        );
+
+        $description = sprintf(
+            '%s %s o powierzchni %d m². Lokalizacja: %s, ul. %s. Oferta %s. ' .
+            'Udogodnienia: %s %s %s.',
+            $adjective,
+            $buildingType === 'house' ? 'dom' : 'mieszkanie',
+            $size,
+            $city['name'],
+            $street,
+            $highlight,
+            $hasBalcony ? 'balkon,' : 'brak balkonu,',
+            $hasElevator ? 'winda,' : 'bez windy,',
+            $parking ? 'miejsce parkingowe' : 'parking na ulicy'
+        );
+
+        try {
+            $stmt->execute([
+                $userId,
+                $title,
+                $description,
+                $city['name'],
+                $street,
+                $city['lat'],
+                $city['lng'],
+                $price,
+                $size,
+                $floor,
+                $hasBalcony,
+                $hasElevator,
+                $buildingType,
+                $rooms,
+                $bathrooms,
+                $parking,
+                $garage,
+                $garden,
+                $furnished,
+                $petsAllowed,
+                $heatingType,
+                $yearBuilt,
+                $conditionType,
+                $availableFrom,
+            ]);
+            $created++;
+        } catch (PDOException $e) {
+            error_log('Failed to generate offer: ' . $e->getMessage());
+        }
+    }
+
+    return $created;
+}
+
 function getAiRecommendedOffers(int $userId, int $currentOfferId, int $limit = 3): array
 {
     global $pdo;
