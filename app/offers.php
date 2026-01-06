@@ -546,7 +546,54 @@ function searchOffersMapData($filters): array
             $stmt->bindValue($index + 1, $param, is_int($param) ? PDO::PARAM_INT : PDO::PARAM_STR);
         }
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $offers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $geocodeCache = [];
+
+        foreach ($offers as &$offer) {
+            if (!empty($offer['lat']) && !empty($offer['lng'])) {
+                continue;
+            }
+
+            $city = trim((string)($offer['city'] ?? ''));
+            $street = trim((string)($offer['street'] ?? ''));
+            if ($city === '' || $street === '') {
+                continue;
+            }
+
+            $cacheKey = mb_strtolower($city . '|' . $street);
+            if (array_key_exists($cacheKey, $geocodeCache)) {
+                $coords = $geocodeCache[$cacheKey];
+            } else {
+                $address = urlencode($city . ', ' . $street);
+                $url = "https://nominatim.openstreetmap.org/search?q={$address}&format=json&limit=1";
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'ApartmentRentalApp/1.0 (your.email@example.com)');
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                $data = json_decode($response, true);
+                $coords = null;
+                if (!empty($data)) {
+                    $coords = [
+                        'lat' => (float)$data[0]['lat'],
+                        'lng' => (float)$data[0]['lon'],
+                    ];
+                }
+                $geocodeCache[$cacheKey] = $coords;
+            }
+
+            if (is_array($coords)) {
+                $offer['lat'] = $coords['lat'];
+                $offer['lng'] = $coords['lng'];
+                $updateStmt = $pdo->prepare("UPDATE offers SET lat = ?, lng = ? WHERE id = ?");
+                $updateStmt->execute([$coords['lat'], $coords['lng'], $offer['id']]);
+            }
+        }
+        unset($offer);
+
+        return $offers;
     } catch (PDOException $e) {
         setFlashMessage('error', 'Search failed: ' . $e->getMessage());
         return [];
