@@ -691,8 +691,9 @@ function getConversations($userId) {
 function getOfferDetails($offerId) {
     global $pdo;
     ensureOfferViewsTable();
+    ensureUserPhoneColumn();
     $stmt = $pdo->prepare("
-        SELECT o.*, u.username AS owner_username, COALESCE(v.views_last_24h, 0) AS views_last_24h
+        SELECT o.*, u.username AS owner_username, u.phone AS owner_phone, COALESCE(v.views_last_24h, 0) AS views_last_24h
         FROM offers o
         JOIN users u ON o.user_id = u.id
         LEFT JOIN (

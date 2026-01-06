@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !validateCsrfToken($_POST['csrf_tok
 switch ($action) {
     case 'register':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            register($_POST['username'], $_POST['email'], $_POST['password']);
+            register($_POST['username'], $_POST['email'], $_POST['password'], $_POST['phone'] ?? '');
         }
         include 'views/register.php';
         break;
