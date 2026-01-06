@@ -62,13 +62,36 @@ function emailDomainExists($email) {
     return checkdnsrr($domain, 'MX') || checkdnsrr($domain, 'A');
 }
 
+function ensureUserPhoneColumn(): void
+{
+    static $checked = false;
+    if ($checked) {
+        return;
+    }
+
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?');
+    $stmt->execute(['users', 'phone']);
+    $exists = (bool)$stmt->fetchColumn();
+
+    if (!$exists) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN phone VARCHAR(30) NULL");
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    $checked = true;
+}
+
 function isValidPassword($password) {
     return strlen($password) >= 6 &&
            preg_match('/[A-Za-z]/', $password) &&
            preg_match('/[0-9]/', $password);
 }
 
-function register($username, $email, $password) {
+function register($username, $email, $password, $phone) {
     global $pdo;
     // Validate inputs
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -88,6 +111,18 @@ function register($username, $email, $password) {
         return;
     }
 
+    $phone = trim((string)$phone);
+    if ($phone === '') {
+        setFlashMessage('error', 'Numer telefonu jest wymagany.');
+        return;
+    }
+    if (!preg_match('/^\+?[0-9][0-9\s-]{6,20}$/', $phone)) {
+        setFlashMessage('error', 'Podaj poprawny numer telefonu.');
+        return;
+    }
+
+    ensureUserPhoneColumn();
+
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
@@ -97,9 +132,9 @@ function register($username, $email, $password) {
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $token = bin2hex(random_bytes(16));
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role, is_verified, verification_token) VALUES (?, ?, ?, 'user', 0, ?)");
+    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role, is_verified, verification_token, phone) VALUES (?, ?, ?, 'user', 0, ?, ?)");
     try {
-        $stmt->execute([$username, $email, $hashedPassword, $token]);
+        $stmt->execute([$username, $email, $hashedPassword, $token, $phone]);
         sendVerificationEmail($email, $token);
         setFlashMessage('success', 'Rejestracja udana. Sprawdź email, aby aktywować konto.');
         header("Location: index.php?action=login");
