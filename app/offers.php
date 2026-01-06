@@ -1420,8 +1420,67 @@ function markMessagesAsRead($userId, $offerId, $otherUserId) {
 // Admin-specific functions
 function getAllUsers() {
     global $pdo;
-    $stmt = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id");
+    ensureUserPhoneColumn();
+    $stmt = $pdo->query("SELECT id, username, email, role, phone, created_at FROM users ORDER BY id");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getUserForAdmin($userId) {
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return null;
+    }
+    global $pdo;
+    ensureUserPhoneColumn();
+    $stmt = $pdo->prepare("SELECT id, username, email, role, phone, is_verified, created_at FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function updateUserAdmin($userId, $username, $email, $phone, $role, $isVerified): void {
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return;
+    }
+    global $pdo;
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        setFlashMessage('error', 'Invalid email format.');
+        return;
+    }
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        setFlashMessage('error', 'Username can only contain letters, numbers, and underscores.');
+        return;
+    }
+    $phone = trim((string)$phone);
+    if ($phone === '') {
+        setFlashMessage('error', 'Numer telefonu jest wymagany.');
+        return;
+    }
+    if (!preg_match('/^\\+?[0-9][0-9\\s-]{6,20}$/', $phone)) {
+        setFlashMessage('error', 'Podaj poprawny numer telefonu.');
+        return;
+    }
+    if (!in_array($role, ['user', 'admin'], true)) {
+        setFlashMessage('error', 'Invalid role value.');
+        return;
+    }
+
+    ensureUserPhoneColumn();
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+    $stmt->execute([$email, $userId]);
+    if ($stmt->fetchColumn() > 0) {
+        setFlashMessage('error', 'Adres email jest już zajęty.');
+        return;
+    }
+
+    $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, phone = ?, role = ?, is_verified = ? WHERE id = ?");
+    try {
+        $stmt->execute([$username, $email, $phone, $role, $isVerified ? 1 : 0, $userId]);
+        setFlashMessage('success', 'Konto użytkownika zostało zaktualizowane.');
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Failed to update user: ' . $e->getMessage());
+    }
 }
 
 function deleteUser($userId) {
