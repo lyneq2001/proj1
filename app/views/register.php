@@ -137,6 +137,14 @@
                         </div>
 
                         <div>
+                            <label for="phone" class="block text-slate-700 text-sm font-semibold mb-3">Numer telefonu</label>
+                            <input type="tel" id="phone" name="phone" required
+                                   class="w-full p-4 form-input"
+                                   placeholder="+48 500 000 000"
+                                   value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>">
+                        </div>
+
+                        <div>
                             <label for="password" class="block text-slate-700 text-sm font-semibold mb-3">Hasło</label>
                             <input type="password" id="password" name="password" required
                                    class="w-full p-4 form-input"

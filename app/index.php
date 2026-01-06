@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !validateCsrfToken($_POST['csrf_tok
 switch ($action) {
     case 'register':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            register($_POST['username'], $_POST['email'], $_POST['password']);
+            register($_POST['username'], $_POST['email'], $_POST['password'], $_POST['phone'] ?? '');
         }
         include 'views/register.php';
         break;
@@ -143,6 +143,36 @@ switch ($action) {
             );
         }
         include 'views/edit_offer.php';
+        break;
+    case 'edit_user':
+        if (!isAdmin()) {
+            setFlashMessage('error', 'Unauthorized.');
+            header("Location: index.php");
+            exit;
+        }
+        if (!isset($_GET['user_id'])) {
+            setFlashMessage('error', 'No user ID provided.');
+            header("Location: index.php?action=admin_dashboard");
+            exit;
+        }
+        $user = getUserForAdmin((int)$_GET['user_id']);
+        if (!$user) {
+            setFlashMessage('error', 'Nie znaleziono użytkownika.');
+            header("Location: index.php?action=admin_dashboard");
+            exit;
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            updateUserAdmin(
+                (int)$_GET['user_id'],
+                $_POST['username'],
+                $_POST['email'],
+                $_POST['phone'] ?? '',
+                $_POST['role'] ?? 'user',
+                isset($_POST['is_verified']) ? 1 : 0
+            );
+            $user = getUserForAdmin((int)$_GET['user_id']);
+        }
+        include 'views/edit_user.php';
         break;
     case 'delete_offer':
         if (!isLoggedIn()) {
