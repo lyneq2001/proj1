@@ -131,12 +131,10 @@ function register($username, $email, $password, $phone) {
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $token = bin2hex(random_bytes(16));
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role, is_verified, verification_token, phone) VALUES (?, ?, ?, 'user', 0, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role, is_verified, verification_token, phone) VALUES (?, ?, ?, 'user', 1, NULL, ?)");
     try {
-        $stmt->execute([$username, $email, $hashedPassword, $token, $phone]);
-        sendVerificationEmail($email, $token);
-        setFlashMessage('success', 'Rejestracja udana. Sprawdź email, aby aktywować konto.');
+        $stmt->execute([$username, $email, $hashedPassword, $phone]);
+        setFlashMessage('success', 'Rejestracja udana. Możesz się zalogować.');
         header("Location: index.php?action=login");
     } catch (PDOException $e) {
         setFlashMessage('error', 'Registration failed: ' . $e->getMessage());
@@ -155,10 +153,6 @@ function login($email, $password) {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     if ($user && password_verify($password, $user['password'])) {
-        if (!$user['is_verified']) {
-            setFlashMessage('error', 'Najpierw potwierdź swój adres email.');
-            return;
-        }
         $_SESSION['user_id'] = $user['id'];
         setFlashMessage('success', 'Logged in successfully.');
         header("Location: index.php");
