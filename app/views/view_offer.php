@@ -554,6 +554,12 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         <p class="text-sm text-slate-600 mb-1">Wystawione przez</p>
                         <p class="font-semibold text-slate-800"><?php echo htmlspecialchars($offer['owner_username']); ?></p>
                     </div>
+                    <div class="bg-slate-50 p-4 rounded-xl">
+                        <p class="text-sm text-slate-600 mb-1">Telefon kontaktowy</p>
+                        <p class="font-semibold text-slate-800">
+                            <?php echo !empty($offer['owner_phone']) ? htmlspecialchars($offer['owner_phone']) : 'Brak numeru telefonu'; ?>
+                        </p>
+                    </div>
                 </div>
             </div>
 

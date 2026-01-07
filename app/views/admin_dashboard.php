@@ -297,6 +297,7 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Użytkownik</th>
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Email</th>
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Rola</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Telefon</th>
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Zarejestrowany</th>
                                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Akcje</th>
                                     </tr>
@@ -322,9 +323,15 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                                <?php echo htmlspecialchars($user['phone'] ?? ''); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                                                 <?php echo isset($user['created_at']) ? date('d.m.Y', strtotime($user['created_at'])) : 'N/A'; ?>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <a href="index.php?action=edit_user&user_id=<?php echo $user['id'] ?? ''; ?>" class="action-btn text-blue-600 hover:text-blue-700 p-2 rounded-lg hover:bg-blue-50 transition-colors" title="Edytuj użytkownika">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                                 <?php if (($user['role'] ?? 'user') !== 'admin'): ?>
                                                     <form method="POST" action="index.php?action=admin_dashboard" onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika? Wszystkie jego oferty i wiadomości również zostaną usunięte.');" class="inline-block">
                                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
