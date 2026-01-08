@@ -401,6 +401,101 @@
                     <p class="text-slate-500 text-sm md:text-base max-w-xl">Mapa i lista ofert są widoczne jednocześnie, aby łatwo porównywać lokalizacje i szczegóły mieszkań.</p>
                 </div>
 
+                    <?php if (!empty($aiRecommendedOffers)): ?>
+                        <section class="glass-panel p-6 mb-8">
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <p class="text-sm uppercase tracking-[0.2em] text-slate-500 font-semibold">Rekomendacje AI</p>
+                                    <h2 class="text-2xl font-playfair font-bold text-slate-800">Najlepsze dopasowania na start</h2>
+                                </div>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-indigo-600/10 text-indigo-700 text-xs font-semibold px-3 py-1">
+                                    <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+                                    AI
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <?php foreach ($aiRecommendedOffers as $offer): ?>
+                                    <?php
+                                    $reactionCounts = $aiOfferReactionCounts[$offer['id']] ?? ['likes' => 0, 'dislikes' => 0];
+                                    $userReaction = $aiUserReactions[$offer['id']] ?? null;
+                                    ?>
+                                    <div class="offer-card overflow-hidden">
+                                        <a href="index.php?action=ai_offer_click&offer_id=<?php echo $offer['id']; ?>&source=search" class="block">
+                                            <?php if (!empty($offer['primary_image'])): ?>
+                                                <div class="w-full h-44 overflow-hidden relative">
+                                                    <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                    <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">AI</span>
+                                                    <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
+                                                        <?php if (isLoggedIn()): ?>
+                                                            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow">
+                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                                    <input type="hidden" name="reaction" value="like">
+                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'like' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'border-slate-200 text-slate-600 hover:text-emerald-700'; ?>">👍</button>
+                                                                </form>
+                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                                    <input type="hidden" name="reaction" value="dislike">
+                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'dislike' ? 'bg-red-100 text-red-700 border-red-200' : 'border-slate-200 text-slate-600 hover:text-red-700'; ?>">👎</button>
+                                                                </form>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                        <span class="text-[10px] uppercase tracking-wide bg-white/90 text-slate-500 rounded-full px-2 py-1 shadow">
+                                                            👍 <?php echo (int)$reactionCounts['likes']; ?> • 👎 <?php echo (int)$reactionCounts['dislikes']; ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="w-full h-44 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">AI</span>
+                                                    <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
+                                                        <?php if (isLoggedIn()): ?>
+                                                            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow">
+                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                                    <input type="hidden" name="reaction" value="like">
+                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'like' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'border-slate-200 text-slate-600 hover:text-emerald-700'; ?>">👍</button>
+                                                                </form>
+                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                                    <input type="hidden" name="reaction" value="dislike">
+                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'dislike' ? 'bg-red-100 text-red-700 border-red-200' : 'border-slate-200 text-slate-600 hover:text-red-700'; ?>">👎</button>
+                                                                </form>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                        <span class="text-[10px] uppercase tracking-wide bg-white/90 text-slate-500 rounded-full px-2 py-1 shadow">
+                                                            👍 <?php echo (int)$reactionCounts['likes']; ?> • 👎 <?php echo (int)$reactionCounts['dislikes']; ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                            <div class="p-5">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <h3 class="text-lg font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($offer['title']); ?></h3>
+                                                    <span class="text-lg font-bold text-blue-600 whitespace-nowrap ml-4"><?php echo htmlspecialchars(number_format((float)$offer['price'], 0, ',', ' ')); ?> PLN</span>
+                                                </div>
+                                                <p class="text-slate-600 text-sm mb-3"><?php echo htmlspecialchars($offer['city']); ?>, <?php echo htmlspecialchars($offer['street']); ?></p>
+                                                <div class="flex flex-wrap gap-2 text-xs text-slate-600">
+                                                    <span><?php echo htmlspecialchars($offer['size']); ?> m²</span>
+                                                    <span>•</span>
+                                                    <span><?php echo htmlspecialchars($offer['rooms']); ?> pokoi</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+                    <?php endif; ?>
+
                     <?php if (empty($offers)): ?>
                         <div class="glass-panel p-12 text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-slate-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
