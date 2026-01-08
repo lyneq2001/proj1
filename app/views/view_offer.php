@@ -259,6 +259,14 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
             if (isLoggedIn()) {
                 $aiRecommendations = getAiRecommendedOffers((int)$_SESSION['user_id'], (int)$offer['id'], 3);
             }
+
+            $offerReactionCounts = getAiOfferReactionCounts([(int)$offer['id']]);
+            $offerReactionCounts = $offerReactionCounts[$offer['id']] ?? ['likes' => 0, 'dislikes' => 0];
+            $userOfferReaction = null;
+            if (isLoggedIn()) {
+                $userReactions = getAiOfferReactionsForUser((int)$_SESSION['user_id'], [(int)$offer['id']]);
+                $userOfferReaction = $userReactions[$offer['id']] ?? null;
+            }
         } else {
         ?>
             <div class="glass-panel p-12 text-center max-w-2xl mx-auto">
@@ -429,6 +437,37 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         <p class="text-sm text-slate-600 font-medium">Wyświetlenia</p>
                         <p class="text-slate-700">Łącznie: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h']); ?></p>
                     </div>
+                </div>
+            </div>
+
+            <div class="offer-section p-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-playfair font-bold text-slate-800">Ocena społeczności</h3>
+                        <p class="text-sm text-slate-500">👍 <?php echo (int)$offerReactionCounts['likes']; ?> • 👎 <?php echo (int)$offerReactionCounts['dislikes']; ?></p>
+                    </div>
+                    <?php if (isLoggedIn()): ?>
+                        <?php if ($userOfferReaction): ?>
+                            <span class="text-sm text-slate-500 font-medium">Już zagłosowałeś.</span>
+                        <?php else: ?>
+                            <div class="flex items-center gap-2">
+                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                    <input type="hidden" name="offer_id" value="<?php echo (int)$offer['id']; ?>">
+                                    <input type="hidden" name="reaction" value="like">
+                                    <button type="submit" class="text-xs px-4 py-2 rounded-full border border-slate-200 text-slate-600 hover:text-emerald-700">👍 Lubię</button>
+                                </form>
+                                <form method="POST" action="index.php?action=ai_offer_reaction">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                    <input type="hidden" name="offer_id" value="<?php echo (int)$offer['id']; ?>">
+                                    <input type="hidden" name="reaction" value="dislike">
+                                    <button type="submit" class="text-xs px-4 py-2 rounded-full border border-slate-200 text-slate-600 hover:text-red-700">👎 Nie lubię</button>
+                                </form>
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="text-sm text-slate-500">Zaloguj się, aby ocenić ofertę.</span>
+                    <?php endif; ?>
                 </div>
             </div>
 
