@@ -464,9 +464,6 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
     if (!empty($data)) {
         $lat = $data[0]['lat'];
         $lng = $data[0]['lon'];
-    } else {
-        setFlashMessage('error', 'Failed to geocode address.');
-        return;
     }
 
     // Insert offer
@@ -1402,8 +1399,8 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
             $lat = $data[0]['lat'];
             $lng = $data[0]['lon'];
         } else {
-            setFlashMessage('error', 'Failed to geocode address.');
-            return;
+            $lat = null;
+            $lng = null;
         }
     }
 
