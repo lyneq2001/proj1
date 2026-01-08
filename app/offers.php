@@ -334,11 +334,11 @@ function getAiOfferUsageByUser(int $limit = 20): array
         SELECT u.id,
                u.username,
                u.email,
-               COUNT(ai_usage.id) AS usage_count,
-               MAX(ai_usage.used_at) AS last_used_at
-        FROM ai_offer_usages ai_usage
-        JOIN users u ON ai_usage.user_id = u.id
-        GROUP BY ai_usage.user_id
+               COUNT(usage.id) AS usage_count,
+               MAX(usage.used_at) AS last_used_at
+        FROM ai_offer_usages usage
+        JOIN users u ON usage.user_id = u.id
+        GROUP BY usage.user_id
         ORDER BY usage_count DESC
         LIMIT {$limit}";
 

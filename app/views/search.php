@@ -426,27 +426,6 @@
                                                 <div class="w-full h-44 overflow-hidden relative">
                                                     <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                                     <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">AI</span>
-                                                    <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
-                                                        <?php if (isLoggedIn()): ?>
-                                                            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow">
-                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
-                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
-                                                                    <input type="hidden" name="reaction" value="like">
-                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'like' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'border-slate-200 text-slate-600 hover:text-emerald-700'; ?>">👍</button>
-                                                                </form>
-                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
-                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
-                                                                    <input type="hidden" name="reaction" value="dislike">
-                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'dislike' ? 'bg-red-100 text-red-700 border-red-200' : 'border-slate-200 text-slate-600 hover:text-red-700'; ?>">👎</button>
-                                                                </form>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <span class="text-[10px] uppercase tracking-wide bg-white/90 text-slate-500 rounded-full px-2 py-1 shadow">
-                                                            👍 <?php echo (int)$reactionCounts['likes']; ?> • 👎 <?php echo (int)$reactionCounts['dislikes']; ?>
-                                                        </span>
-                                                    </div>
                                                 </div>
                                             <?php else: ?>
                                                 <div class="w-full h-44 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
@@ -454,27 +433,6 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
                                                     <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">AI</span>
-                                                    <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
-                                                        <?php if (isLoggedIn()): ?>
-                                                            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 shadow">
-                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
-                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
-                                                                    <input type="hidden" name="reaction" value="like">
-                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'like' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'border-slate-200 text-slate-600 hover:text-emerald-700'; ?>">👍</button>
-                                                                </form>
-                                                                <form method="POST" action="index.php?action=ai_offer_reaction">
-                                                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
-                                                                    <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
-                                                                    <input type="hidden" name="reaction" value="dislike">
-                                                                    <button type="submit" class="text-xs px-2 py-0.5 rounded-full border <?php echo $userReaction === 'dislike' ? 'bg-red-100 text-red-700 border-red-200' : 'border-slate-200 text-slate-600 hover:text-red-700'; ?>">👎</button>
-                                                                </form>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        <span class="text-[10px] uppercase tracking-wide bg-white/90 text-slate-500 rounded-full px-2 py-1 shadow">
-                                                            👍 <?php echo (int)$reactionCounts['likes']; ?> • 👎 <?php echo (int)$reactionCounts['dislikes']; ?>
-                                                        </span>
-                                                    </div>
                                                 </div>
                                             <?php endif; ?>
                                             <div class="p-5">
@@ -490,6 +448,29 @@
                                                 </div>
                                             </div>
                                         </a>
+                                        <?php if (isLoggedIn()): ?>
+                                            <div class="px-5 pb-5 flex items-center justify-between border-t border-slate-100">
+                                                <div class="text-xs text-slate-500">Ocena społeczności: 👍 <?php echo (int)$reactionCounts['likes']; ?> • 👎 <?php echo (int)$reactionCounts['dislikes']; ?></div>
+                                                <div class="flex items-center gap-2">
+                                                    <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                        <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                        <input type="hidden" name="reaction" value="like">
+                                                        <button type="submit" class="text-xs px-3 py-1 rounded-full border <?php echo $userReaction === 'like' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'border-slate-200 text-slate-600 hover:text-emerald-700'; ?>">👍 Lubię</button>
+                                                    </form>
+                                                    <form method="POST" action="index.php?action=ai_offer_reaction">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                        <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                        <input type="hidden" name="reaction" value="dislike">
+                                                        <button type="submit" class="text-xs px-3 py-1 rounded-full border <?php echo $userReaction === 'dislike' ? 'bg-red-100 text-red-700 border-red-200' : 'border-slate-200 text-slate-600 hover:text-red-700'; ?>">👎 Nie lubię</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="px-5 pb-5 text-xs text-slate-500 border-t border-slate-100">
+                                                Zaloguj się, aby oceniać oferty AI.
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
