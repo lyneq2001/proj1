@@ -197,6 +197,41 @@ switch ($action) {
         setFlashMessage('success', $is_favorited ? 'Added to favorites.' : 'Removed from favorites.');
         header("Location: index.php?action=view_offer&offer_id=" . (int)$_GET['offer_id']);
         break;
+    case 'ai_offer_click':
+        if (!isset($_GET['offer_id'])) {
+            setFlashMessage('error', 'No offer ID provided.');
+            header("Location: index.php?action=search");
+            exit;
+        }
+        $offerId = (int)$_GET['offer_id'];
+        $source = $_GET['source'] ?? 'search';
+        recordAiOfferUsage($offerId, $source);
+        header("Location: index.php?action=view_offer&offer_id=" . $offerId);
+        break;
+    case 'ai_offer_reaction':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?action=search");
+            exit;
+        }
+        if (!isLoggedIn()) {
+            setFlashMessage('error', 'Musisz być zalogowany, aby ocenić ofertę AI.');
+            header("Location: index.php?action=login");
+            exit;
+        }
+        if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            setFlashMessage('error', 'CSRF token verification failed.');
+            header("Location: index.php?action=search");
+            exit;
+        }
+        if (!isset($_POST['offer_id'], $_POST['reaction'])) {
+            setFlashMessage('error', 'Brak danych oceny.');
+            header("Location: index.php?action=search");
+            exit;
+        }
+        setAiOfferReaction((int)$_POST['offer_id'], (int)$_SESSION['user_id'], (string)$_POST['reaction']);
+        $redirect = $_SERVER['HTTP_REFERER'] ?? 'index.php?action=search';
+        header("Location: " . $redirect);
+        break;
     case 'search':
         $perPage = 10;
         $filters = [
@@ -240,6 +275,24 @@ switch ($action) {
                 $offers = $sortingService->sortOffers($offers, $aiFilters, $aiWeights, $userPreferences);
             } catch (Throwable $e) {
                 error_log('AI sorting failed: ' . $e->getMessage());
+            }
+        }
+        $aiRecommendedOffers = [];
+        $aiOfferReactionCounts = [];
+        $aiUserReactions = [];
+        if (isLoggedIn()) {
+            $aiRecommendedOffers = getAiRecommendedOffers((int)$_SESSION['user_id'], 0, 6);
+            if (!empty($aiRecommendedOffers)) {
+                $aiRecommendedOffers = filterOffersBySearchFilters($aiRecommendedOffers, $filters);
+                $aiRecommendedOffers = array_slice($aiRecommendedOffers, 0, 3);
+                $aiOfferIds = array_values(array_unique(array_map('intval', array_column($aiRecommendedOffers, 'id'))));
+                if (!empty($aiOfferIds)) {
+                    $aiOfferReactionCounts = getAiOfferReactionCounts($aiOfferIds);
+                    $aiUserReactions = getAiOfferReactionsForUser((int)$_SESSION['user_id'], $aiOfferIds);
+                    $offers = array_values(array_filter($offers, function ($offer) use ($aiOfferIds) {
+                        return !in_array((int)($offer['id'] ?? 0), $aiOfferIds, true);
+                    }));
+                }
             }
         }
         $mapOffers = array_values(array_filter(array_map(function ($offer) {

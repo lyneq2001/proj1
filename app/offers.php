@@ -100,6 +100,58 @@ function ensureOfferViewsTable(): void
     $initialized = true;
 }
 
+function ensureAiOfferUsageTable(): void
+{
+    static $initialized = false;
+    if ($initialized) {
+        return;
+    }
+
+    global $pdo;
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS ai_offer_usages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            offer_id INT NOT NULL,
+            user_id INT NULL,
+            viewer_identifier VARCHAR(64) NULL,
+            source VARCHAR(32) NOT NULL DEFAULT 'search',
+            used_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_ai_offer_usage (offer_id, used_at),
+            INDEX idx_ai_offer_user (user_id),
+            CONSTRAINT fk_ai_offer_usage_offer FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE,
+            CONSTRAINT fk_ai_offer_usage_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+
+    $initialized = true;
+}
+
+function ensureAiOfferReactionsTable(): void
+{
+    static $initialized = false;
+    if ($initialized) {
+        return;
+    }
+
+    global $pdo;
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS ai_offer_reactions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            offer_id INT NOT NULL,
+            user_id INT NOT NULL,
+            reaction VARCHAR(8) NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_ai_offer_reaction (offer_id, user_id),
+            INDEX idx_ai_offer_reaction_offer (offer_id),
+            CONSTRAINT fk_ai_offer_reaction_offer FOREIGN KEY (offer_id) REFERENCES offers(id) ON DELETE CASCADE,
+            CONSTRAINT fk_ai_offer_reaction_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    );
+
+    $initialized = true;
+}
+
 function recordOfferView(int $offerId): void
 {
     global $pdo;
@@ -127,6 +179,221 @@ function recordOfferView(int $offerId): void
             error_log('Could not record view in user history: ' . $e->getMessage());
         }
     }
+}
+
+function recordAiOfferUsage(int $offerId, string $source = 'search'): void
+{
+    global $pdo;
+
+    ensureAiOfferUsageTable();
+
+    $viewerIdentifier = null;
+    $userId = null;
+    if (isset($_SESSION['user_id'])) {
+        $userId = (int)$_SESSION['user_id'];
+        $viewerIdentifier = 'user:' . $userId;
+    } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+        $viewerIdentifier = 'ip:' . $_SERVER['REMOTE_ADDR'];
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO ai_offer_usages (offer_id, user_id, viewer_identifier, source) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$offerId, $userId, $viewerIdentifier, $source]);
+}
+
+function setAiOfferReaction(int $offerId, int $userId, string $reaction): void
+{
+    global $pdo;
+
+    ensureAiOfferReactionsTable();
+
+    $reaction = strtolower(trim($reaction));
+    if (!in_array($reaction, ['like', 'dislike'], true)) {
+        return;
+    }
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO ai_offer_reactions (offer_id, user_id, reaction)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE reaction = VALUES(reaction), updated_at = NOW()"
+    );
+    $stmt->execute([$offerId, $userId, $reaction]);
+}
+
+function getAiOfferReactionCounts(array $offerIds): array
+{
+    if (empty($offerIds)) {
+        return [];
+    }
+
+    global $pdo;
+    ensureAiOfferReactionsTable();
+
+    $placeholders = implode(',', array_fill(0, count($offerIds), '?'));
+    $stmt = $pdo->prepare(
+        "SELECT offer_id,
+                SUM(CASE WHEN reaction = 'like' THEN 1 ELSE 0 END) AS likes,
+                SUM(CASE WHEN reaction = 'dislike' THEN 1 ELSE 0 END) AS dislikes
+         FROM ai_offer_reactions
+         WHERE offer_id IN ({$placeholders})
+         GROUP BY offer_id"
+    );
+    $stmt->execute(array_values($offerIds));
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $counts = [];
+    foreach ($rows as $row) {
+        $offerId = (int)($row['offer_id'] ?? 0);
+        if ($offerId) {
+            $counts[$offerId] = [
+                'likes' => (int)($row['likes'] ?? 0),
+                'dislikes' => (int)($row['dislikes'] ?? 0)
+            ];
+        }
+    }
+
+    return $counts;
+}
+
+function getAiOfferReactionsForUser(int $userId, array $offerIds): array
+{
+    if (empty($offerIds)) {
+        return [];
+    }
+
+    global $pdo;
+    ensureAiOfferReactionsTable();
+
+    $placeholders = implode(',', array_fill(0, count($offerIds), '?'));
+    $params = array_merge([$userId], array_values($offerIds));
+    $stmt = $pdo->prepare(
+        "SELECT offer_id, reaction
+         FROM ai_offer_reactions
+         WHERE user_id = ?
+           AND offer_id IN ({$placeholders})"
+    );
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $reactions = [];
+    foreach ($rows as $row) {
+        $offerId = (int)($row['offer_id'] ?? 0);
+        if ($offerId) {
+            $reactions[$offerId] = $row['reaction'];
+        }
+    }
+
+    return $reactions;
+}
+
+function getAiOfferUsageSummary(int $limit = 20): array
+{
+    global $pdo;
+
+    ensureAiOfferUsageTable();
+    ensureAiOfferReactionsTable();
+
+    $limit = max(1, $limit);
+    $query = "
+        SELECT o.id,
+               o.title,
+               usage_stats.usage_count,
+               usage_stats.unique_users,
+               usage_stats.last_used_at,
+               COALESCE(reaction_stats.likes, 0) AS likes,
+               COALESCE(reaction_stats.dislikes, 0) AS dislikes
+        FROM offers o
+        JOIN (
+            SELECT offer_id,
+                   COUNT(*) AS usage_count,
+                   COUNT(DISTINCT user_id) AS unique_users,
+                   MAX(used_at) AS last_used_at
+            FROM ai_offer_usages
+            GROUP BY offer_id
+        ) usage_stats ON o.id = usage_stats.offer_id
+        LEFT JOIN (
+            SELECT offer_id,
+                   SUM(CASE WHEN reaction = 'like' THEN 1 ELSE 0 END) AS likes,
+                   SUM(CASE WHEN reaction = 'dislike' THEN 1 ELSE 0 END) AS dislikes
+            FROM ai_offer_reactions
+            GROUP BY offer_id
+        ) reaction_stats ON o.id = reaction_stats.offer_id
+        ORDER BY usage_stats.usage_count DESC, reaction_stats.likes DESC
+        LIMIT {$limit}";
+
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getAiOfferUsageByUser(int $limit = 20): array
+{
+    global $pdo;
+
+    ensureAiOfferUsageTable();
+
+    $limit = max(1, $limit);
+    $query = "
+        SELECT u.id,
+               u.username,
+               u.email,
+               COUNT(usage.id) AS usage_count,
+               MAX(usage.used_at) AS last_used_at
+        FROM ai_offer_usages usage
+        JOIN users u ON usage.user_id = u.id
+        GROUP BY usage.user_id
+        ORDER BY usage_count DESC
+        LIMIT {$limit}";
+
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function filterOffersBySearchFilters(array $offers, array $filters): array
+{
+    return array_values(array_filter($offers, function ($offer) use ($filters) {
+        if (!empty($filters['city']) && stripos((string)($offer['city'] ?? ''), (string)$filters['city']) === false) {
+            return false;
+        }
+        if (!empty($filters['street']) && stripos((string)($offer['street'] ?? ''), (string)$filters['street']) === false) {
+            return false;
+        }
+        if (!empty($filters['min_price']) && (float)($offer['price'] ?? 0) < (float)$filters['min_price']) {
+            return false;
+        }
+        if (!empty($filters['max_price']) && (float)($offer['price'] ?? 0) > (float)$filters['max_price']) {
+            return false;
+        }
+        if (!empty($filters['min_size']) && (float)($offer['size'] ?? 0) < (float)$filters['min_size']) {
+            return false;
+        }
+        if (!empty($filters['min_floor']) && (float)($offer['floor'] ?? 0) < (float)$filters['min_floor']) {
+            return false;
+        }
+        if (!empty($filters['max_floor']) && (float)($offer['floor'] ?? 0) > (float)$filters['max_floor']) {
+            return false;
+        }
+        if (isset($filters['has_balcony']) && $filters['has_balcony'] == 1 && empty($offer['has_balcony'])) {
+            return false;
+        }
+        if (isset($filters['has_elevator']) && $filters['has_elevator'] == 1 && empty($offer['has_elevator'])) {
+            return false;
+        }
+        if (!empty($filters['building_type']) && ($offer['building_type'] ?? '') !== $filters['building_type']) {
+            return false;
+        }
+        if (!empty($filters['min_rooms']) && (int)($offer['rooms'] ?? 0) < (int)$filters['min_rooms']) {
+            return false;
+        }
+        if (!empty($filters['min_bathrooms']) && (int)($offer['bathrooms'] ?? 0) < (int)$filters['min_bathrooms']) {
+            return false;
+        }
+        if (isset($filters['parking']) && $filters['parking'] == 1 && empty($offer['parking'])) {
+            return false;
+        }
+        if (isset($filters['furnished']) && $filters['furnished'] == 1 && empty($offer['furnished'])) {
+            return false;
+        }
+
+        return true;
+    }));
 }
 
 function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
