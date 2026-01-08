@@ -40,6 +40,8 @@ $offers = getAllOffers();
 $messages = getAllMessages();
 $reports = getReports();
 $platformStats = getPlatformStatistics();
+$aiOfferStats = getAiOfferUsageSummary();
+$aiUserStats = getAiOfferUsageByUser();
 
 // Get counts for summary
 global $pdo;
@@ -264,6 +266,9 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                     </button>
                     <button class="tab-button py-4 px-1 font-semibold text-slate-600 hover:text-blue-600" data-tab="moderation">
                         Moderacja
+                    </button>
+                    <button class="tab-button py-4 px-1 font-semibold text-slate-600 hover:text-blue-600" data-tab="ai-insights">
+                        AI analityka
                     </button>
                 </nav>
             </div>
@@ -621,6 +626,105 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                             </table>
                         </div>
                     <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- AI Insights Tab -->
+            <div id="ai-insights-tab" class="tab-content">
+                <div class="glass-panel p-6 space-y-10">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-playfair font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-robot mr-3 text-indigo-600"></i>
+                                Wykorzystanie ofert AI
+                            </h2>
+                            <span class="text-sm text-slate-500">Top oferty rekomendowane przez AI</span>
+                        </div>
+
+                        <?php if (empty($aiOfferStats)): ?>
+                            <div class="text-center py-12">
+                                <i class="fas fa-robot text-6xl text-slate-300 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-slate-600 mb-2">Brak danych AI</h3>
+                                <p class="text-slate-500">Użytkownicy nie klikali jeszcze ofert AI.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-container rounded-xl border border-slate-200">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50 sticky-header">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">ID</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Oferta</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Kliknięcia AI</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Unikalni użytkownicy</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">👍</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">👎</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Ostatnia aktywność</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <?php foreach ($aiOfferStats as $stat): ?>
+                                            <tr class="hover:bg-slate-50 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900"><?php echo htmlspecialchars($stat['id'] ?? ''); ?></td>
+                                                <td class="px-6 py-4 text-sm text-slate-900">
+                                                    <a href="index.php?action=view_offer&offer_id=<?php echo $stat['id']; ?>" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                                                        <?php echo htmlspecialchars($stat['title'] ?? ''); ?>
+                                                    </a>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700"><?php echo number_format((int)($stat['usage_count'] ?? 0)); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700"><?php echo number_format((int)($stat['unique_users'] ?? 0)); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-emerald-600 font-semibold"><?php echo number_format((int)($stat['likes'] ?? 0)); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold"><?php echo number_format((int)($stat['dislikes'] ?? 0)); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                                    <?php echo !empty($stat['last_used_at']) ? date('d.m.Y H:i', strtotime($stat['last_used_at'])) : '—'; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-playfair font-bold text-slate-800 flex items-center">
+                                <i class="fas fa-user-clock mr-3 text-indigo-600"></i>
+                                Aktywność użytkowników w ofertach AI
+                            </h3>
+                            <span class="text-sm text-slate-500">Najczęściej korzystający</span>
+                        </div>
+
+                        <?php if (empty($aiUserStats)): ?>
+                            <p class="text-sm text-slate-500">Brak aktywności użytkowników w ofertach AI.</p>
+                        <?php else: ?>
+                            <div class="table-container rounded-xl border border-slate-200">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50 sticky-header">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">ID</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Użytkownik</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Email</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Kliknięcia AI</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Ostatnia aktywność</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <?php foreach ($aiUserStats as $stat): ?>
+                                            <tr class="hover:bg-slate-50 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900"><?php echo htmlspecialchars($stat['id'] ?? ''); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900"><?php echo htmlspecialchars($stat['username'] ?? ''); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600"><?php echo htmlspecialchars($stat['email'] ?? ''); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700"><?php echo number_format((int)($stat['usage_count'] ?? 0)); ?></td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                                    <?php echo !empty($stat['last_used_at']) ? date('d.m.Y H:i', strtotime($stat['last_used_at'])) : '—'; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
