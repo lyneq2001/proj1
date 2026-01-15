@@ -424,7 +424,7 @@
                                         <a href="index.php?action=ai_offer_click&offer_id=<?php echo $offer['id']; ?>&source=search" class="block">
                                             <?php if (!empty($offer['primary_image'])): ?>
                                                 <div class="w-full h-44 overflow-hidden relative">
-                                                    <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                    <img src="<?php echo htmlspecialchars(getImageUrl($offer['primary_image'])); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                                     <span class="absolute top-3 left-3 rounded-full bg-white/90 text-indigo-700 text-xs font-semibold px-2 py-1 shadow">AI</span>
                                                 </div>
                                             <?php else: ?>
@@ -501,7 +501,7 @@
                                             <a href="index.php?action=view_offer&offer_id=<?php echo $offer['id']; ?>" class="block">
                                                 <?php if (!empty($offer['primary_image'])): ?>
                                                     <div class="w-full h-48 overflow-hidden relative">
-                                                        <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                        <img src="<?php echo htmlspecialchars(getImageUrl($offer['primary_image'])); ?>" alt="Property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                                         <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                                                             <span class="text-sm font-semibold px-2 text-slate-700">
                                                                 Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>

@@ -328,8 +328,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                     <div id="lightgallery" class="space-y-4">
                         <!-- Main Image -->
                         <div class="relative rounded-2xl overflow-hidden">
-                            <a href="<?php echo htmlspecialchars($offer['primary_image']); ?>" class="block w-full h-64 sm:h-80 md:h-96 overflow-hidden">
-                                <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Main property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            <a href="<?php echo htmlspecialchars(getImageUrl($offer['primary_image'])); ?>" class="block w-full h-64 sm:h-80 md:h-96 overflow-hidden">
+                                <img src="<?php echo htmlspecialchars(getImageUrl($offer['primary_image'])); ?>" alt="Main property image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                             </a>
                             <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                                 <span class="text-sm font-semibold px-2 text-slate-700">
@@ -342,8 +342,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         <div class="grid grid-cols-3 gap-3">
                             <?php foreach ($offer['images'] as $image): ?>
                                 <?php if ($image['file_path'] !== $offer['primary_image']): ?>
-                                    <a href="<?php echo htmlspecialchars($image['file_path']); ?>" class="gallery-thumbnail block h-24 sm:h-28 overflow-hidden rounded-xl">
-                                        <img src="<?php echo htmlspecialchars($image['file_path']); ?>" alt="Property image" class="w-full h-full object-cover">
+                                    <a href="<?php echo htmlspecialchars(getImageUrl($image['file_path'])); ?>" class="gallery-thumbnail block h-24 sm:h-28 overflow-hidden rounded-xl">
+                                        <img src="<?php echo htmlspecialchars(getImageUrl($image['file_path'])); ?>" alt="Property image" class="w-full h-full object-cover">
                                     </a>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -670,7 +670,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                         <a href="index.php?action=view_offer&offer_id=<?php echo $recommendation['id']; ?>" class="block">
                             <div class="relative h-48">
                                 <?php if (!empty($recommendation['primary_image'])): ?>
-                                    <img src="<?php echo htmlspecialchars($recommendation['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover">
+                                    <img src="<?php echo htmlspecialchars(getImageUrl($recommendation['primary_image'])); ?>" alt="Offer Image" class="w-full h-full object-cover">
                                 <?php else: ?>
                                     <div class="w-full h-full bg-slate-100 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

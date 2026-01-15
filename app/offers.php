@@ -6,6 +6,23 @@ require_once __DIR__ . '/AI/UserPreferencesService.php';
 
 use App\AI\UserPreferencesService;
 
+function getImageUrl(?string $path): ?string
+{
+    if (!$path) {
+        return null;
+    }
+
+    $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
+    $filePath = $path;
+    if (is_file($filePath)) {
+        $cacheBuster .= '-' . filemtime($filePath);
+    }
+
+    $separator = str_contains($path, '?') ? '&' : '?';
+
+    return $path . $separator . 'v=' . urlencode((string)$cacheBuster);
+}
+
 function columnExists(string $table, string $column): bool
 {
     static $cache = [];

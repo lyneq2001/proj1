@@ -437,7 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <div class="offer-card overflow-hidden">
                                         <?php if (!empty($offer['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
-                                                <img src="<?php echo htmlspecialchars($offer['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                <img src="<?php echo htmlspecialchars(getImageUrl($offer['primary_image'])); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                                                     <span class="text-sm font-semibold px-2 text-slate-700">
                                                         Wyświetlenia: <?php echo htmlspecialchars($offer['visits']); ?> • 24h: <?php echo htmlspecialchars($offer['views_last_24h'] ?? 0); ?>
@@ -535,7 +535,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <div class="offer-card overflow-hidden">
                                         <?php if (!empty($favorite['primary_image'])): ?>
                                             <div class="w-full h-48 overflow-hidden relative">
-                                                <img src="<?php echo htmlspecialchars($favorite['primary_image']); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                                                <img src="<?php echo htmlspecialchars(getImageUrl($favorite['primary_image'])); ?>" alt="Offer Image" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
                                                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
                                                     <span class="text-sm font-semibold px-2 text-slate-700">
                                                         Wyświetlenia: <?php echo htmlspecialchars($favorite['visits']); ?> • 24h: <?php echo htmlspecialchars($favorite['views_last_24h'] ?? 0); ?>

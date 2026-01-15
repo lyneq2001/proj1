@@ -1,5 +1,8 @@
 <?php
 session_start();
+if (!isset($_SESSION['image_cache_buster'])) {
+    $_SESSION['image_cache_buster'] = time();
+}
 require_once 'config.php';
 require_once 'auth.php';
 require_once 'offers.php';
