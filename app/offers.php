@@ -12,15 +12,91 @@ function getImageUrl(?string $path): ?string
         return null;
     }
 
+    $publicPath = normalizeImagePublicPath($path);
     $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
     $filePath = resolveImageFilePath($path);
     if ($filePath && is_file($filePath)) {
         $cacheBuster .= '-' . filemtime($filePath);
     }
 
-    $separator = str_contains($path, '?') ? '&' : '?';
+    $separator = str_contains($publicPath, '?') ? '&' : '?';
 
-    return $path . $separator . 'v=' . urlencode((string)$cacheBuster);
+    return $publicPath . $separator . 'v=' . urlencode((string)$cacheBuster);
+}
+
+function getUploadsDir(): string
+{
+    return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
+}
+
+function getUploadsUrl(): string
+{
+    return $GLOBALS['uploadsUrl'] ?? 'uploads';
+}
+
+function buildImageStoragePath(string $filename): string
+{
+    return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
+}
+
+function buildImagePublicPath(string $filename): string
+{
+    return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
+}
+
+function resolveImageFilePath(string $path): ?string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+        return null;
+    }
+
+    $uploadsDir = rtrim(getUploadsDir(), '/');
+    if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+        return $path;
+    }
+
+    $uploadsUrl = getUploadsUrl();
+    $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
+    if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
+        $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
+        if ($relative === '') {
+            return null;
+        }
+
+        return buildImageStoragePath($relative);
+    }
+
+    if (!str_starts_with($path, '/')) {
+        return buildImageStoragePath($path);
+    }
+
+    return null;
+}
+
+function normalizeImagePublicPath(string $path): string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+        return $path;
+    }
+
+    $uploadsUrl = rtrim(getUploadsUrl(), '/');
+    if ($uploadsUrl !== '' && str_starts_with($path, $uploadsUrl)) {
+        return $path;
+    }
+
+    $uploadsDir = rtrim(getUploadsDir(), '/');
+    if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+        $relative = ltrim(substr($path, strlen($uploadsDir)), '/');
+        if ($relative !== '') {
+            return buildImagePublicPath($relative);
+        }
+    }
+
+    if (str_starts_with($path, '/')) {
+        return buildImagePublicPath(basename($path));
+    }
+
+    return buildImagePublicPath($path);
 }
 
 function getUploadsDir(): string
