@@ -459,13 +459,13 @@
                                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                                             <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
                                                             <input type="hidden" name="reaction" value="like">
-                                                            <button type="submit" class="text-xs px-3 py-1 rounded-full border border-slate-200 text-slate-600 hover:text-emerald-700">👍 Lubię</button>
+                                                            <button type="submit" class="text-xs px-3 py-1 rounded-full border border-slate-800 bg-white text-slate-800 hover:text-emerald-700">👍 Lubię</button>
                                                         </form>
                                                         <form method="POST" action="index.php?action=ai_offer_reaction">
                                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
                                                             <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
                                                             <input type="hidden" name="reaction" value="dislike">
-                                                            <button type="submit" class="text-xs px-3 py-1 rounded-full border border-slate-200 text-slate-600 hover:text-red-700">👎 Nie lubię</button>
+                                                            <button type="submit" class="text-xs px-3 py-1 rounded-full border border-slate-800 bg-white text-slate-800 hover:text-red-700">👎 Nie lubię</button>
                                                         </form>
                                                     </div>
                                                 <?php endif; ?>
