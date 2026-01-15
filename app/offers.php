@@ -2023,7 +2023,7 @@ function getReports(?string $statusFilter = null): array
     global $pdo;
     ensureReportsTable();
 
-    $query = "SELECT r.*, o.title AS offer_title, u_owner.username AS owner_username, u_reporter.username AS reporter_username, u_admin.username AS handled_by_username FROM reports r JOIN offers o ON r.offer_id = o.id JOIN users u_owner ON o.user_id = u_owner.id JOIN users u_reporter ON r.reporter_id = u_reporter.id LEFT JOIN users u_admin ON r.handled_by = u_admin.id";
+    $query = "SELECT r.*, o.title AS offer_title, o.user_id AS owner_id, u_owner.username AS owner_username, u_reporter.username AS reporter_username, u_admin.username AS handled_by_username FROM reports r JOIN offers o ON r.offer_id = o.id JOIN users u_owner ON o.user_id = u_owner.id JOIN users u_reporter ON r.reporter_id = u_reporter.id LEFT JOIN users u_admin ON r.handled_by = u_admin.id";
     $params = [];
     if ($statusFilter) {
         $query .= " WHERE r.status = ?";
@@ -2082,6 +2082,87 @@ function updateReportStatus($reportId, $status, $adminId, string $note = ''): bo
     } catch (PDOException $e) {
         setFlashMessage('error', 'Nie udało się zaktualizować zgłoszenia: ' . $e->getMessage());
         return false;
+    }
+}
+
+function banUserAdmin(int $userId, int $adminId, string $reason = ''): bool
+{
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return false;
+    }
+
+    if ($userId <= 0) {
+        setFlashMessage('error', 'Nieprawidłowy użytkownik do zablokowania.');
+        return false;
+    }
+
+    global $pdo;
+    ensureUserBanColumns();
+
+    $roleStmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+    $roleStmt->execute([$userId]);
+    $role = $roleStmt->fetchColumn();
+    if (!$role) {
+        setFlashMessage('error', 'Nie znaleziono użytkownika.');
+        return false;
+    }
+    if ($role === 'admin') {
+        setFlashMessage('error', 'Nie można zablokować administratora.');
+        return false;
+    }
+
+    $finalReason = trim($reason);
+    $finalReason = $finalReason !== '' ? $finalReason : 'Zablokowany przez administratora.';
+    $stmt = $pdo->prepare("UPDATE users SET is_banned = 1, banned_at = NOW(), ban_reason = ? WHERE id = ?");
+    try {
+        $stmt->execute([$finalReason, $userId]);
+        if ($stmt->rowCount() === 0) {
+            setFlashMessage('error', 'Nie udało się zablokować użytkownika.');
+            return false;
+        }
+        setFlashMessage('success', 'Użytkownik został zablokowany.');
+        return true;
+    } catch (PDOException $e) {
+        setFlashMessage('error', 'Nie udało się zablokować użytkownika: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function handleReportAction(int $reportId, string $action, int $adminId): bool
+{
+    if (!isAdmin()) {
+        setFlashMessage('error', 'Unauthorized.');
+        return false;
+    }
+
+    global $pdo;
+    ensureReportsTable();
+
+    $detailsStmt = $pdo->prepare("SELECT r.id, r.offer_id, o.user_id AS owner_id FROM reports r JOIN offers o ON r.offer_id = o.id WHERE r.id = ?");
+    $detailsStmt->execute([$reportId]);
+    $report = $detailsStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$report) {
+        setFlashMessage('error', 'Nie znaleziono zgłoszenia.');
+        return false;
+    }
+
+    switch ($action) {
+        case 'delete_offer':
+            deleteOfferAdmin((int)$report['offer_id']);
+            return true;
+        case 'ban_user':
+            $banReason = 'Zgłoszenie #' . $reportId;
+            $banned = banUserAdmin((int)$report['owner_id'], $adminId, $banReason);
+            if ($banned) {
+                updateReportStatus($reportId, 'resolved', $adminId, 'Użytkownik zablokowany.');
+            }
+            return $banned;
+        case 'resolve_report':
+            return updateReportStatus($reportId, 'resolved', $adminId, 'Zgłoszenie zamknięte bez dalszych działań.');
+        default:
+            setFlashMessage('error', 'Nieprawidłowa akcja zgłoszenia.');
+            return false;
     }
 }
 ?>

@@ -85,6 +85,62 @@ function ensureUserPhoneColumn(): void
     $checked = true;
 }
 
+function ensureUserBanColumns(): void
+{
+    static $checked = false;
+    if ($checked) {
+        return;
+    }
+
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?');
+
+    $stmt->execute(['users', 'is_banned']);
+    $hasIsBanned = (bool)$stmt->fetchColumn();
+    if (!$hasIsBanned) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN is_banned TINYINT(1) NOT NULL DEFAULT 0");
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    $stmt->execute(['users', 'banned_at']);
+    $hasBannedAt = (bool)$stmt->fetchColumn();
+    if (!$hasBannedAt) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN banned_at DATETIME NULL");
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    $stmt->execute(['users', 'ban_reason']);
+    $hasBanReason = (bool)$stmt->fetchColumn();
+    if (!$hasBanReason) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN ban_reason TEXT NULL");
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    $checked = true;
+}
+
+function isUserBanned($userId): bool
+{
+    if (!$userId) {
+        return false;
+    }
+
+    global $pdo;
+    ensureUserBanColumns();
+    $stmt = $pdo->prepare("SELECT is_banned FROM users WHERE id = ?");
+    $stmt->execute([(int)$userId]);
+    return (int)($stmt->fetchColumn() ?? 0) === 1;
+}
+
 function isValidPassword($password) {
     return strlen($password) >= 6 &&
            preg_match('/[A-Za-z]/', $password) &&
@@ -218,6 +274,7 @@ function register($username, $email, $password, $countryCode, $phoneNumber) {
 
 function login($email, $password) {
     global $pdo;
+    ensureUserBanColumns();
     // Validate inputs
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         setFlashMessage('error', 'Invalid email format.');
@@ -228,6 +285,10 @@ function login($email, $password) {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     if ($user && password_verify($password, $user['password'])) {
+        if ((int)($user['is_banned'] ?? 0) === 1) {
+            setFlashMessage('error', 'Twoje konto zostało zablokowane. Skontaktuj się z administracją.');
+            return;
+        }
         $_SESSION['user_id'] = $user['id'];
         setFlashMessage('success', 'Logged in successfully.');
         header("Location: index.php");
@@ -243,7 +304,17 @@ function logout() {
 }
 
 function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+    if (!isset($_SESSION['user_id'])) {
+        return false;
+    }
+
+    if (isUserBanned($_SESSION['user_id'])) {
+        unset($_SESSION['user_id']);
+        setFlashMessage('error', 'Twoje konto zostało zablokowane. Skontaktuj się z administracją.');
+        return false;
+    }
+
+    return true;
 }
 
 function getUserRole() {

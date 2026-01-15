@@ -619,6 +619,39 @@ $total_messages = $pdo->query("SELECT COUNT(*) FROM messages")->fetchColumn();
                                                         Zapisz zmiany
                                                     </button>
                                                 </form>
+                                                <div class="mt-4 flex flex-col gap-2 text-sm">
+                                                    <a href="index.php?action=view_offer&offer_id=<?php echo (int)($report['offer_id'] ?? 0); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 px-3 py-2 font-semibold text-blue-600 hover:bg-blue-50 transition-colors">
+                                                        <i class="fas fa-eye"></i>
+                                                        Podgląd oferty
+                                                    </a>
+                                                    <form method="POST" action="index.php?action=report_action" onsubmit="return confirm('Czy na pewno chcesz usunąć zgłoszoną ofertę?');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                        <input type="hidden" name="report_id" value="<?php echo $report['id'] ?? ''; ?>">
+                                                        <input type="hidden" name="report_action" value="delete_offer">
+                                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 px-3 py-2 font-semibold text-red-600 hover:bg-red-50 transition-colors">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                            Usuń ofertę
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST" action="index.php?action=report_action" onsubmit="return confirm('Czy na pewno chcesz zablokować użytkownika?');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                        <input type="hidden" name="report_id" value="<?php echo $report['id'] ?? ''; ?>">
+                                                        <input type="hidden" name="report_action" value="ban_user">
+                                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-orange-200 px-3 py-2 font-semibold text-orange-600 hover:bg-orange-50 transition-colors">
+                                                            <i class="fas fa-user-slash"></i>
+                                                            Zbanuj użytkownika
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST" action="index.php?action=report_action">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
+                                                        <input type="hidden" name="report_id" value="<?php echo $report['id'] ?? ''; ?>">
+                                                        <input type="hidden" name="report_action" value="resolve_report">
+                                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-200 px-3 py-2 font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            Rozwiąż bez akcji
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
