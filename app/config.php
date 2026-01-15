@@ -14,4 +14,7 @@ try {
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
+
+$uploadsDir = rtrim(getenv('UPLOADS_DIR') ?: (__DIR__ . '/uploads'), '/');
+$uploadsUrl = rtrim(getenv('UPLOADS_URL') ?: 'uploads', '/');
 ?>
