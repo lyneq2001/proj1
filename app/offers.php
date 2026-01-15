@@ -6,21 +6,111 @@ require_once __DIR__ . '/AI/UserPreferencesService.php';
 
 use App\AI\UserPreferencesService;
 
-function getImageUrl(?string $path): ?string
-{
-    if (!$path) {
+if (!function_exists('getImageUrl')) {
+    function getImageUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        $publicPath = normalizeImagePublicPath($path);
+        $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
+        $filePath = resolveImageFilePath($path);
+        if ($filePath && is_file($filePath)) {
+            $cacheBuster .= '-' . filemtime($filePath);
+        }
+
+        $separator = str_contains($publicPath, '?') ? '&' : '?';
+
+        return $publicPath . $separator . 'v=' . urlencode((string)$cacheBuster);
+    }
+}
+
+if (!function_exists('getUploadsDir')) {
+    function getUploadsDir(): string
+    {
+        return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
+    }
+}
+
+if (!function_exists('getUploadsUrl')) {
+    function getUploadsUrl(): string
+    {
+        return $GLOBALS['uploadsUrl'] ?? 'uploads';
+    }
+}
+
+if (!function_exists('buildImageStoragePath')) {
+    function buildImageStoragePath(string $filename): string
+    {
+        return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
+    }
+}
+
+if (!function_exists('buildImagePublicPath')) {
+    function buildImagePublicPath(string $filename): string
+    {
+        return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
+    }
+}
+
+if (!function_exists('resolveImageFilePath')) {
+    function resolveImageFilePath(string $path): ?string
+    {
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+            return null;
+        }
+
+        $uploadsDir = rtrim(getUploadsDir(), '/');
+        if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+            return $path;
+        }
+
+        $uploadsUrl = getUploadsUrl();
+        $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
+        if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
+            $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
+            if ($relative === '') {
+                return null;
+            }
+
+            return buildImageStoragePath($relative);
+        }
+
+        if (!str_starts_with($path, '/')) {
+            return buildImageStoragePath($path);
+        }
+
         return null;
     }
+}
 
-    $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
-    $filePath = $path;
-    if (is_file($filePath)) {
-        $cacheBuster .= '-' . filemtime($filePath);
+if (!function_exists('normalizeImagePublicPath')) {
+    function normalizeImagePublicPath(string $path): string
+    {
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+            return $path;
+        }
+
+        $uploadsUrl = rtrim(getUploadsUrl(), '/');
+        if ($uploadsUrl !== '' && str_starts_with($path, $uploadsUrl)) {
+            return $path;
+        }
+
+        $uploadsDir = rtrim(getUploadsDir(), '/');
+        if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+            $relative = ltrim(substr($path, strlen($uploadsDir)), '/');
+            if ($relative !== '') {
+                return buildImagePublicPath($relative);
+            }
+        }
+
+        if (str_starts_with($path, '/')) {
+            return buildImagePublicPath(basename($path));
+        }
+
+        return buildImagePublicPath($path);
     }
-
-    $separator = str_contains($path, '?') ? '&' : '?';
-
-    return $path . $separator . 'v=' . urlencode((string)$cacheBuster);
 }
 
 function columnExists(string $table, string $column): bool
@@ -491,7 +581,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
 
         // Handle image uploads
         if (!empty($images['name'][0])) {
-            $upload_dir = 'uploads/';
+            $upload_dir = getUploadsDir();
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
@@ -512,11 +602,11 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
                         return;
                     }
                     $filename = uniqid() . '.' . $ext;
-                    $destination = $upload_dir . $filename;
+                    $destination = buildImageStoragePath($filename);
                     if (move_uploaded_file($images['tmp_name'][$index], $destination)) {
                         $is_primary = ($index == $primary_image_index) ? 1 : 0;
                         $stmt = $pdo->prepare("INSERT INTO images (offer_id, file_path, is_primary) VALUES (?, ?, ?)");
-                        $stmt->execute([$offer_id, $destination, $is_primary]);
+                        $stmt->execute([$offer_id, buildImagePublicPath($filename), $is_primary]);
                     } else {
                         setFlashMessage('error', 'Failed to upload image.');
                         return;
@@ -1436,7 +1526,7 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
 
         // Handle image uploads
         if (!empty($images['name'][0])) {
-            $upload_dir = 'uploads/';
+            $upload_dir = getUploadsDir();
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
@@ -1460,11 +1550,11 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
                         return;
                     }
                     $filename = uniqid() . '.' . $ext;
-                    $destination = $upload_dir . $filename;
+                    $destination = buildImageStoragePath($filename);
                     if (move_uploaded_file($images['tmp_name'][$index], $destination)) {
                         $is_primary = ($index == $primary_image_index) ? 1 : 0;
                         $stmt = $pdo->prepare("INSERT INTO images (offer_id, file_path, is_primary) VALUES (?, ?, ?)");
-                        $stmt->execute([$offerId, $destination, $is_primary]);
+                        $stmt->execute([$offerId, buildImagePublicPath($filename), $is_primary]);
                     } else {
                         setFlashMessage('error', 'Failed to upload image.');
                         return;
