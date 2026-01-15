@@ -1701,7 +1701,7 @@ function getUserForAdmin($userId) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function updateUserAdmin($userId, $username, $email, $phone, $role, $isVerified): void {
+function updateUserAdmin($userId, $username, $email, $countryCode, $phoneNumber, $role, $isVerified): void {
     if (!isAdmin()) {
         setFlashMessage('error', 'Unauthorized.');
         return;
@@ -1715,15 +1715,12 @@ function updateUserAdmin($userId, $username, $email, $phone, $role, $isVerified)
         setFlashMessage('error', 'Username can only contain letters, numbers, and underscores.');
         return;
     }
-    $phone = trim((string)$phone);
-    if ($phone === '') {
-        setFlashMessage('error', 'Numer telefonu jest wymagany.');
+    $phoneData = buildPhoneNumber((string)$countryCode, (string)$phoneNumber);
+    if ($phoneData['error']) {
+        setFlashMessage('error', $phoneData['error']);
         return;
     }
-    if (!preg_match('/^\\+?[0-9][0-9\\s-]{6,20}$/', $phone)) {
-        setFlashMessage('error', 'Podaj poprawny numer telefonu.');
-        return;
-    }
+    $phone = $phoneData['phone'];
     if (!in_array($role, ['user', 'admin'], true)) {
         setFlashMessage('error', 'Invalid role value.');
         return;

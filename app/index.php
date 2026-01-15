@@ -24,7 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !validateCsrfToken($_POST['csrf_tok
 switch ($action) {
     case 'register':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            register($_POST['username'], $_POST['email'], $_POST['password'], $_POST['phone'] ?? '');
+            register(
+                $_POST['username'],
+                $_POST['email'],
+                $_POST['password'],
+                $_POST['country_code'] ?? '',
+                $_POST['phone_number'] ?? ''
+            );
         }
         include 'views/register.php';
         break;
@@ -166,7 +172,8 @@ switch ($action) {
                 (int)$_GET['user_id'],
                 $_POST['username'],
                 $_POST['email'],
-                $_POST['phone'] ?? '',
+                $_POST['country_code'] ?? '',
+                $_POST['phone_number'] ?? '',
                 $_POST['role'] ?? 'user',
                 isset($_POST['is_verified']) ? 1 : 0
             );
