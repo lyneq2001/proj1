@@ -387,6 +387,26 @@ switch ($action) {
         updateReportStatus($reportId, $status, $_SESSION['user_id'], $note);
         header("Location: index.php?action=admin_dashboard");
         break;
+    case 'report_action':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isAdmin()) {
+            setFlashMessage('error', 'Brak uprawnień do moderacji zgłoszeń.');
+            header("Location: index.php");
+            exit;
+        }
+        if (!validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            setFlashMessage('error', 'Nieprawidłowy token bezpieczeństwa.');
+            header("Location: index.php?action=admin_dashboard");
+            exit;
+        }
+        $reportId = (int)($_POST['report_id'] ?? 0);
+        $reportAction = $_POST['report_action'] ?? '';
+        if ($reportId > 0 && $reportAction !== '') {
+            handleReportAction($reportId, $reportAction, $_SESSION['user_id']);
+        } else {
+            setFlashMessage('error', 'Nieprawidłowe dane akcji zgłoszenia.');
+        }
+        header("Location: index.php?action=admin_dashboard");
+        break;
     case 'dashboard':
         if (!isLoggedIn()) {
             setFlashMessage('error', 'You must be logged in to view the dashboard.');
