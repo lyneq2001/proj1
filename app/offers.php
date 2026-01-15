@@ -6,11 +6,25 @@ require_once __DIR__ . '/AI/UserPreferencesService.php';
 
 use App\AI\UserPreferencesService;
 
-function getImageUrl(?string $path): ?string
-{
-    if (!$path) {
-        return null;
+if (!function_exists('getImageUrl')) {
+    function getImageUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        $publicPath = normalizeImagePublicPath($path);
+        $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
+        $filePath = resolveImageFilePath($path);
+        if ($filePath && is_file($filePath)) {
+            $cacheBuster .= '-' . filemtime($filePath);
+        }
+
+        $separator = str_contains($publicPath, '?') ? '&' : '?';
+
+        return $publicPath . $separator . 'v=' . urlencode((string)$cacheBuster);
     }
+}
 
     $publicPath = normalizeImagePublicPath($path);
     $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
@@ -18,6 +32,7 @@ function getImageUrl(?string $path): ?string
     if ($filePath && is_file($filePath)) {
         $cacheBuster .= '-' . filemtime($filePath);
     }
+}
 
     $separator = str_contains($publicPath, '?') ? '&' : '?';
 
