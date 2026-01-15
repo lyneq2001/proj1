@@ -26,19 +26,6 @@ if (!function_exists('getImageUrl')) {
     }
 }
 
-    $publicPath = normalizeImagePublicPath($path);
-    $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
-    $filePath = resolveImageFilePath($path);
-    if ($filePath && is_file($filePath)) {
-        $cacheBuster .= '-' . filemtime($filePath);
-    }
-}
-
-    $separator = str_contains($publicPath, '?') ? '&' : '?';
-
-    return $publicPath . $separator . 'v=' . urlencode((string)$cacheBuster);
-}
-
 function getUploadsDir(): string
 {
     return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
@@ -112,50 +99,6 @@ function normalizeImagePublicPath(string $path): string
     }
 
     return buildImagePublicPath($path);
-}
-
-function getUploadsDir(): string
-{
-    return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
-}
-
-function getUploadsUrl(): string
-{
-    return $GLOBALS['uploadsUrl'] ?? 'uploads';
-}
-
-function buildImageStoragePath(string $filename): string
-{
-    return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
-}
-
-function buildImagePublicPath(string $filename): string
-{
-    return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
-}
-
-function resolveImageFilePath(string $path): ?string
-{
-    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
-        return null;
-    }
-
-    $uploadsUrl = getUploadsUrl();
-    $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
-    if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
-        $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
-        if ($relative === '') {
-            return null;
-        }
-
-        return buildImageStoragePath($relative);
-    }
-
-    if (!str_starts_with($path, '/')) {
-        return buildImageStoragePath($path);
-    }
-
-    return null;
 }
 
 function columnExists(string $table, string $column): bool
