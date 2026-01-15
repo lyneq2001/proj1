@@ -26,91 +26,136 @@ if (!function_exists('getImageUrl')) {
     }
 }
 
-if (!function_exists('getUploadsDir')) {
-    function getUploadsDir(): string
-    {
-        return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
+    $publicPath = normalizeImagePublicPath($path);
+    $cacheBuster = $_SESSION['image_cache_buster'] ?? time();
+    $filePath = resolveImageFilePath($path);
+    if ($filePath && is_file($filePath)) {
+        $cacheBuster .= '-' . filemtime($filePath);
     }
 }
 
-if (!function_exists('getUploadsUrl')) {
-    function getUploadsUrl(): string
-    {
-        return $GLOBALS['uploadsUrl'] ?? 'uploads';
-    }
+    $separator = str_contains($publicPath, '?') ? '&' : '?';
+
+    return $publicPath . $separator . 'v=' . urlencode((string)$cacheBuster);
 }
 
-if (!function_exists('buildImageStoragePath')) {
-    function buildImageStoragePath(string $filename): string
-    {
-        return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
-    }
+function getUploadsDir(): string
+{
+    return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
 }
 
-if (!function_exists('buildImagePublicPath')) {
-    function buildImagePublicPath(string $filename): string
-    {
-        return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
-    }
+function getUploadsUrl(): string
+{
+    return $GLOBALS['uploadsUrl'] ?? 'uploads';
 }
 
-if (!function_exists('resolveImageFilePath')) {
-    function resolveImageFilePath(string $path): ?string
-    {
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+function buildImageStoragePath(string $filename): string
+{
+    return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
+}
+
+function buildImagePublicPath(string $filename): string
+{
+    return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
+}
+
+function resolveImageFilePath(string $path): ?string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+        return null;
+    }
+
+    $uploadsDir = rtrim(getUploadsDir(), '/');
+    if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+        return $path;
+    }
+
+    $uploadsUrl = getUploadsUrl();
+    $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
+    if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
+        $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
+        if ($relative === '') {
             return null;
         }
 
-        $uploadsDir = rtrim(getUploadsDir(), '/');
-        if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
-            return $path;
-        }
-
-        $uploadsUrl = getUploadsUrl();
-        $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
-        if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
-            $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
-            if ($relative === '') {
-                return null;
-            }
-
-            return buildImageStoragePath($relative);
-        }
-
-        if (!str_starts_with($path, '/')) {
-            return buildImageStoragePath($path);
-        }
-
-        return null;
+        return buildImageStoragePath($relative);
     }
+
+    if (!str_starts_with($path, '/')) {
+        return buildImageStoragePath($path);
+    }
+
+    return null;
 }
 
-if (!function_exists('normalizeImagePublicPath')) {
-    function normalizeImagePublicPath(string $path): string
-    {
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
-            return $path;
-        }
-
-        $uploadsUrl = rtrim(getUploadsUrl(), '/');
-        if ($uploadsUrl !== '' && str_starts_with($path, $uploadsUrl)) {
-            return $path;
-        }
-
-        $uploadsDir = rtrim(getUploadsDir(), '/');
-        if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
-            $relative = ltrim(substr($path, strlen($uploadsDir)), '/');
-            if ($relative !== '') {
-                return buildImagePublicPath($relative);
-            }
-        }
-
-        if (str_starts_with($path, '/')) {
-            return buildImagePublicPath(basename($path));
-        }
-
-        return buildImagePublicPath($path);
+function normalizeImagePublicPath(string $path): string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+        return $path;
     }
+
+    $uploadsUrl = rtrim(getUploadsUrl(), '/');
+    if ($uploadsUrl !== '' && str_starts_with($path, $uploadsUrl)) {
+        return $path;
+    }
+
+    $uploadsDir = rtrim(getUploadsDir(), '/');
+    if ($uploadsDir !== '' && str_starts_with($path, $uploadsDir)) {
+        $relative = ltrim(substr($path, strlen($uploadsDir)), '/');
+        if ($relative !== '') {
+            return buildImagePublicPath($relative);
+        }
+    }
+
+    if (str_starts_with($path, '/')) {
+        return buildImagePublicPath(basename($path));
+    }
+
+    return buildImagePublicPath($path);
+}
+
+function getUploadsDir(): string
+{
+    return $GLOBALS['uploadsDir'] ?? (__DIR__ . '/uploads');
+}
+
+function getUploadsUrl(): string
+{
+    return $GLOBALS['uploadsUrl'] ?? 'uploads';
+}
+
+function buildImageStoragePath(string $filename): string
+{
+    return rtrim(getUploadsDir(), '/') . '/' . ltrim($filename, '/');
+}
+
+function buildImagePublicPath(string $filename): string
+{
+    return rtrim(getUploadsUrl(), '/') . '/' . ltrim($filename, '/');
+}
+
+function resolveImageFilePath(string $path): ?string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, 'data:')) {
+        return null;
+    }
+
+    $uploadsUrl = getUploadsUrl();
+    $normalizedUploadsUrl = rtrim($uploadsUrl, '/');
+    if ($normalizedUploadsUrl !== '' && str_starts_with($path, $normalizedUploadsUrl)) {
+        $relative = ltrim(substr($path, strlen($normalizedUploadsUrl)), '/');
+        if ($relative === '') {
+            return null;
+        }
+
+        return buildImageStoragePath($relative);
+    }
+
+    if (!str_starts_with($path, '/')) {
+        return buildImageStoragePath($path);
+    }
+
+    return null;
 }
 
 function columnExists(string $table, string $column): bool
