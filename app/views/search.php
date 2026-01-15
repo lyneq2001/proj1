@@ -398,7 +398,6 @@
                             Znaleziono <span class="text-blue-600"><?php echo (int)($totalOffers ?? count($offers)); ?></span> ofert
                         </p>
                     </div>
-                    <p class="text-slate-500 text-sm md:text-base max-w-xl">Mapa i lista ofert są widoczne jednocześnie, aby łatwo porównywać lokalizacje i szczegóły mieszkań.</p>
                 </div>
 
                     <?php if (!empty($aiRecommendedOffers)): ?>
