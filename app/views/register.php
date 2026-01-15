@@ -117,6 +117,16 @@
                         </div>
                     <?php endif; ?>
 
+                    <?php
+                    $phoneOptions = getPhoneCountryOptions();
+                    $phoneParts = getPhoneParts($_POST['phone'] ?? '');
+                    $selectedCountry = $_POST['country_code'] ?? $phoneParts['country_code'];
+                    if ($selectedCountry === '' && !empty($phoneOptions)) {
+                        $selectedCountry = $phoneOptions[0]['code'];
+                    }
+                    $phoneNumberValue = $_POST['phone_number'] ?? $phoneParts['phone_number'];
+                    ?>
+
                     <form method="POST" class="space-y-6">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(generateCsrfToken()); ?>">
 
@@ -137,11 +147,21 @@
                         </div>
 
                         <div>
-                            <label for="phone" class="block text-slate-700 text-sm font-semibold mb-3">Numer telefonu</label>
-                            <input type="tel" id="phone" name="phone" required
-                                   class="w-full p-4 form-input"
-                                   placeholder="+48 500 000 000"
-                                   value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>">
+                            <label for="phone_number" class="block text-slate-700 text-sm font-semibold mb-3">Numer telefonu</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4">
+                                <select id="country_code" name="country_code" required class="w-full p-4 form-input bg-white">
+                                    <?php foreach ($phoneOptions as $option): ?>
+                                        <option value="<?php echo htmlspecialchars($option['code']); ?>" <?php echo $selectedCountry === $option['code'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($option['label'] . ' ' . $option['code']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <input type="tel" id="phone_number" name="phone_number" required
+                                       class="w-full p-4 form-input"
+                                       placeholder="500000000"
+                                       value="<?php echo htmlspecialchars($phoneNumberValue); ?>">
+                            </div>
+                            <p class="mt-2 text-sm text-slate-500 font-medium">Wybierz numer kierunkowy i wpisz numer bez prefiksu kraju.</p>
                         </div>
 
                         <div>

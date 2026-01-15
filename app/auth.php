@@ -91,7 +91,85 @@ function isValidPassword($password) {
            preg_match('/[0-9]/', $password);
 }
 
-function register($username, $email, $password, $phone) {
+function getPhoneCountryOptions(): array
+{
+    return [
+        ['code' => '+48', 'label' => 'Polska', 'lengths' => [9]],
+        ['code' => '+49', 'label' => 'Niemcy', 'lengths' => [10, 11]],
+        ['code' => '+44', 'label' => 'Wielka Brytania', 'lengths' => [10]],
+        ['code' => '+33', 'label' => 'Francja', 'lengths' => [9]],
+        ['code' => '+1', 'label' => 'USA/Kanada', 'lengths' => [10]],
+    ];
+}
+
+function findPhoneCountryOption(string $countryCode): ?array
+{
+    foreach (getPhoneCountryOptions() as $option) {
+        if ($option['code'] === $countryCode) {
+            return $option;
+        }
+    }
+
+    return null;
+}
+
+function buildPhoneNumber(string $countryCode, string $phoneNumber): array
+{
+    $countryCode = trim($countryCode);
+    $phoneNumber = trim($phoneNumber);
+
+    if ($countryCode === '' || $phoneNumber === '') {
+        return ['phone' => '', 'error' => 'Numer telefonu jest wymagany.'];
+    }
+
+    $option = findPhoneCountryOption($countryCode);
+    if (!$option) {
+        return ['phone' => '', 'error' => 'Wybierz numer kierunkowy z listy.'];
+    }
+
+    $digits = preg_replace('/\D+/', '', $phoneNumber);
+    if ($digits === '') {
+        return ['phone' => '', 'error' => 'Podaj poprawny numer telefonu.'];
+    }
+
+    $length = strlen($digits);
+    if (!in_array($length, $option['lengths'], true)) {
+        $lengthsLabel = implode(' lub ', $option['lengths']);
+        return ['phone' => '', 'error' => "Numer telefonu musi mieć {$lengthsLabel} cyfr."];
+    }
+
+    return ['phone' => $countryCode . ' ' . $digits, 'error' => ''];
+}
+
+function getPhoneParts(string $phone): array
+{
+    $phone = trim($phone);
+    if ($phone === '') {
+        return ['country_code' => '', 'phone_number' => ''];
+    }
+
+    $normalized = preg_replace('/[\s-]+/', '', $phone);
+    foreach (getPhoneCountryOptions() as $option) {
+        $code = $option['code'];
+        $codeNoPlus = ltrim($code, '+');
+        if (str_starts_with($normalized, $code)) {
+            return [
+                'country_code' => $code,
+                'phone_number' => substr($normalized, strlen($code)),
+            ];
+        }
+        if (str_starts_with($normalized, $codeNoPlus)) {
+            return [
+                'country_code' => $code,
+                'phone_number' => substr($normalized, strlen($codeNoPlus)),
+            ];
+        }
+    }
+
+    return ['country_code' => '', 'phone_number' => $normalized];
+}
+
+function register($username, $email, $password, $countryCode, $phoneNumber) {
     global $pdo;
     // Validate inputs
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -111,15 +189,12 @@ function register($username, $email, $password, $phone) {
         return;
     }
 
-    $phone = trim((string)$phone);
-    if ($phone === '') {
-        setFlashMessage('error', 'Numer telefonu jest wymagany.');
+    $phoneData = buildPhoneNumber($countryCode, $phoneNumber);
+    if ($phoneData['error']) {
+        setFlashMessage('error', $phoneData['error']);
         return;
     }
-    if (!preg_match('/^\+?[0-9][0-9\s-]{6,20}$/', $phone)) {
-        setFlashMessage('error', 'Podaj poprawny numer telefonu.');
-        return;
-    }
+    $phone = $phoneData['phone'];
 
     ensureUserPhoneColumn();
 
