@@ -89,29 +89,6 @@ switch ($action) {
         }
         include 'views/add_offer.php';
         break;
-    case 'generate_offers':
-        if (!isLoggedIn()) {
-            setFlashMessage('error', 'Please log in to generate offers.');
-            header("Location: index.php?action=login");
-            exit;
-        }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $requestedCount = isset($_POST['offer_count']) ? (int)$_POST['offer_count'] : 0;
-            if ($requestedCount < 1 || $requestedCount > 50) {
-                setFlashMessage('error', 'Podaj liczbę ofert od 1 do 50.');
-                header("Location: index.php?action=dashboard");
-                exit;
-            }
-
-            $created = generateRandomOffers($requestedCount, (int)$_SESSION['user_id']);
-            if ($created > 0) {
-                setFlashMessage('success', "Dodano {$created} nowych ofert.");
-            } else {
-                setFlashMessage('error', 'Nie udało się dodać nowych ofert.');
-            }
-        }
-        header("Location: index.php?action=dashboard");
-        exit;
     case 'edit_offer':
         if (!isLoggedIn()) {
             setFlashMessage('error', 'Please log in to edit an offer.');
