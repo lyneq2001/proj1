@@ -216,7 +216,6 @@
                                 <button type="submit" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl hover:scale-105">
                                     Wyślij wiadomość
                                 </button>
-                                <span class="text-sm text-slate-500 font-medium">Otrzymasz powiadomienie, gdy druga strona odpowie.</span>
                             </div>
                         </form>
                     </section>
