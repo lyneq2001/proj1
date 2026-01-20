@@ -1,6 +1,5 @@
 <?php
 require_once 'config.php';
-require_once __DIR__ . '/notifications.php';
 
 function generateCsrfToken() {
     if (empty($_SESSION['csrf_token'])) {
@@ -46,15 +45,6 @@ function getOldInput($field) {
 
 function clearOldInput() {
     unset($_SESSION['old_input']);
-}
-
-function sendVerificationEmail($email, $token) {
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $link = "http://$host/index.php?action=verify&token=$token";
-    $subject = 'Potwierdzenie konta';
-    $message = "Kliknij link, aby aktywować konto: $link";
-
-    sendSystemEmail($email, $subject, $message, 'verification');
 }
 
 function emailDomainExists($email) {

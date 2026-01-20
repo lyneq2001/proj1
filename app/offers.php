@@ -1,7 +1,6 @@
 <?php
 require_once 'config.php';
 require_once 'auth.php';
-require_once __DIR__ . '/notifications.php';
 require_once __DIR__ . '/AI/UserPreferencesService.php';
 
 use App\AI\UserPreferencesService;
@@ -1704,7 +1703,7 @@ function sendMessage($receiver_id, $offerId, $message) {
     }
 
     // Verify offer exists and get owner details
-    $stmt = $pdo->prepare("SELECT o.user_id, o.title, u.email AS owner_email, u.username AS owner_username FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
+    $stmt = $pdo->prepare("SELECT o.user_id, o.title, u.username AS owner_username FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
     $stmt->execute([$offerId]);
     $offer = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$offer) {
@@ -1719,7 +1718,7 @@ function sendMessage($receiver_id, $offerId, $message) {
     }
 
     // Verify receiver exists
-    $stmt = $pdo->prepare("SELECT id, email, username FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE id = ?");
     $stmt->execute([$receiver_id]);
     $receiver = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$receiver) {
@@ -1730,18 +1729,6 @@ function sendMessage($receiver_id, $offerId, $message) {
     $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, offer_id, message, is_read) VALUES (?, ?, ?, ?, 0)");
     try {
         $stmt->execute([$_SESSION['user_id'], $receiver_id, $offerId, $message]);
-
-        if ((int)$offer['user_id'] === (int)$receiver_id && !empty($receiver['email'])) {
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $threadLink = "http://$host/index.php?action=dashboard&offer_id=$offerId&receiver_id=" . (int)$_SESSION['user_id'];
-            $emailSubject = 'Nowa wiadomość dotycząca Twojego ogłoszenia';
-            $emailBody = "Cześć " . ($offer['owner_username'] ?? '') . ",\n\n" .
-                "Otrzymałeś nową wiadomość w sprawie ogłoszenia: " . ($offer['title'] ?? 'Twoja oferta') . ".\n" .
-                "Treść wiadomości:\n" . trim($message) . "\n\n" .
-                "Odpowiedz bezpośrednio w panelu: $threadLink\n\n" .
-                "Pozdrawiamy,\nZespół Luxury Apartments";
-            sendSystemEmail($receiver['email'], $emailSubject, $emailBody, 'messages');
-        }
 
         setFlashMessage('success', 'Message sent successfully.');
         header("Location: index.php?action=dashboard");
@@ -1973,19 +1960,9 @@ function updateOfferStatus($offerId, $status, $adminId = null): bool
             return false;
         }
 
-        $ownerStmt = $pdo->prepare("SELECT u.email, u.username, o.title FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
+        $ownerStmt = $pdo->prepare("SELECT u.username, o.title FROM offers o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
         $ownerStmt->execute([$offerId]);
         $owner = $ownerStmt->fetch(PDO::FETCH_ASSOC);
-        if ($owner && !empty($owner['email'])) {
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $dashboardLink = "http://$host/index.php?action=dashboard&offer_id=" . (int)$offerId;
-            $subject = 'Aktualizacja statusu Twojego ogłoszenia';
-            $body = "Cześć " . ($owner['username'] ?? '') . ",\n\n" .
-                "Status ogłoszenia \"" . ($owner['title'] ?? 'Twoja oferta') . "\" został zmieniony na: " . strtoupper($status) . ".\n" .
-                "Sprawdź szczegóły i historię zmian w panelu: $dashboardLink\n\n" .
-                "Pozdrawiamy,\nZespół Luxury Apartments";
-            sendSystemEmail($owner['email'], $subject, $body, 'status_change');
-        }
 
         if ($adminId) {
             $historyStmt = $pdo->prepare("INSERT INTO offer_status_history (offer_id, status, changed_by, changed_at) VALUES (?, ?, ?, NOW())");
@@ -2153,23 +2130,6 @@ function updateReportStatus($reportId, $status, $adminId, string $note = ''): bo
         if ($stmt->rowCount() === 0) {
             setFlashMessage('error', 'Zgłoszenie nie istnieje lub nie zmieniono statusu.');
             return false;
-        }
-
-        if ($status === 'resolved') {
-            $detailsStmt = $pdo->prepare("SELECT r.reason, r.admin_note, u.email, u.username, o.title FROM reports r JOIN users u ON r.reporter_id = u.id JOIN offers o ON r.offer_id = o.id WHERE r.id = ?");
-            $detailsStmt->execute([$reportId]);
-            $details = $detailsStmt->fetch(PDO::FETCH_ASSOC);
-            if ($details && !empty($details['email'])) {
-                $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-                $link = "http://$host/index.php?action=dashboard";
-                $subject = 'Aktualizacja zgłoszenia oferty';
-                $body = "Cześć " . ($details['username'] ?? '') . ",\n\n" .
-                    "Twoje zgłoszenie dotyczące ogłoszenia \"" . ($details['title'] ?? '') . "\" zostało rozpatrzone.\n" .
-                    "Notatka administratora: " . ($details['admin_note'] ?? 'brak dodatkowych informacji') . "\n\n" .
-                    "Dziękujemy za dbanie o jakość ogłoszeń.\n\n" .
-                    "Panel użytkownika: $link";
-                sendSystemEmail($details['email'], $subject, $body, 'moderation');
-            }
         }
 
         setFlashMessage('success', 'Status zgłoszenia został zaktualizowany.');
