@@ -144,6 +144,47 @@ function ensureOfferStatusColumn(): void
     $checked = true;
 }
 
+function ensureOfferAmenityColumns(): void
+{
+    static $checked = false;
+    if ($checked) {
+        return;
+    }
+
+    global $pdo;
+    $columnMappings = [
+        ['old' => 'parking', 'new' => 'has_parking'],
+        ['old' => 'garage', 'new' => 'has_garage'],
+        ['old' => 'garden', 'new' => 'has_garden'],
+        ['old' => 'furnished', 'new' => 'is_furnished'],
+    ];
+
+    foreach ($columnMappings as $mapping) {
+        $newExists = columnExists('offers', $mapping['new']);
+        $oldExists = columnExists('offers', $mapping['old']);
+
+        if ($newExists) {
+            continue;
+        }
+
+        try {
+            if ($oldExists) {
+                $pdo->exec(
+                    "ALTER TABLE offers CHANGE COLUMN {$mapping['old']} {$mapping['new']} TINYINT(1) NOT NULL DEFAULT 0"
+                );
+            } else {
+                $pdo->exec(
+                    "ALTER TABLE offers ADD COLUMN {$mapping['new']} TINYINT(1) NOT NULL DEFAULT 0"
+                );
+            }
+        } catch (PDOException $e) {
+            // Column may already exist due to race condition.
+        }
+    }
+
+    $checked = true;
+}
+
 function ensureReportsTable(): void
 {
     static $initialized = false;
@@ -479,10 +520,10 @@ function filterOffersBySearchFilters(array $offers, array $filters): array
         if (!empty($filters['min_bathrooms']) && (int)($offer['bathrooms'] ?? 0) < (int)$filters['min_bathrooms']) {
             return false;
         }
-        if (isset($filters['parking']) && $filters['parking'] == 1 && empty($offer['parking'])) {
+        if (isset($filters['has_parking']) && $filters['has_parking'] == 1 && empty($offer['has_parking'])) {
             return false;
         }
-        if (isset($filters['furnished']) && $filters['furnished'] == 1 && empty($offer['furnished'])) {
+        if (isset($filters['is_furnished']) && $filters['is_furnished'] == 1 && empty($offer['is_furnished'])) {
             return false;
         }
 
@@ -490,7 +531,7 @@ function filterOffersBySearchFilters(array $offers, array $filters): array
     }));
 }
 
-function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
+function addOffer($title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $has_parking, $has_garage, $has_garden, $is_furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
     if (!isLoggedIn()) {
         setFlashMessage('error', 'Unauthorized.');
         return;
@@ -541,6 +582,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
     }
 
     ensureOfferStatusColumn();
+    ensureOfferAmenityColumns();
 
     // Geocode address using Nominatim
     $address = urlencode($city . ', ' . $street);
@@ -561,9 +603,9 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
     }
 
     // Insert offer
-    $stmt = $pdo->prepare("INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, parking, garage, garden, furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+    $stmt = $pdo->prepare("INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, has_parking, has_garage, has_garden, is_furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
     try {
-        $stmt->execute([$_SESSION['user_id'], $title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, 'active']);
+        $stmt->execute([$_SESSION['user_id'], $title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $has_parking, $has_garage, $has_garden, $is_furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, 'active']);
         $offer_id = $pdo->lastInsertId();
 
         // Handle image uploads
@@ -613,6 +655,7 @@ function addOffer($title, $description, $city, $street, $price, $size, $floor, $
 function searchOffers($filters, $page = 1, $perPage = 10) {
     global $pdo;
     ensureOfferViewsTable();
+    ensureOfferAmenityColumns();
     $offset = ($page - 1) * $perPage;
     $query = "SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image, COALESCE(v.views_last_24h, 0) AS views_last_24h";
     $countQuery = "SELECT COUNT(*)";
@@ -744,13 +787,13 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
         $params[] = $filters['min_bathrooms'];
         $countParams[] = $filters['min_bathrooms'];
     }
-    if (isset($filters['parking']) && $filters['parking'] == 1) {
-        $query .= " AND o.parking = 1";
-        $countQuery .= " AND o.parking = 1";
+    if (isset($filters['has_parking']) && $filters['has_parking'] == 1) {
+        $query .= " AND o.has_parking = 1";
+        $countQuery .= " AND o.has_parking = 1";
     }
-    if (isset($filters['furnished']) && $filters['furnished'] == 1) {
-        $query .= " AND o.furnished = 1";
-        $countQuery .= " AND o.furnished = 1";
+    if (isset($filters['is_furnished']) && $filters['is_furnished'] == 1) {
+        $query .= " AND o.is_furnished = 1";
+        $countQuery .= " AND o.is_furnished = 1";
     }
 
     // Handle sorting
@@ -814,6 +857,7 @@ function searchOffers($filters, $page = 1, $perPage = 10) {
 function searchOffersMapData($filters): array
 {
     global $pdo;
+    ensureOfferAmenityColumns();
 
     $query = "SELECT o.id, o.title, o.lat, o.lng, o.price, o.city, o.street FROM offers o WHERE 1=1";
     $params = [];
@@ -891,11 +935,11 @@ function searchOffersMapData($filters): array
         $query .= " AND o.bathrooms >= ?";
         $params[] = $filters['min_bathrooms'];
     }
-    if (isset($filters['parking']) && $filters['parking'] == 1) {
-        $query .= " AND o.parking = 1";
+    if (isset($filters['has_parking']) && $filters['has_parking'] == 1) {
+        $query .= " AND o.has_parking = 1";
     }
-    if (isset($filters['furnished']) && $filters['furnished'] == 1) {
-        $query .= " AND o.furnished = 1";
+    if (isset($filters['is_furnished']) && $filters['is_furnished'] == 1) {
+        $query .= " AND o.is_furnished = 1";
     }
 
     try {
@@ -961,6 +1005,7 @@ function searchOffersMapData($filters): array
 function getUserOffers($userId, $page = 1, $perPage = 10) {
     global $pdo;
     ensureOfferViewsTable();
+    ensureOfferAmenityColumns();
     $offset = ($page - 1) * $perPage;
     $stmt = $pdo->prepare("SELECT o.*, COALESCE(img.primary_image, img.first_image) AS primary_image, COALESCE(v.views_last_24h, 0) AS views_last_24h
                            FROM offers o
@@ -1050,6 +1095,7 @@ function getOfferDetails($offerId) {
     global $pdo;
     ensureOfferViewsTable();
     ensureUserPhoneColumn();
+    ensureOfferAmenityColumns();
     $stmt = $pdo->prepare("
         SELECT o.*, u.username AS owner_username, u.phone AS owner_phone, COALESCE(v.views_last_24h, 0) AS views_last_24h
         FROM offers o
@@ -1095,6 +1141,7 @@ function generateRandomOffers(int $count, int $userId): int
     }
 
     ensureOfferStatusColumn();
+    ensureOfferAmenityColumns();
 
     $cities = [
         [
@@ -1155,7 +1202,7 @@ function generateRandomOffers(int $count, int $userId): int
     ];
 
     $stmt = $pdo->prepare(
-        "INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, parking, garage, garden, furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at)
+        "INSERT INTO offers (user_id, title, description, city, street, lat, lng, price, size, floor, has_balcony, has_elevator, building_type, rooms, bathrooms, has_parking, has_garage, has_garden, is_furnished, pets_allowed, heating_type, year_built, condition_type, available_from, status, status_updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())"
     );
 
@@ -1201,10 +1248,10 @@ function generateRandomOffers(int $count, int $userId): int
         $bathrooms = $rooms > 3 ? random_int(2, 3) : 1;
         $hasElevator = $buildingType !== 'house' && $floor >= 3 ? 1 : (random_int(0, 100) > 60 ? 1 : 0);
         $hasBalcony = $buildingType !== 'house' ? (random_int(0, 100) > 30 ? 1 : 0) : 0;
-        $parking = random_int(0, 100) > 50 ? 1 : 0;
-        $garage = $buildingType === 'house' ? (random_int(0, 100) > 40 ? 1 : 0) : (random_int(0, 100) > 80 ? 1 : 0);
-        $garden = $buildingType === 'house' ? (random_int(0, 100) > 20 ? 1 : 0) : (random_int(0, 100) > 90 ? 1 : 0);
-        $furnished = random_int(0, 100) > 45 ? 1 : 0;
+        $hasParking = random_int(0, 100) > 50 ? 1 : 0;
+        $hasGarage = $buildingType === 'house' ? (random_int(0, 100) > 40 ? 1 : 0) : (random_int(0, 100) > 80 ? 1 : 0);
+        $hasGarden = $buildingType === 'house' ? (random_int(0, 100) > 20 ? 1 : 0) : (random_int(0, 100) > 90 ? 1 : 0);
+        $isFurnished = random_int(0, 100) > 45 ? 1 : 0;
         $petsAllowed = random_int(0, 100) > 55 ? 1 : 0;
         $yearBuilt = random_int(1975, 2024);
         $availableDays = random_int(0, 60);
@@ -1241,7 +1288,7 @@ function generateRandomOffers(int $count, int $userId): int
             $highlight,
             $hasBalcony ? 'balkon,' : 'brak balkonu,',
             $hasElevator ? 'winda,' : 'bez windy,',
-            $parking ? 'miejsce parkingowe' : 'parking na ulicy'
+            $hasParking ? 'miejsce parkingowe' : 'parking na ulicy'
         );
 
         try {
@@ -1261,10 +1308,10 @@ function generateRandomOffers(int $count, int $userId): int
                 $buildingType,
                 $rooms,
                 $bathrooms,
-                $parking,
-                $garage,
-                $garden,
-                $furnished,
+                $hasParking,
+                $hasGarage,
+                $hasGarden,
+                $isFurnished,
                 $petsAllowed,
                 $heatingType,
                 $yearBuilt,
@@ -1402,7 +1449,7 @@ function getAiRecommendedOffers(int $userId, int $currentOfferId, int $limit = 3
     return array_merge($offers, $fallbackOffers);
 }
 
-function editOffer($offerId, $title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
+function editOffer($offerId, $title, $description, $city, $street, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $has_parking, $has_garage, $has_garden, $is_furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $images, $primary_image_index) {
     if (!isLoggedIn()) {
         setFlashMessage('error', 'Unauthorized.');
         return;
@@ -1455,6 +1502,8 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
         return;
     }
 
+    ensureOfferStatusColumn();
+    ensureOfferAmenityColumns();
     $isAdmin = isAdmin();
     if ($isAdmin) {
         $stmt = $pdo->prepare("SELECT user_id, city, street, lat, lng FROM offers WHERE id = ?");
@@ -1500,12 +1549,12 @@ function editOffer($offerId, $title, $description, $city, $street, $price, $size
 
     // Update offer
     if ($isAdmin) {
-        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, parking = ?, garage = ?, garden = ?, furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, has_parking = ?, has_garage = ?, has_garden = ?, is_furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ?");
     } else {
-        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, parking = ?, garage = ?, garden = ?, furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ? AND user_id = ?");
+        $stmt = $pdo->prepare("UPDATE offers SET title = ?, description = ?, city = ?, street = ?, lat = ?, lng = ?, price = ?, size = ?, floor = ?, has_balcony = ?, has_elevator = ?, building_type = ?, rooms = ?, bathrooms = ?, has_parking = ?, has_garage = ?, has_garden = ?, is_furnished = ?, pets_allowed = ?, heating_type = ?, year_built = ?, condition_type = ?, available_from = ? WHERE id = ? AND user_id = ?");
     }
     try {
-        $params = [$title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $parking, $garage, $garden, $furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $offerId];
+        $params = [$title, $description, $city, $street, $lat, $lng, $price, $size, $floor, $has_balcony, $has_elevator, $building_type, $rooms, $bathrooms, $has_parking, $has_garage, $has_garden, $is_furnished, $pets_allowed, $heating_type, $year_built, $condition_type, $available_from, $offerId];
         if (!$isAdmin) {
             $params[] = $_SESSION['user_id'];
         }

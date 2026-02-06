@@ -347,12 +347,12 @@
                                         <span class="ml-3 text-slate-700 text-sm font-semibold">Winda</span>
                                     </label>
                                     <label class="checkbox-label flex items-center p-3 cursor-pointer">
-                                        <input type="checkbox" name="parking" value="1" <?php echo isset($_GET['parking']) ? 'checked' : ''; ?> 
+                                        <input type="checkbox" name="has_parking" value="1" <?php echo isset($_GET['has_parking']) ? 'checked' : ''; ?> 
                                                class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                         <span class="ml-3 text-slate-700 text-sm font-semibold">Parking</span>
                                     </label>
                                     <label class="checkbox-label flex items-center p-3 cursor-pointer">
-                                        <input type="checkbox" name="furnished" value="1" <?php echo isset($_GET['furnished']) ? 'checked' : ''; ?> 
+                                        <input type="checkbox" name="is_furnished" value="1" <?php echo isset($_GET['is_furnished']) ? 'checked' : ''; ?> 
                                                class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                         <span class="ml-3 text-slate-700 text-sm font-semibold">Umeblowane</span>
                                     </label>

@@ -522,7 +522,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             <span class="font-medium">Winda</span>
                         </div>
                     <?php endif; ?>
-                    <?php if ($offer['parking']): ?>
+                    <?php if ($offer['has_parking']): ?>
                         <div class="amenity-badge flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
@@ -530,7 +530,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             <span class="font-medium">Parking</span>
                         </div>
                     <?php endif; ?>
-                    <?php if ($offer['garage']): ?>
+                    <?php if ($offer['has_garage']): ?>
                         <div class="amenity-badge flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -538,7 +538,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             <span class="font-medium">Garaż</span>
                         </div>
                     <?php endif; ?>
-                    <?php if ($offer['garden']): ?>
+                    <?php if ($offer['has_garden']): ?>
                         <div class="amenity-badge flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -546,7 +546,7 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'offers.php';
                             <span class="font-medium">Ogród</span>
                         </div>
                     <?php endif; ?>
-                    <?php if ($offer['furnished']): ?>
+                    <?php if ($offer['is_furnished']): ?>
                         <div class="amenity-badge flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
