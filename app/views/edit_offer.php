@@ -325,25 +325,25 @@
                             </label>
 
                             <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                <input type="checkbox" id="parking" name="parking" value="1" <?php echo $offer['parking'] ? 'checked' : ''; ?>
+                                <input type="checkbox" id="has_parking" name="has_parking" value="1" <?php echo $offer['has_parking'] ? 'checked' : ''; ?>
                                        class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                 <span class="ml-3 text-slate-700 text-sm font-semibold">Parking</span>
                             </label>
 
                             <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                <input type="checkbox" id="garage" name="garage" value="1" <?php echo $offer['garage'] ? 'checked' : ''; ?>
+                                <input type="checkbox" id="has_garage" name="has_garage" value="1" <?php echo $offer['has_garage'] ? 'checked' : ''; ?>
                                        class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                 <span class="ml-3 text-slate-700 text-sm font-semibold">Garaż</span>
                             </label>
 
                             <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                <input type="checkbox" id="garden" name="garden" value="1" <?php echo $offer['garden'] ? 'checked' : ''; ?>
+                                <input type="checkbox" id="has_garden" name="has_garden" value="1" <?php echo $offer['has_garden'] ? 'checked' : ''; ?>
                                        class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                 <span class="ml-3 text-slate-700 text-sm font-semibold">Ogród</span>
                             </label>
 
                             <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                <input type="checkbox" id="furnished" name="furnished" value="1" <?php echo $offer['furnished'] ? 'checked' : ''; ?>
+                                <input type="checkbox" id="is_furnished" name="is_furnished" value="1" <?php echo $offer['is_furnished'] ? 'checked' : ''; ?>
                                        class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded">
                                 <span class="ml-3 text-slate-700 text-sm font-semibold">Umeblowane</span>
                             </label>

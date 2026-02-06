@@ -382,19 +382,19 @@
                                     <span class="ml-3 text-slate-700 text-sm font-semibold">Winda</span>
                                 </label>
                                 <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                    <input type="checkbox" name="parking" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('parking') ? 'checked' : ''; ?> >
+                                    <input type="checkbox" name="has_parking" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('has_parking') ? 'checked' : ''; ?> >
                                     <span class="ml-3 text-slate-700 text-sm font-semibold">Parking</span>
                                 </label>
                                 <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                    <input type="checkbox" name="garage" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('garage') ? 'checked' : ''; ?> >
+                                    <input type="checkbox" name="has_garage" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('has_garage') ? 'checked' : ''; ?> >
                                     <span class="ml-3 text-slate-700 text-sm font-semibold">Garaż</span>
                                 </label>
                                 <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                    <input type="checkbox" name="garden" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('garden') ? 'checked' : ''; ?> >
+                                    <input type="checkbox" name="has_garden" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('has_garden') ? 'checked' : ''; ?> >
                                     <span class="ml-3 text-slate-700 text-sm font-semibold">Ogród</span>
                                 </label>
                                 <label class="checkbox-label flex items-center p-4 cursor-pointer">
-                                    <input type="checkbox" name="furnished" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('furnished') ? 'checked' : ''; ?> >
+                                    <input type="checkbox" name="is_furnished" value="1" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-slate-300 rounded" <?php echo getOldInput('is_furnished') ? 'checked' : ''; ?> >
                                     <span class="ml-3 text-slate-700 text-sm font-semibold">Umeblowane</span>
                                 </label>
                                 <label class="checkbox-label flex items-center p-4 cursor-pointer">
