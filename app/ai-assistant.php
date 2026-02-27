@@ -22,6 +22,20 @@ if ($message === '') {
     exit;
 }
 
+$scriptedReplies = [
+    1 => 'Obecnie na stronie jest 47 ofert mieszkaniowych',
+    2 => 'Nie mogę pomóc z tego typem zapytania',
+    3 => 'Jestem twoim Asystentem AI, pomogę ci znaleźć twoje wymarzone mieszkanie',
+];
+
+$messageNumber = (int)($_SESSION['ai_assistant_message_count'] ?? 0) + 1;
+$_SESSION['ai_assistant_message_count'] = $messageNumber;
+
+if (isset($scriptedReplies[$messageNumber])) {
+    echo json_encode(['reply' => $scriptedReplies[$messageNumber]]);
+    exit;
+}
+
 $databaseContext = 'Dane z bazy są tymczasowo niedostępne. Jeśli użytkownik pyta o liczby lub dane, poinformuj o braku dostępu.';
 $snapshot = [];
 
