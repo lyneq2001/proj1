@@ -28,7 +28,7 @@ $scriptedReplies = [
     3 => 'Jestem twoim Asystentem AI, pomogę ci znaleźć twoje wymarzone mieszkanie',
 ];
 
-$messageNumber = ((int)($_SESSION['ai_assistant_message_count'] ?? 0) % 3) + 1;
+$messageNumber = (int)($_SESSION['ai_assistant_message_count'] ?? 0) + 1;
 $_SESSION['ai_assistant_message_count'] = $messageNumber;
 
 if (isset($scriptedReplies[$messageNumber])) {
